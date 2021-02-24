@@ -4,7 +4,7 @@
 #include <stdio.h>
 
 // 给出大小为 n 的数组 a 的单峰的下标位置。
-int ternary_search_peak(int a[], int n) {
+int TernarySearchPeak(int a[], int n) {
     int low = 0;
     int high = n - 1;
     int delta = 0;
