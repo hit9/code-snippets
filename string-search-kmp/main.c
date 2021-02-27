@@ -1,7 +1,9 @@
 // 字符串搜索 KMP 算法
 // https://writings.sh/post/algorithm-string-searching-kmp
 
-#include <stdio.h>  // for printf
+#include <assert.h>
+#include <stdio.h>   // for printf
+#include <string.h>  // for strlen
 
 // ComputeNext 为长度为 m 的模式串 p 计算 next 数组.
 // next 数组的含义：
@@ -70,13 +72,14 @@ int KMP(char *s, int n, char *p, int m) {
 }
 
 int main(void) {
-    char *s = "ABCDABCABCABABCABCDA";  // length => 20
-    char *p = "ABCABCD";               // length => 7
-    char *t = "ABCABCF";               // length => 7
+    char *s = "ABCDABCABCABABCABCDA";
+    char *p = "ABCABCD";
+    char *p1 = "ABCABCF";
+    char *p2 = "ABCDA";
+    char *p3 = "BABC";
 
-    int pos_of_p = KMP(s, 20, p, 7);
-    int pos_of_t = KMP(s, 20, t, 7);
-
-    printf("position of p in s: %d\n", pos_of_p);  // Expect: 12
-    printf("position of t in s: %d\n", pos_of_t);  // Expect: -1
+    assert(KMP(s, strlen(s), p, strlen(p)) == 12);
+    assert(KMP(s, strlen(s), p1, strlen(p1)) == -1);
+    assert(KMP(s, strlen(s), p2, strlen(p2)) == 0);
+    assert(KMP(s, strlen(s), p3, strlen(p3)) == 11);
 }
