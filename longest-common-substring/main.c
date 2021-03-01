@@ -1,4 +1,4 @@
-// 最长公共子串
+// 最长公共子串 - 动态规划方法
 // https://writings.sh/post/algorithm-longest-common-substring-and-subsequence
 
 #include <assert.h>
