@@ -14,8 +14,8 @@ struct Result {
 // 比如 1 4 7
 //      2 5 8
 //      3 6 9
-struct Result MatrixSearch(int target, int rows, int cols,
-                           int matrix[rows][cols]) {
+struct Result MatrixSearch(int rows, int cols, int matrix[rows][cols],
+                           int target) {
     // 从右上角开始探索
     int row = 0;
     int col = cols - 1;
@@ -39,6 +39,6 @@ int main(void) {
         {3, 6, 9, 12},
     };
 
-    struct Result result = MatrixSearch(9, 3, 4, matrix);
+    struct Result result = MatrixSearch(3, 4, matrix, 9);
     assert(result.row == 2 && result.col == 2);
 }
