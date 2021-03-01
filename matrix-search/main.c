@@ -16,6 +16,9 @@ struct Result {
 //      3 6 9
 struct Result MatrixSearch(int rows, int cols, int matrix[rows][cols],
                            int target) {
+    struct Result not_found = {-1, -1};
+    if (rows <= 0 || cols <= 0) return not_found;
+
     // 从右上角开始探索
     int row = 0;
     int col = cols - 1;
@@ -29,7 +32,7 @@ struct Result MatrixSearch(int rows, int cols, int matrix[rows][cols],
             return (struct Result){row, col};
         }
     }
-    return (struct Result){-1, -1};
+    return not_found;
 }
 
 int main(void) {
