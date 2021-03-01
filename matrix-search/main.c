@@ -20,7 +20,7 @@ struct Result MatrixSearch(int rows, int cols, int matrix[rows][cols],
     int row = 0;
     int col = cols - 1;
 
-    while (row < rows && col > 0) {
+    while (row < rows && col >= 0) {
         if (matrix[row][col] < target) {
             row++;
         } else if (matrix[row][col] > target) {
