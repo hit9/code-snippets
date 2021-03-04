@@ -5,26 +5,51 @@
 #include <stdio.h>   // for printf
 #include <string.h>  // for strlen
 
-// ComputeNext 为长度为 m 的模式串 p 计算 next 数组.
+// ComputeNext 为长度为 m 的搜索串 p 计算 next 数组.
 // next 数组的含义：
-// 取字符串 p 的位置 j 之前的前缀字符串 p' ，其头尾的最大公共长度即 next[j]
-// 此处采用递推方法实现
+// 取字符串 p 的位置 j 之前的前缀字符串 p'，其头尾的最大公共长度即 next[j].
+// 在 KMP 中，next 数组的值的应用为，在 j 处失配时的跳转位置是 next[j].
+// 此处采用归纳方法实现
 void ComputeNext(char *p, int m, int next[]) {
+    // 初始为 0
     next[0] = 0;
     if (m <= 1) return;
 
     // p' 是单个字符时，认为它无公共头尾
     next[1] = 0;
 
-    // j 是 next 数组的第 j 项
-    // p' 是字符串 p 的长度为 j 的子串
     int j = 2;
 
     while (j < m) {
-        if (p[j - 1] == p[next[j - 1]]) {
-            next[j] = next[j - 1] + 1;
+        // last 是上一次计算得出的 next 值
+        int last = next[j - 1];
+
+        // ch 是归纳本次结果时新增的尾巴字符
+        char ch = p[j - 1];
+
+        if (ch == p[last]) {
+            // 当 ch 和原公共缀后面的一个字符相等
+            // 说明新增字符扩展了公共缀，则长度加一
+            next[j] = last + 1;
         } else {
-            next[j] = 0;
+            // 否则，观察新增字符 ch 是否和原公共后缀的一部分形成新的公共缀
+            // 向前找出第一次匹配的位置 k
+            int k = last;
+
+            while (ch != p[k] && k != 0) {
+                // 再次应用 KMP 的对齐原则：
+                // 失配处跳转 k -> next[k]
+                k = next[k];
+            }
+
+            if (k == 0 && p[0] != ch) {
+                // 未找到任何公共缀
+                next[j] = 0;
+            } else {
+                // ch 和某子串的尾巴匹配，形成新的公共缀
+                // k 是匹配的尾巴坐标，因此新公共缀长度是 k + 1
+                next[j] = k + 1;
+            }
         }
 
         j++;
@@ -78,8 +103,13 @@ int main(void) {
     char *p2 = "ABCDA";
     char *p3 = "BABC";
 
+    char *s1 = "aabaaabaaac";
+    char *p4 = "aabaaac";
+
     assert(KMP(s, strlen(s), p, strlen(p)) == 12);
     assert(KMP(s, strlen(s), p1, strlen(p1)) == -1);
     assert(KMP(s, strlen(s), p2, strlen(p2)) == 0);
     assert(KMP(s, strlen(s), p3, strlen(p3)) == 11);
+    assert(KMP(s1, strlen(s1), p4, strlen(p4)) == 4);
+    return 0;
 }
