@@ -13,8 +13,11 @@ int LongestCommonSubstring(char *a, int a_length, char *b, int b_length) {
 
     for (int i = 0; i < a_length; i++) {
         for (int j = 0; j < b_length; j++) {
-            if (a[i] == b[j] && i >= 1 && j >= 1) {
-                table[i][j] = table[i - 1][j - 1] + 1;
+            if (a[i] == b[j]) {
+                if (i >= 1 && j >= 1)
+                    table[i][j] = table[i - 1][j - 1] + 1;
+                else
+                    table[i][j] = 1;
             } else {
                 table[i][j] = 0;
             }
@@ -40,4 +43,12 @@ int main(void) {
     char *a3 = "abcbcdefg";
     char *b3 = "gbcbcde";
     assert(LongestCommonSubstring(a3, strlen(a3), b3, strlen(b3)) == 6);
+
+    char *a4 = "abcbcde";
+    char *b4 = "bbcbce";
+    assert(LongestCommonSubstring(a4, strlen(a4), b4, strlen(b4)) == 4);
+
+    char *a5 = "abc";
+    char *b5 = "aef";
+    assert(LongestCommonSubstring(a5, strlen(a5), b5, strlen(b5)) == 1);
 }
