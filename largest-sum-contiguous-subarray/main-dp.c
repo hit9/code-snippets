@@ -23,7 +23,24 @@ int LargestSumContiguousSubarray(int nums[], int length) {
     return max;
 }
 
+int LargestSumContiguousSubarraySpaceO1(int nums[], int length) {
+    if (length <= 0) return 0;
+
+    int dp = nums[0];
+    int max = dp;
+
+    for (int i = 1; i < length; i++) {
+        if (dp > 0)
+            dp += nums[i];
+        else
+            dp = nums[i];
+
+        if (max < dp) max = dp;
+    }
+    return max;
+}
+
 int main(void) {
     int nums1[] = {-2, 1, -3, 4, -1, 2, 1, -5, 4};
-    assert(LargestSumContiguousSubarray(nums1, 9) == 6);
+    assert(LargestSumContiguousSubarraySpaceO1(nums1, 9) == 6);
 }
