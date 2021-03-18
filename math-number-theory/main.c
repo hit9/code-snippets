@@ -2,8 +2,8 @@
 // https://writings.sh/post/algorithm-number-theory
 
 #include <assert.h>
-#include <stdbool.h>  // for printf
-#include <stdio.h>    // for bool
+#include <stdbool.h>  // for bool
+#include <stdio.h>    // for printf
 
 // 辗转相除法 - 最大公约数
 int Gcd(int a, int b) {
