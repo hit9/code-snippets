@@ -55,7 +55,6 @@ int Manacher(char *s, int n) {
             p[i] = 0;
         }
 
-        // 从 i 左右两边扩展
         int left = i - p[i] - 1;
         int right = i + p[i] + 1;
 
