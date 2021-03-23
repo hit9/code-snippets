@@ -21,6 +21,10 @@ algorithms
 * [字符串匹配 - Boyer Moore 算法](https://writings.sh/post/algorithm-string-searching-boyer-moore)
 * [最长回文串 - Manacher 算法](https://writings.sh/post/algorithm-longest-palindromic-substring#manacher-%E6%96%B9%E6%B3%95)
 
+数据结构：
+
+* [堆](https://writings.sh/post/data-structure-heap-and-common-problems)
+
 数学类：
 
 * [加减乘除四则运算](https://writings.sh/post/algorithm-basic-math-computations)
