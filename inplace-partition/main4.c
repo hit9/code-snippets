@@ -1,3 +1,6 @@
+// 原地分割数组（三份）
+// https://writings.sh/post/algorithm-inplace-operations-on-array
+
 #include <stdio.h>
 
 void Swap(int arr[], int i, int j) {

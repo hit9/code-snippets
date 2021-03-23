@@ -1,3 +1,5 @@
+// 原地分割数组（两份）
+// https://writings.sh/post/algorithm-inplace-operations-on-array
 
 #include <stdio.h>
 

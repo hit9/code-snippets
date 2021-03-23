@@ -4,19 +4,30 @@
 #include <stdio.h>
 
 // 从长度为 n 的数组中原地删除给定元素 k
-// 不断把尾巴元素拣过来覆盖 k 元素
+// 从左到右，遇到 k 就从右边找一个非 k 的元素拣过来覆盖
 int RemoveInplace(int arr[], int n, int k) {
-    int i = 0;
+    int left = 0;
+    int right = n - 1;
 
-    while (i < n) {
-        if (arr[i] == k) {
-            arr[i] = arr[n - 1];
-            n--;
-        } else {
-            i++;
+    while (left <= right) {
+        // 右侧先准备好，找到一个非 k 的位置
+        if (arr[right] == k) {
+            right--;
+            continue;
         }
+
+        // 然后 left 才行动
+        if (arr[left] == k) {
+            // 遇到 k ，把右侧的非 k 元素拣过来覆盖
+            arr[left] = arr[right];
+            // 这个 right 已经用过，不再利用
+            right--;
+        }
+
+        left++;
     }
-    return n;
+
+    return left;
 }
 
 int main(void) {
