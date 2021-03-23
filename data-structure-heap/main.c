@@ -17,7 +17,6 @@
 ///////////
 
 void Swap(int a[], int i, int j);  // 交换
-
 void Up(int a[], int j);           // 上浮
 void Down(int a[], int n, int i);  // 下沉
 void Build(int a[], int n);        // 堆化
@@ -30,7 +29,7 @@ void Fix(int a[], int i);          // 修整
 // 实现
 ///////////
 
-// 从位置 j 开始上浮堆
+// 从位置 j 开始上浮堆 O(logn)
 void Up(int a[], int j) {
     while (j > 0) {
         // 父节点
@@ -41,7 +40,7 @@ void Up(int a[], int j) {
     }
 }
 
-// 从位置 i 开始下沉大小为 n 的堆
+// 从位置 i 开始下沉大小为 n 的堆 O(logn)
 void Down(int a[], int n, int i) {
     while (1) {
         // 左孩子 j1
@@ -61,7 +60,7 @@ void Down(int a[], int n, int i) {
     }
 }
 
-// 将大小为 n 的数组 a 堆化
+// 将大小为 n 的数组 a 堆化  O(n)
 void Build(int a[], int n) {
     // 从最后一层父节点，不断下沉堆
     for (int i = (n - 1) / 2; i >= 0; i--) {
@@ -69,11 +68,12 @@ void Build(int a[], int n) {
     }
 }
 
-// 获取堆顶元素
+// 获取堆顶元素  O(1)
 int Top(int a[]) { return a[0]; }
 
 // 向大小为 n 的堆 a 中添加元素 v
 // 返回添加后的数组大小
+// O(logn)
 int Push(int a[], int n, int v) {
     a[n] = v;
     Up(a, n);  // 上浮
@@ -83,6 +83,7 @@ int Push(int a[], int n, int v) {
 // 从大小为 n 的堆 a 中移除堆顶元素
 // 返回移除的元素
 // 如果堆空，返回 -1
+// O(logn)
 int Pop(int a[], int n) {
     if (n <= 0) return -1;
     n--;
