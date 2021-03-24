@@ -12,6 +12,7 @@ algorithms
 数组：
 
 * [原地删除](https://writings.sh/post/algorithm-inplace-operations-on-array#%E5%8E%9F%E5%9C%B0%E5%88%A0%E9%99%A4%E6%95%B0%E7%BB%84%E5%85%83%E7%B4%A0)
+* [原地移动零](https://writings.sh/post/algorithm-inplace-operations-on-array#%E5%8E%9F%E5%9C%B0%E5%88%A0%E9%99%A4%E6%95%B0%E7%BB%84%E5%85%83%E7%B4%A0)
 * [原地分割](https://writings.sh/post/algorithm-inplace-operations-on-array#%E5%8E%9F%E5%9C%B0%E5%88%86%E5%89%B2%E6%95%B0%E7%BB%84-%E4%B8%A4%E4%BB%BD)
 * [原地分割三份 - 荷兰国旗问题](https://writings.sh/post/algorithm-inplace-operations-on-array#%E5%8E%9F%E5%9C%B0%E5%88%86%E5%89%B2%E6%95%B0%E7%BB%84-%E4%B8%89%E4%BB%BD)
 
