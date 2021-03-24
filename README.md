@@ -27,7 +27,7 @@ algorithms
 
 排序：
 
-* [堆排序](http://localhost:4000/post/data-structure-heap-and-common-problems#%E5%A0%86%E6%8E%92%E5%BA%8F)
+* [堆排序](http://writings.sh/post/data-structure-heap-and-common-problems#%E5%A0%86%E6%8E%92%E5%BA%8F)
 
 数学类：
 
