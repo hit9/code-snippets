@@ -16,13 +16,14 @@
 // 声明
 ///////////
 
-void Swap(int a[], int i, int j);  // 交换
-void Up(int a[], int j);           // 上浮
-void Down(int a[], int n, int i);  // 下沉
-void Build(int a[], int n);        // 堆化
-int Push(int a[], int n, int v);   // 插入
-int Pop(int a[], int n);           // 删除
-int Top(int a[]);                  // 堆顶
+void Swap(int a[], int i, int j);    // 交换
+void Up(int a[], int j);             // 上浮
+void Down(int a[], int n, int i);    // 下沉
+void Build(int a[], int n);          // 堆化
+int Push(int a[], int n, int v);     // 插入
+int Pop(int a[], int n);             // 删除
+int Top(int a[]);                    // 堆顶
+int Replace(int a[], int n, int v);  // 替换
 
 ///////////
 // 实现
@@ -89,6 +90,18 @@ int Pop(int a[], int n) {
     Swap(a, 0, n);
     Down(a, n, 0);  // 下沉
     return a[n];
+}
+
+// 替换堆顶元素为 v
+// 返回原堆顶元素
+// 如果堆空，返回 -1
+// 相对 Pop + Push 更快一些
+int Replace(int a[], int n, int v) {
+    if (n <= 0) return -1;
+    int top = a[0];
+    a[0] = v;
+    Down(a, n, 0);
+    return top;
 }
 
 // Swap 交换数组 a 的位置 i 和 j
