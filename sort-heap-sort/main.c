@@ -13,12 +13,10 @@ int HeapPop(int a[], int n);
 // 建立最大堆，弹出头，放到尾
 void HeapSort(int a[], int n) {
     HeapBuild(a, n);
-    int n1 = n;
-    while (n1 > 0) {
+    while (n > 0) {
         // 取出顶元素
-        int v = HeapPop(a, n1);
-        n1--;
-        a[n1] = v;  // 放到最后面
+        int v = HeapPop(a, n--);
+        a[n] = v;  // 放到最后面
     }
 }
 
