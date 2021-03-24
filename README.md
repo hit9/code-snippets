@@ -29,8 +29,8 @@ algorithms
 排序：
 
 * [堆排序](http://writings.sh/post/data-structure-heap-and-common-problems#%E5%A0%86%E6%8E%92%E5%BA%8F)
-* [快速排序]
-* [归并排序]
+* [快速排序](https://writings.sh/post/quick-sort-and-merge-sort#%E5%BF%AB%E9%80%9F%E6%8E%92%E5%BA%8F)
+* [归并排序](https://writings.sh/post/quick-sort-and-merge-sort#%E5%BD%92%E5%B9%B6%E6%8E%92%E5%BA%8F)
 
 数学类：
 
