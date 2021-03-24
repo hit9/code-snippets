@@ -33,15 +33,15 @@ int Partition(int a[], int start, int end) {
     return i;
 }
 
-void QuickTopK(int a[], int start, int end, int k) {
+void QuickSelect(int a[], int start, int end, int k) {
     if (start >= end) return;
 
     int m = Partition(a, start, end);
 
     if (k < m)
-        QuickTopK(a, start, m - 1, k);
+        QuickSelect(a, start, m - 1, k);
     else if (k > m)
-        QuickTopK(a, m, end, k - m);
+        QuickSelect(a, m, end, k - m);
     else
         return;
 }
@@ -49,7 +49,7 @@ void QuickTopK(int a[], int start, int end, int k) {
 // 采用不断分区的办法，找出给定数组中的最大的 k 个数
 // 输入原大小为 n 的数组 a
 // 函数会原地把 k 大数放到 a 的前 k 个
-void TopK(int a[], int n, int k) { return QuickTopK(a, 0, n - 1, k); }
+void TopK(int a[], int n, int k) { return QuickSelect(a, 0, n - 1, k); }
 
 int main(void) {
     int n = 8;
