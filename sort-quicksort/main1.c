@@ -1,4 +1,4 @@
-// 快速排序 - 递归版本
+// 快速排序 - 循环版本
 
 #include <stdio.h>  // for printf
 
@@ -32,17 +32,38 @@ int Partition(int a[], int start, int end) {
     return i;
 }
 
-// 快速排序 - 递归实现
-void QuickSort(int a[], int start, int end) {
-    if (start >= end) return;
-    int p = Partition(a, start, end);
-    QuickSort(a, start, p - 1);
-    QuickSort(a, p, end);
+// 快速排序 - 循环版本
+void QuickSort(int a[], int n) {
+    // 保存 start, end
+    int stack[2 * n];
+    int top = 0;  // 栈顶
+
+    // 初始元素入栈
+    stack[top++] = 0;
+    stack[top++] = n - 1;
+
+    while (top != 0) {
+        // 出栈
+        int end = stack[--top];
+        int start = stack[--top];
+
+        if (start >= end) continue;
+
+        // 分割
+        int p = Partition(a, start, end);
+
+        // 左边、右边分别入栈
+        stack[top++] = start;
+        stack[top++] = p - 1;
+
+        stack[top++] = p;
+        stack[top++] = end;
+    }
 }
 
 int main(void) {
     int n = 9;
     int a[] = {4, 1, 3, 9, 7, 2, 6, 8, 5};
-    QuickSort(a, 0, n - 1);
+    QuickSort(a, n);
     for (int i = 0; i < n; i++) printf("%d ", a[i]);
 }
