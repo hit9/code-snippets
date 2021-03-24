@@ -27,6 +27,12 @@ void TopK(int a[], int n, int k) {
     }
 }
 
+// 最终的堆顶元素即第 k 大的元素
+int Kth(int a[], int n, int k) {
+    TopK(a, n, k);
+    return a[0];
+}
+
 int main(void) {
     int n = 8;
     int k = 3;
@@ -37,6 +43,13 @@ int main(void) {
     for (int i = 0; i < k; i++) {
         printf("%d ", a[i]);
     }
+
+    printf("\n");
+
+    // 堆顶元素
+    int a1[] = {5, 1, 2, 4, 8, 7, 9, 13};
+    int kth = Kth(a1, n, k);
+    printf("kth => %d ", kth);
 }
 
 // 堆实现
