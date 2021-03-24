@@ -46,3 +46,4 @@ algorithms
 * [最长回文串问题](https://writings.sh/post/algorithm-longest-palindromic-substring)
 * [最长回文子序列](https://writings.sh/post/algorithm-longest-palindromic-subsequence)
 * [最长递增子序列](https://writings.sh/post/algorithm-longest-increasing-subsequence)
+* [最大的 k 个数 - topk](https://writings.sh/post/algorithm-topk-and-median)

@@ -1,6 +1,6 @@
 // 堆排序
 
-#include <stdio.h>
+#include <stdio.h>  // for printf
 
 // 声明
 
