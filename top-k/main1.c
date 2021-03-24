@@ -50,6 +50,8 @@ int main(void) {
     int a1[] = {5, 1, 2, 4, 8, 7, 9, 13};
     int kth = Kth(a1, n, k);
     printf("kth => %d ", kth);
+
+    return 0;
 }
 
 // 堆实现
