@@ -2,17 +2,24 @@
 
 #include <stdio.h>  // for printf
 
+// 合并两个有序数组
 void MergeSortedArrays(int a[], int start1, int end1, int b[], int start2,
                        int end2, int c[], int start3) {
     int i = start1;
     int j = start2;
     int k = start3;
 
-    while (i <= end1 && j <= end2) c[k++] = a[i] <= b[j] ? a[i++] : b[j++];
+    while (i <= end1 && j <= end2) {
+        if (a[i] <= b[j])
+            c[k++] = a[i++];
+        else
+            c[k++] = b[j++];
+    }
     while (i <= end1) c[k++] = a[i++];
     while (j <= end2) c[k++] = b[j++];
 }
 
+// 递归合并过程
 void Merge(int a[], int tmp[], int start, int end) {
     if (start >= end) return;
 
@@ -33,6 +40,7 @@ void Merge(int a[], int tmp[], int start, int end) {
     for (int i = start; i <= end; i++) a[i] = tmp[i];
 }
 
+// 归并排序：输入数组和大小
 void MergeSort(int a[], int n) {
     int tmp[n];
     Merge(a, tmp, 0, n - 1);
