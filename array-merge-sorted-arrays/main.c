@@ -8,6 +8,7 @@ void MergeSortedArrays(int a[], int m, int b[], int n, int c[]) {
     int i = 0;
     int j = 0;
     int k = 0;
+
     while (i < m && j < n) c[k++] = a[i] <= b[j] ? a[i++] : b[j++];
     while (i < m) c[k++] = a[i++];
     while (j < n) c[k++] = b[j++];

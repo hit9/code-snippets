@@ -7,9 +7,10 @@ void MergeSortedArrays(int a[], int start1, int end1, int b[], int start2,
     int i = start1;
     int j = start2;
     int k = start3;
-    while (i < end1 && j < end2) c[k++] = a[i] <= b[j] ? a[i++] : b[j++];
-    while (i < end1) c[k++] = a[i++];
-    while (j < end2) c[k++] = b[j++];
+
+    while (i <= end1 && j <= end2) c[k++] = a[i] <= b[j] ? a[i++] : b[j++];
+    while (i <= end1) c[k++] = a[i++];
+    while (j <= end2) c[k++] = b[j++];
 }
 
 void Merge(int a[], int tmp[], int start, int end) {
