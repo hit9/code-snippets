@@ -50,8 +50,8 @@ void MergeSort(int a[], int n) {
 }
 
 int main(void) {
-    int n = 10;
-    int a[] = {4, 1, 3, 9, 7, 2, 6, 8, 5, 3};
+    int n = 9;
+    int a[] = {5, 3, 1, 9, 7, 2, 5, 8, 4};
     MergeSort(a, n);
     for (int i = 0; i < n; i++) printf("%d ", a[i]);
 }
