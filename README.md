@@ -5,21 +5,21 @@ algorithms
 
 查找类：
 
-* [二分查找](https://writings.sh/post/algorithm-binary-search) ············ [binary-search](binary-search)
-* [三分法求极值](https://writings.sh/post/algorithm-golden-search)
-* [有序二维矩阵搜索问题](https://writings.sh/post/algorithm-search-sorted-2d-matrix)
+* [二分查找](https://writings.sh/post/algorithm-binary-search) ....................................... [binary-search](binary-search)
+* [三分法求极值](https://writings.sh/post/algorithm-golden-search) ....................................... [ternary-search-peak](ternary-search-peak)
+* [有序二维矩阵搜索问题](https://writings.sh/post/algorithm-search-sorted-2d-matrix) ....................................... [matrix-sorted-search](matrix-sorted-search)
 
 数组：
 
-* [原地删除](https://writings.sh/post/algorithm-inplace-operations-on-array#%E5%8E%9F%E5%9C%B0%E5%88%A0%E9%99%A4%E6%95%B0%E7%BB%84%E5%85%83%E7%B4%A0)
-* [原地移动零](https://writings.sh/post/algorithm-inplace-operations-on-array#%E5%8E%9F%E5%9C%B0%E5%88%A0%E9%99%A4%E6%95%B0%E7%BB%84%E5%85%83%E7%B4%A0)
-* [原地分割](https://writings.sh/post/algorithm-inplace-operations-on-array#%E5%8E%9F%E5%9C%B0%E5%88%86%E5%89%B2%E6%95%B0%E7%BB%84-%E4%B8%A4%E4%BB%BD)
-* [原地分割三份 - 荷兰国旗问题](https://writings.sh/post/algorithm-inplace-operations-on-array#%E5%8E%9F%E5%9C%B0%E5%88%86%E5%89%B2%E6%95%B0%E7%BB%84-%E4%B8%89%E4%BB%BD)
+* [原地删除](https://writings.sh/post/algorithm-inplace-operations-on-array#%E5%8E%9F%E5%9C%B0%E5%88%A0%E9%99%A4%E6%95%B0%E7%BB%84%E5%85%83%E7%B4%A0) ....................................... [array-inplace-remove](array-inplace-remove)
+* [原地移动零](https://writings.sh/post/algorithm-inplace-operations-on-array#%E5%8E%9F%E5%9C%B0%E5%88%A0%E9%99%A4%E6%95%B0%E7%BB%84%E5%85%83%E7%B4%A0) ....................................... [array-inplace-move-zeros](array-inplace-move-zeros)
+* [原地分割](https://writings.sh/post/algorithm-inplace-operations-on-array#%E5%8E%9F%E5%9C%B0%E5%88%86%E5%89%B2%E6%95%B0%E7%BB%84-%E4%B8%A4%E4%BB%BD) ....................................... [array-inplace-partition](array-inplace-partition/main3.c)
+* [原地分割三份 - 荷兰国旗问题](https://writings.sh/post/algorithm-inplace-operations-on-array#%E5%8E%9F%E5%9C%B0%E5%88%86%E5%89%B2%E6%95%B0%E7%BB%84-%E4%B8%89%E4%BB%BD) ....................................... [array-inplace-partition](array-inplace-partition/main4.c)
 
 字符串：
 
-* [字符串匹配 - KMP 算法](https://writings.sh/post/algorithm-string-searching-kmp)
-* [字符串匹配 - Boyer Moore 算法](https://writings.sh/post/algorithm-string-searching-boyer-moore)
+* [字符串匹配 - KMP 算法](https://writings.sh/post/algorithm-string-searching-kmp) ....................................... [string-search-kmp](string-search-kmp)
+* [字符串匹配 - Boyer Moore 算法](https://writings.sh/post/algorithm-string-searching-boyer-moore) ....................................... [string-search-boyer-moore](string-search-boyer-moore)
 * [最长回文串 - Manacher 算法](https://writings.sh/post/algorithm-longest-palindromic-substring#manacher-%E6%96%B9%E6%B3%95)
 
 数据结构：
