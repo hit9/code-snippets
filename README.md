@@ -5,7 +5,7 @@ algorithms
 
 查找类：
 
-* [二分查找](https://writings.sh/post/algorithm-binary-search)
+* [二分查找](https://writings.sh/post/algorithm-binary-search) ············ [binary-search](binary-search)
 * [三分法求极值](https://writings.sh/post/algorithm-golden-search)
 * [有序二维矩阵搜索问题](https://writings.sh/post/algorithm-search-sorted-2d-matrix)
 
