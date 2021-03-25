@@ -42,7 +42,7 @@ void QuickSort(int a[], int start, int end) {
 
 int main(void) {
     int n = 9;
-    int a[] = {5, 1, 3, 9, 7, 2, 5, 8, 4};
+    int a[] = {5, 3, 1, 9, 7, 2, 5, 8, 4};
     QuickSort(a, 0, n - 1);
     for (int i = 0; i < n; i++) printf("%d ", a[i]);
 }

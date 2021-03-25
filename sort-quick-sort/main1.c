@@ -10,7 +10,7 @@ void Swap(int a[], int i, int j) {
 
 // 分割函数，选取第一个为基准元素
 // 把 start 到 end 内的元素，小于基准元素的放在左边，大于的放在右边
-// 返回基准值的右边界位置，也是 <= 基准值的个数
+// 返回基准值的最右位置
 int Partition(int a[], int start, int end) {
     int k = a[start];
     int left = start;
@@ -29,7 +29,7 @@ int Partition(int a[], int start, int end) {
             i++;
         }
     }
-    return i;
+    return i - 1;
 }
 
 // 快速排序 - 循环版本
@@ -56,14 +56,14 @@ void QuickSort(int a[], int n) {
         stack[top++] = start;
         stack[top++] = p - 1;
 
-        stack[top++] = p;
+        stack[top++] = p + 1;
         stack[top++] = end;
     }
 }
 
 int main(void) {
     int n = 9;
-    int a[] = {4, 1, 3, 9, 7, 2, 6, 8, 5};
+    int a[] = {5, 1, 3, 9, 7, 2, 6, 8, 5};
     QuickSort(a, n);
     for (int i = 0; i < n; i++) printf("%d ", a[i]);
 }

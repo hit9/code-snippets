@@ -2,6 +2,16 @@
 
 #include <stdio.h>  // for printf
 
+void MergeSortedArrays(int a[], int start1, int end1, int b[], int start2,
+                       int end2, int c[], int start3) {
+    int i = start1;
+    int j = start2;
+    int k = start3;
+    while (i < end1 && j < end2) c[k++] = a[i] <= b[j] ? a[i++] : b[j++];
+    while (i < end1) c[k++] = a[i++];
+    while (j < end2) c[k++] = b[j++];
+}
+
 void Merge(int a[], int tmp[], int start, int end) {
     if (start >= end) return;
 
@@ -16,13 +26,7 @@ void Merge(int a[], int tmp[], int start, int end) {
     Merge(a, tmp, start2, end2);
 
     // 合并到 tmp
-    int i = start1;
-    int j = start2;
-    int k = start;
-
-    while (i <= end1 && j <= end2) tmp[k++] = a[i] <= a[j] ? a[i++] : a[j++];
-    while (i <= end1) tmp[k++] = a[i++];
-    while (j <= end2) tmp[k++] = a[j++];
+    MergeSortedArrays(a, start1, end1, a, start2, end2, tmp, start);
 
     // 拷贝 tmp => a
     for (int i = start; i <= end; i++) a[i] = tmp[i];
