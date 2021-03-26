@@ -255,6 +255,42 @@ struct Node *Sort(struct Node *node) {
     return MergeSortedList(a1, b1);
 }
 
+// 链表分割
+// https://leetcode-cn.com/problems/partition-list/
+// 使得小于给定值的在左边，大于等于的在右边
+// 要求保序。
+// 两种思路：
+// 1. 起两个链表头，小的、大的依次拣过去，最后拼接。
+// 2. 加一个左哨兵，快慢指针，把遇到的小的追加到左边。
+// 这里是第一种方法
+struct Node *Partition(struct Node *head, int k) {
+    struct Node *left_head = &(struct Node){0, NULL};
+    struct Node *right_head = &(struct Node){0, NULL};
+
+    struct Node *node = head;         // 迭代原链表
+    struct Node *left = left_head;    // 迭代左链表
+    struct Node *right = right_head;  // 迭代右链表
+
+    while (node != NULL) {
+        if (node->v < k) {
+            // 拣到左边链表
+            left->next = node;
+            left = left->next;
+        } else {
+            // 拣到右边链表
+            right->next = node;
+            right = right->next;
+        }
+        node = node->next;
+    }
+    // 末尾抹 NULL
+    right->next = NULL;
+    // 拼接，并丢弃 right_head
+    left->next = right_head->next;
+    // 返回左起第二个元素即原链表中的节点
+    return left_head->next;
+}
+
 ////////
 // 测试
 ///////
@@ -419,6 +455,23 @@ void TestSort() {
     assert(h->next->next->next->next->next == &a);
 }
 
+void TestPartition() {
+    struct Node f = {2, NULL};
+    struct Node e = {5, &f};
+    struct Node d = {2, &e};
+    struct Node c = {3, &d};
+    struct Node b = {4, &c};
+    struct Node a = {1, &b};
+
+    struct Node *h = Partition(&a, 3);
+    assert(h == &a);
+    assert(h->next == &d);
+    assert(h->next->next == &f);
+    assert(h->next->next->next == &b);
+    assert(h->next->next->next->next == &c);
+    assert(h->next->next->next->next->next == &e);
+}
+
 int main(void) {
     TestReverse();
     TestInsert();
@@ -432,5 +485,6 @@ int main(void) {
     TestCycleEntry();
     TestMergeSortedList();
     TestSort();
+    TestPartition();
     return 0;
 }
