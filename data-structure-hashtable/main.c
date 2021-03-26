@@ -44,21 +44,9 @@ bool Copy(T m1[], int n1, T m2[], int n2) {
 
     // 拷贝并重新哈希到 m2
     for (int i = 0; i < n1; i++) {
-        T *s1 = &m1[i];
-        if (s1->used) {
-            bool found = false;
-            for (int j = 0; j < n2; j++) {
-                int p = Hash(s1->k, j, n2);
-                T *s2 = &m2[p];
-                if (!s2->used) {
-                    s2->k = s1->k;
-                    s2->v = s1->v;
-                    s2->used = true;
-                    found = true;
-                    break;
-                }
-            }
-            if (!found) return false;
+        T *s = &m1[i];
+        if (s->used) {
+            if (!Set(m2, n2, s->k, s->v)) return false;
         }
     }
     return true;
@@ -70,7 +58,7 @@ bool Set(T m[], int n, int k, int v) {
     for (int i = 0; i < n; i++) {
         int p = Hash(k, i, n);
         T *s = &m[p];
-        if (!s->used || s->k == k) {
+        if (!s->used || s->k == k) {  // 添加或更新
             s->k = k;
             s->v = v;
             s->used = true;
