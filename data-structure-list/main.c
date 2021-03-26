@@ -19,6 +19,39 @@ void Print(struct Node *node) {
     printf("\n");
 }
 
+// 插入一个结点 a 到结点 b 之前
+// 如果找不到 b 则不插入，返回 false
+bool Insert(struct Node *node, struct Node *a, struct Node *b) {
+    struct Node *prev = NULL;
+    while (node != NULL) {
+        if (node == b) {
+            // 插入
+            if (prev != NULL) prev->next = a;
+            if (a != NULL) a->next = b;
+            return true;
+        }
+        prev = node;
+        node = node->next;
+    }
+    return false;
+}
+
+// 删除一个结点 a
+// 返回是否删除成功, 找不到返回 false
+bool Remove(struct Node *node, struct Node *a) {
+    struct Node *prev = NULL;
+    while (node != NULL) {
+        if (node == a) {
+            // 删除
+            if (prev != NULL) prev->next = node->next;
+            return true;
+        }
+        prev = node;
+        node = node->next;
+    }
+    return false;
+}
+
 // 反转链表，返回新的链表头
 // https://leetcode-cn.com/problems/fan-zhuan-lian-biao-lcof/
 struct Node *Reverse(struct Node *node) {
@@ -100,7 +133,6 @@ bool IsPalindromic(struct Node *node) {
 
 // 找出两个单链表的交叉点，没有交叉点则返回 NULL
 // https://leetcode-cn.com/problems/liang-ge-lian-biao-de-di-yi-ge-gong-gong-jie-dian-lcof/
-// 非常经典的问题
 struct Node *Intersection(struct Node *a, struct Node *b) {
     struct Node *na = a;
     struct Node *nb = b;
@@ -119,6 +151,46 @@ struct Node *Intersection(struct Node *a, struct Node *b) {
     return na;
 }
 
+// 判断单链表是否存在环
+// https://leetcode-cn.com/problems/linked-list-cycle/
+bool HasCycle(struct Node *node) {
+    struct Node *slow = node;
+    struct Node *fast = node;
+
+    while (fast != NULL && fast->next != NULL) {
+        slow = slow->next;
+        fast = fast->next;
+        fast = fast->next;
+        if (slow == fast) return true;
+    }
+    return false;
+}
+
+// 如果单链表存在环，返回其入口节点
+// https://leetcode-cn.com/problems/linked-list-cycle-ii/
+struct Node *CycleEntry(struct Node *node) {
+    // 找到相遇节点，同 HasCycle
+    struct Node *slow = node;
+    struct Node *fast = node;
+
+    while (1) {
+        if (fast == NULL || fast->next == NULL) return NULL;
+        slow = slow->next;
+        fast = fast->next;
+        fast = fast->next;
+        if (slow == fast) break;
+    }
+
+    // slow 是相遇节点, fast 重置到头，各自一步一步走
+    fast = node;
+    while (fast != NULL && slow != NULL) {
+        if (slow == fast) return slow;
+        slow = slow->next;
+        fast = fast->next;
+    }
+    return NULL;
+}
+
 ////////
 // 测试
 ///////
@@ -133,6 +205,35 @@ void TestReverse() {
     assert(d == &c);
     assert(d->next == &b);
     assert(d->next->next == &a);
+}
+
+void TestInsert() {
+    struct Node d = {4, NULL};
+    struct Node c = {3, NULL};
+    struct Node b = {2, &c};
+    struct Node a = {1, &b};
+    assert(Insert(&a, &d, &d) == false);
+    assert(Insert(&a, &d, &b) == true);
+    assert(a.next == &d);
+    assert(a.next->next == &b);
+
+    assert(Insert(&a, NULL, &d) == true);
+    assert(a.next == NULL);
+}
+
+void TestRemove() {
+    struct Node f = {6, NULL};
+    struct Node e = {5, NULL};
+    struct Node d = {4, &e};
+    struct Node c = {3, &d};
+    struct Node b = {2, &c};
+    struct Node a = {1, &b};
+
+    assert(Remove(&a, &f) == false);
+    assert(Remove(&a, &c) == true);
+    assert(a.next == &b);
+    assert(a.next->next == &d);
+    assert(a.next->next->next == &e);
 }
 
 void TestLength() {
@@ -191,12 +292,38 @@ void TestIntersection() {
     assert(Intersection(&a, &a1) == &e);
 }
 
+void TestHasCycle() {
+    struct Node f = {6, NULL};
+    struct Node e = {5, &f};
+    struct Node d = {4, &e};
+    struct Node c = {3, &d};
+    struct Node b = {2, &c};
+    struct Node a = {1, &b};
+    f.next = &d;
+    assert(HasCycle(&a) == true);
+}
+
+void TestCycleEntry() {
+    struct Node f = {6, NULL};
+    struct Node e = {5, &f};
+    struct Node d = {4, &e};
+    struct Node c = {3, &d};
+    struct Node b = {2, &c};
+    struct Node a = {1, &b};
+    f.next = &d;
+    assert(CycleEntry(&a) == &d);
+}
+
 int main(void) {
     TestReverse();
+    TestInsert();
+    TestRemove();
     TestLength();
     TestTail();
     TestMiddle();
     TestIsPalindromic();
     TestIntersection();
+    TestHasCycle();
+    TestCycleEntry();
     return 0;
 }
