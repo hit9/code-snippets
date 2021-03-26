@@ -25,7 +25,7 @@ algorithms
 数据结构：
 
 * [堆](https://writings.sh/post/data-structure-heap-and-common-problems) ....................................... [data-structure-heap](data-structure-heap)
-* [哈希表](data-structure-hashtable)
+* [哈希表](data-structure-hashtable) ....................................... [data-structure-hashtable](data-structure-hashtable)
 
 排序：
 
