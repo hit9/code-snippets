@@ -98,7 +98,7 @@ struct Node *Middle(struct Node *node) {
         fast = fast->next;
         prev = slow;
         slow = slow->next;
-        // 多走一步
+        // fast 多走一步
         if (fast != NULL) fast = fast->next;
     }
     return prev;
@@ -229,6 +229,30 @@ struct Node *MergeSortedList(struct Node *a, struct Node *b) {
         prev = c;
     }
     return head;
+}
+
+// 链表排序，从小到大
+// https://leetcode-cn.com/problems/sort-list/
+// 采用归并排序
+struct Node *Sort(struct Node *node) {
+    // 递归终止
+    if (node == NULL || node->next == NULL) return node;
+
+    // 分割链表，找出中间的节点
+    struct Node *mid = Middle(node);
+    // 分割为左右两个链表
+    struct Node *a = node;
+    // 此时至少两个节点, mid 必然有后节点
+    struct Node *b = mid->next;
+    // 左边链表以 mid 结尾，封死其结尾
+    mid->next = NULL;
+
+    // 递归
+    struct Node *a1 = Sort(a);
+    struct Node *b1 = Sort(b);
+
+    // 合并
+    return MergeSortedList(a1, b1);
 }
 
 ////////
@@ -378,6 +402,23 @@ void TestMergeSortedList() {
     assert(h->next->next->next->next->next->next->next->next == NULL);
 }
 
+void TestSort() {
+    struct Node f = {4, NULL};
+    struct Node e = {3, &f};
+    struct Node d = {1, &e};
+    struct Node c = {2, &d};
+    struct Node b = {5, &c};
+    struct Node a = {6, &b};
+
+    struct Node *h = Sort(&a);
+    assert(h == &d);
+    assert(h->next == &c);
+    assert(h->next->next == &e);
+    assert(h->next->next->next == &f);
+    assert(h->next->next->next->next == &b);
+    assert(h->next->next->next->next->next == &a);
+}
+
 int main(void) {
     TestReverse();
     TestInsert();
@@ -390,5 +431,6 @@ int main(void) {
     TestHasCycle();
     TestCycleEntry();
     TestMergeSortedList();
+    TestSort();
     return 0;
 }
