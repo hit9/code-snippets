@@ -191,6 +191,46 @@ struct Node *CycleEntry(struct Node *node) {
     return NULL;
 }
 
+// 合并两个有序链表，返回新链表的头，要求原地 O(1)
+// https://leetcode-cn.com/problems/merge-two-sorted-lists/
+struct Node *MergeSortedList(struct Node *a, struct Node *b) {
+    struct Node *c = NULL;
+    struct Node *head = NULL;  // c's head
+    struct Node *prev = NULL;  // c's prev
+
+    // 合并
+    while (a != NULL && b != NULL) {
+        if (a->v <= b->v) {
+            c = a;
+            a = a->next;
+        } else {
+            c = b;
+            b = b->next;
+        }
+        if (head == NULL) head = c;
+        if (prev != NULL) prev->next = c;
+        prev = c;
+    }
+
+    // 拷贝没有迭代完的链表
+    while (a != NULL) {
+        c = a;
+        a = a->next;
+        if (head == NULL) head = c;
+        if (prev != NULL) prev->next = c;
+        prev = c;
+    }
+
+    while (b != NULL) {
+        c = b;
+        b = b->next;
+        if (head == NULL) head = c;
+        if (prev != NULL) prev->next = c;
+        prev = c;
+    }
+    return head;
+}
+
 ////////
 // 测试
 ///////
@@ -314,6 +354,30 @@ void TestCycleEntry() {
     assert(CycleEntry(&a) == &d);
 }
 
+void TestMergeSortedList() {
+    struct Node e = {8, NULL};
+    struct Node d = {6, &e};
+    struct Node c = {5, &d};
+    struct Node b = {3, &c};
+    struct Node a = {1, &b};
+
+    struct Node c1 = {7, NULL};
+    struct Node b1 = {2, &c1};
+    struct Node a1 = {1, &b1};
+
+    struct Node *h = MergeSortedList(&a, &a1);
+
+    assert(h == &a);
+    assert(h->next == &a1);
+    assert(h->next->next == &b1);
+    assert(h->next->next->next == &b);
+    assert(h->next->next->next->next == &c);
+    assert(h->next->next->next->next->next == &d);
+    assert(h->next->next->next->next->next->next == &c1);
+    assert(h->next->next->next->next->next->next->next == &e);
+    assert(h->next->next->next->next->next->next->next->next == NULL);
+}
+
 int main(void) {
     TestReverse();
     TestInsert();
@@ -325,5 +389,6 @@ int main(void) {
     TestIntersection();
     TestHasCycle();
     TestCycleEntry();
+    TestMergeSortedList();
     return 0;
 }
