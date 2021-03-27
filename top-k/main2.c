@@ -11,25 +11,26 @@ void Swap(int a[], int i, int j) {
     a[j] = tmp;
 }
 
-// 数组原地分割，取 a[start] = p
-// >p 在左，=p 在中，<p在右
+// 数组原地分割，取 v = a[start]
+// >v 在左，=v 在中，<v在右
 int Partition(int a[], int start, int end) {
-    int p = a[start];
+    int v = a[start];
     int left = start;
     int right = end;
     int i = start;
     while (i <= right) {
-        if (a[i] > p) {
+        if (a[i] > v) {
             Swap(a, i, left);
             left++;
             i++;
-        } else if (a[i] < p) {
+        } else if (a[i] < v) {
             Swap(a, i, right);
             right--;
         } else {
             i++;
         }
     }
+    // 返回的是: <=v 的元素个数
     return i;
 }
 
@@ -37,12 +38,15 @@ void QuickSelect(int a[], int start, int end, int k) {
     if (start >= end || k <= 0) return;
 
     int m = Partition(a, start, end);
-    int p = m - 1;  // 此时基准元素的位置
+    int p = m - 1;  // 此时基准元素 v 的位置
 
     if (k < m)
         QuickSelect(a, start, p - 1, k);
     else if (k > m)
-        QuickSelect(a, p + 1, end, k - m);
+        // 注意此处传入是 k 而非 k-m
+        // m 是整个数组上的基准位置 + 1 而得
+        // k 需要和 m 比较，所以 k 是绝对的
+        QuickSelect(a, p + 1, end, k);
     else
         return;
 }
