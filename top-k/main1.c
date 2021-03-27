@@ -1,5 +1,5 @@
 // topk 问题 - 找出无序数组中的最大的 k 个数
-// https://writings.sh/post/algorithm-topk-and-median
+// https://writings.sh/post/algorithm-topk
 
 // 最小堆方法
 

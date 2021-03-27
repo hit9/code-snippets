@@ -1,5 +1,5 @@
 // topk 问题 - 找出无序数组中的最大的 k 个数
-// https://writings.sh/post/algorithm-topk-and-median
+// https://writings.sh/post/algorithm-topk
 
 // 快速选择方法
 
@@ -34,14 +34,15 @@ int Partition(int a[], int start, int end) {
 }
 
 void QuickSelect(int a[], int start, int end, int k) {
-    if (start >= end) return;
+    if (start >= end || k <= 0) return;
 
     int m = Partition(a, start, end);
+    int p = m - 1;  // 此时基准元素的位置
 
     if (k < m)
-        QuickSelect(a, start, m - 1, k);
+        QuickSelect(a, start, p - 1, k);
     else if (k > m)
-        QuickSelect(a, m, end, k - m);
+        QuickSelect(a, p + 1, end, k - m);
     else
         return;
 }
