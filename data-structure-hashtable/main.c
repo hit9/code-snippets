@@ -28,8 +28,8 @@ int Count(T m[], int n);                    // 计数
 // 实现
 ///////
 
-// 简单哈希函数
-int Hash(int k, int i, int n) { return (k * (k + 3) + i) % n; }
+// 简单哈希函数 i^2 + 3 永远非负
+int Hash(int k, int i, int n) { return (k * k + i) % n; }
 
 // 初始化表格为未使用
 void Init(T m[], int n) {
