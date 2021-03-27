@@ -13,6 +13,8 @@ void Swap(int a[], int i, int j) {
 
 // 数组原地分割，取 v = a[start]
 // >v 在左，=v 在中，<v在右
+// 返回基准元素在整个数组中的位置
+// 和快排完全一样
 int Partition(int a[], int start, int end) {
     int v = a[start];
     int left = start;
@@ -30,23 +32,19 @@ int Partition(int a[], int start, int end) {
             i++;
         }
     }
-    // 返回的是: <=v 的元素个数
-    return i;
+    return i - 1;
 }
 
 void QuickSelect(int a[], int start, int end, int k) {
     if (start >= end || k <= 0) return;
 
-    int m = Partition(a, start, end);
-    int p = m - 1;  // 此时基准元素 v 的位置
+    int p = Partition(a, start, end);
+    int m = p + 1;  // 整个数组中在基准元素左边的元素个数
 
     if (k < m)
         QuickSelect(a, start, p - 1, k);
     else if (k > m)
-        // 注意此处传入是 k 而非 k-m
-        // m 是整个数组上的基准位置 + 1 而得
-        // k 需要和 m 比较，所以 k 是绝对的
-        QuickSelect(a, p + 1, end, k);
+        QuickSelect(a, p + 1, end, k);  // 注意传 k 而非 k - m ，对齐 m 的意义
     else
         return;
 }
