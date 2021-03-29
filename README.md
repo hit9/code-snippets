@@ -27,6 +27,7 @@ algorithms
 * [堆](https://writings.sh/post/data-structure-heap-and-common-problems) ....................................... [data-structure-heap](data-structure-heap)
 * [哈希表](data-structure-hashtable) ....................................... [data-structure-hashtable](data-structure-hashtable)
 * [链表 类问题](data-structure-list)  ....................................... [data-structure-list](data-structure-list)
+* [队列](data-structure-queue)  ....................................... [data-structure-queue](data-structure-queue)
 
 排序：
 
