@@ -27,8 +27,9 @@ algorithms
 * [堆](https://writings.sh/post/data-structure-heap-and-common-problems) ....................................... [data-structure-heap](data-structure-heap)
 * [哈希表](data-structure-hashtable) ....................................... [data-structure-hashtable](data-structure-hashtable)
 * [链表 类问题](data-structure-list)  ....................................... [data-structure-list](data-structure-list)
-* [队列](data-structure-queue)  ....................................... [data-structure-queue](data-structure-queue)
-* [栈](data-structure-stack)  ....................................... [data-structure-stack](data-structure-stack)
+* [双头队列](data-structure-queue/main-dequeue.c)  ....................................... [dequeue](data-structure-queue/main-dequeue.c)
+* [栈 - 动态内存版](data-structure-stack/main-dynamic-mem-stack.c)  ....................................... [stack-dynamic-mem](data-structure-stack/main-dynamic-mem-stack.c)
+* [输出最小值的栈](data-structure-stack/main-min-stack.c)  ....................................... [min-stack](data-structure-stack/main-min-stack.c)
 
 排序：
 
