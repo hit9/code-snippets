@@ -30,6 +30,7 @@ algorithms
 * [双头队列](data-structure-queue/main-dequeue.c)  ....................................... [dequeue](data-structure-queue/main-dequeue.c)
 * [栈 - 动态内存版](data-structure-stack/main-dynamic-mem-stack.c)  ....................................... [stack-dynamic-mem](data-structure-stack/main-dynamic-mem-stack.c)
 * [输出最小值的栈](data-structure-stack/main-min-stack.c)  ....................................... [min-stack](data-structure-stack/main-min-stack.c)
+* [输出最大值的栈队列](data-structure-queue/max-queue.c)  ....................................... [max-queue](data-structure-queue/max-queue.c)
 
 排序：
 
