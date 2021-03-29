@@ -52,3 +52,4 @@ algorithms
 * [最长回文子序列](https://writings.sh/post/algorithm-longest-palindromic-subsequence) ....................................... [longest-palindromic-subsequence](longest-palindromic-subsequence)
 * [最长递增子序列](https://writings.sh/post/algorithm-longest-increasing-subsequence) ....................................... [longest-increasing-subsequence](longest-increasing-subsequence)
 * [最大的 k 个数 - topk](https://writings.sh/post/algorithm-topk)  ....................................... [top-k](top-k)
+* [字符串的全排列](permutation) ....................................... [permutation](permutation)
