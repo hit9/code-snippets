@@ -1,4 +1,4 @@
-// 最小栈
+// 数据结构 - 最小栈 - 在栈的基础上，实现一个常数时间的最小值函数
 // https://leetcode-cn.com/problems/min-stack/
 // 要求 Push() Pop() Min() 三个函数平均时间复杂度 O(1)
 
@@ -60,6 +60,7 @@ void FreeMinStack(MinStack *m) {
 }
 
 bool Push(MinStack *m, int value) {
+    // 只有不大于 b 的栈顶时，才入栈 b
     if (StackLen(m->b) == 0 || value <= StackTop(m->b)) StackPush(m->b, value);
     return StackPush(m->a, value);
 }
@@ -67,6 +68,7 @@ bool Push(MinStack *m, int value) {
 int Pop(MinStack *m) {
     if (StackLen(m->a) == 0) return -1;
     int value = StackPop(m->a);
+    // 只有等于 b 的栈顶时，才出栈 b
     if (value == StackTop(m->b)) StackPop(m->b);
     return value;
 }
