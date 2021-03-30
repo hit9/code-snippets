@@ -308,6 +308,86 @@ struct Node *Partition2(struct Node *head, int k) {
     return slow_head->next;
 }
 
+// 反转链表的一个区间
+// 第一种方法：头插法
+struct Node *ReverseInterval1(struct Node *head, int left, int right) {
+    struct Node *virtual_head = &(struct Node){0, head};
+    struct Node *node = head;
+    struct Node *prev = virtual_head;
+    struct Node *left_bound = NULL;       // 左边界节点
+    struct Node *left_bound_prev = NULL;  // 左边界节点的前驱节点
+
+    int i = 1;
+
+    while (node != NULL && i <= right) {
+        struct Node *node_next = node->next;
+
+        if (i == left) {
+            // 初始化左边界
+            left_bound = node;
+            left_bound_prev = prev;
+        }
+
+        if (i > left) {  // 插入左边界之前
+            prev->next = node->next;
+            node->next = left_bound;
+            // 此时 i > left ，说明 i == left 肯定已执行
+            // left_bound_prev 必定非空
+            left_bound_prev->next = node;
+            // 更新左边界
+            left_bound = node;
+        } else {
+            // 注意，只有在没有挪走 node 的时候才需要更新 prev
+            prev = node;
+        }
+
+        node = node_next;
+        i++;
+    }
+
+    return virtual_head->next;
+}
+
+// 反转链表的一个区间
+// 第二个方法：反转区间后再缝接的方法
+struct Node *ReverseInterval2(struct Node *head, int left, int right) {
+    struct Node *node = head;
+    struct Node *prev = NULL;
+    struct Node *left_bound = NULL;   // 左边界节点
+    struct Node *right_bound = NULL;  // 右边界节点
+    struct Node *left_prev = NULL;    // 左边界前面的节点
+    struct Node *right_next = NULL;   // 右边界后面的节点
+
+    int i = 1;
+
+    while (node != NULL && i <= right) {
+        struct Node *node_next = node->next;
+
+        if (i == left) {  // 记住左边界
+            left_bound = node;
+            left_prev = prev;
+        }
+
+        if (i == right) {  // 记住右边界
+            right_bound = node;
+            right_next = node_next;
+        }
+
+        // 中间区间 (left, right] 进行反转
+        if (i > left && i <= right) node->next = prev;
+
+        prev = node;
+        node = node_next;
+        i++;
+    }
+
+    // 缝接到原链表上
+    if (left_prev != NULL) left_prev->next = right_bound;
+    if (left_bound != NULL) left_bound->next = right_next;
+    if (left_prev != NULL) return head;
+    return right_bound;
+}
+
 ////////
 // 测试
 ///////
@@ -506,6 +586,36 @@ void TestPartition2() {
     assert(h->next->next->next->next->next == &e);
 }
 
+void TestReverseInterval1() {
+    struct Node e = {5, NULL};
+    struct Node d = {4, &e};
+    struct Node c = {3, &d};
+    struct Node b = {2, &c};
+    struct Node a = {1, &b};
+
+    struct Node *a1 = ReverseInterval1(&a, 2, 4);
+    assert(a1 == &a);
+    assert(a1->next == &d);
+    assert(a1->next->next == &c);
+    assert(a1->next->next->next == &b);
+    assert(a1->next->next->next->next == &e);
+}
+
+void TestReverseInterval2() {
+    struct Node e = {5, NULL};
+    struct Node d = {4, &e};
+    struct Node c = {3, &d};
+    struct Node b = {2, &c};
+    struct Node a = {1, &b};
+
+    struct Node *a1 = ReverseInterval2(&a, 2, 4);
+    assert(a1 == &a);
+    assert(a1->next == &d);
+    assert(a1->next->next == &c);
+    assert(a1->next->next->next == &b);
+    assert(a1->next->next->next->next == &e);
+}
+
 int main(void) {
     TestReverse();
     TestInsert();
@@ -521,5 +631,7 @@ int main(void) {
     TestSort();
     TestPartition();
     TestPartition2();
+    TestReverseInterval1();
+    TestReverseInterval2();
     return 0;
 }
