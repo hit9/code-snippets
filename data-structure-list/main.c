@@ -213,22 +213,16 @@ struct Node *MergeSortedList(struct Node *a, struct Node *b) {
         prev = c;
     }
 
-    // 拷贝没有迭代完的链表
-    while (a != NULL) {
-        c = a;
-        a = a->next;
-        if (head == NULL) head = c;
-        if (prev != NULL) prev->next = c;
-        prev = c;
+    // 至多还有一个没有迭代完的链表
+    if (a != NULL) {
+        if (head == NULL) head = a;
+        if (prev != NULL) prev->next = a;
+    }
+    if (b != NULL) {
+        if (head == NULL) head = b;
+        if (prev != NULL) prev->next = b;
     }
 
-    while (b != NULL) {
-        c = b;
-        b = b->next;
-        if (head == NULL) head = c;
-        if (prev != NULL) prev->next = c;
-        prev = c;
-    }
     return head;
 }
 
@@ -304,13 +298,16 @@ struct Node *Partition2(struct Node *head, int k) {
     while (fast != NULL) {
         struct Node *fast_next = fast->next;
         if (fast->v < k) {
+            // 移除当前节点 fast
             if (prev != NULL) prev->next = fast_next;
+            // 放入到 slow 节点之后
             if (slow->next != fast) {
                 fast->next = slow->next;
                 slow->next = fast;
             }
             slow = fast;
         } else {
+            // 只有不挪走 fast 的时候才更新 prev
             prev = fast;
         }
         fast = fast_next;
