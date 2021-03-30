@@ -1,4 +1,5 @@
 // 链表类问题
+// https://writings.sh/post/data-structure-list-common-algorithm-problems
 
 #include <assert.h>   // for assert
 #include <stdbool.h>  // for bool
@@ -291,6 +292,32 @@ struct Node *Partition(struct Node *head, int k) {
     return left_head->next;
 }
 
+// 链表分割
+// 这是另外一种解法：把小于 k 的节点往前提
+struct Node *Partition2(struct Node *head, int k) {
+    // slow_head 是虚拟头节点，指向 head
+    struct Node *slow_head = &(struct Node){0, head};
+    struct Node *slow = slow_head;  // slow 指向目前 <k 的节点
+    struct Node *fast = head;       // fast 一步一个节点迭代
+    struct Node *prev = head;       // fast 的前驱节点
+
+    while (fast != NULL) {
+        struct Node *fast_next = fast->next;
+        if (fast->v < k) {
+            if (prev != NULL) prev->next = fast_next;
+            if (slow->next != fast) {
+                fast->next = slow->next;
+                slow->next = fast;
+            }
+            slow = fast;
+        } else {
+            prev = fast;
+        }
+        fast = fast_next;
+    }
+    return slow_head->next;
+}
+
 ////////
 // 测试
 ///////
@@ -472,6 +499,23 @@ void TestPartition() {
     assert(h->next->next->next->next->next == &e);
 }
 
+void TestPartition2() {
+    struct Node f = {2, NULL};
+    struct Node e = {5, &f};
+    struct Node d = {2, &e};
+    struct Node c = {3, &d};
+    struct Node b = {4, &c};
+    struct Node a = {1, &b};
+
+    struct Node *h = Partition2(&a, 3);
+    assert(h == &a);
+    assert(h->next == &d);
+    assert(h->next->next == &f);
+    assert(h->next->next->next == &b);
+    assert(h->next->next->next->next == &c);
+    assert(h->next->next->next->next->next == &e);
+}
+
 int main(void) {
     TestReverse();
     TestInsert();
@@ -486,5 +530,6 @@ int main(void) {
     TestMergeSortedList();
     TestSort();
     TestPartition();
+    TestPartition2();
     return 0;
 }
