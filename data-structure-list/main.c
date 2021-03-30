@@ -195,9 +195,9 @@ struct Node *CycleEntry(struct Node *node) {
 // 合并两个有序链表，返回新链表的头，要求原地 O(1)
 // https://leetcode-cn.com/problems/merge-two-sorted-lists/
 struct Node *MergeSortedList(struct Node *a, struct Node *b) {
+    struct Node *head = &(struct Node){0, NULL};  // 虚拟头节点
+    struct Node *prev = head;                     // c 的前驱节点
     struct Node *c = NULL;
-    struct Node *head = NULL;  // c's head
-    struct Node *prev = NULL;  // c's prev
 
     // 合并
     while (a != NULL && b != NULL) {
@@ -208,22 +208,15 @@ struct Node *MergeSortedList(struct Node *a, struct Node *b) {
             c = b;
             b = b->next;
         }
-        if (head == NULL) head = c;
-        if (prev != NULL) prev->next = c;
+        prev->next = c;
         prev = c;
     }
 
     // 至多还有一个没有迭代完的链表
-    if (a != NULL) {
-        if (head == NULL) head = a;
-        if (prev != NULL) prev->next = a;
-    }
-    if (b != NULL) {
-        if (head == NULL) head = b;
-        if (prev != NULL) prev->next = b;
-    }
+    if (a != NULL) prev->next = a;
+    if (b != NULL) prev->next = b;
 
-    return head;
+    return head->next;
 }
 
 // 链表排序，从小到大
