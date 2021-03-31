@@ -139,7 +139,7 @@ void LevelOrder(TreeNode *root) {
 // 前序遍历 - 非递归
 void PreOrderII(TreeNode *root) {
     Stack *s = NewStack();
-    StackPush(s, NewWrap(root, false));
+    StackPush(s, NewTreeNodeWrapper(root, false));
 
     while (!IsStackEmpty(s)) {
         TreeNodeWrapper *w = StackPop(s);
@@ -147,14 +147,14 @@ void PreOrderII(TreeNode *root) {
         bool visited = w->visited;
         TreeNode *node = w->node;
 
-        FreeWrap(w);
+        FreeTreeNodeWrapper(w);
 
         if (node == NULL) continue;
 
         if (!visited) {
-            StackPush(s, NewWrap(node->right, false));
-            StackPush(s, NewWrap(node->left, false));
-            StackPush(s, NewWrap(node, true));
+            StackPush(s, NewTreeNodeWrapper(node->right, false));
+            StackPush(s, NewTreeNodeWrapper(node->left, false));
+            StackPush(s, NewTreeNodeWrapper(node, true));
         } else {
             PrintTreeNode(node);
         }
@@ -166,21 +166,21 @@ void PreOrderII(TreeNode *root) {
 // 中序遍历 - 非递归
 void InOrderII(TreeNode *root) {
     Stack *s = NewStack();
-    StackPush(s, NewWrap(root, false));
+    StackPush(s, NewTreeNodeWrapper(root, false));
 
     while (!IsStackEmpty(s)) {
         TreeNodeWrapper *w = StackPop(s);
 
         TreeNode *node = w->node;
         bool visited = w->visited;
-        FreeWrap(w);
+        FreeTreeNodeWrapper(w);
 
         if (node == NULL) continue;
 
         if (!visited) {
-            StackPush(s, NewWrap(node->right, false));
-            StackPush(s, NewWrap(node, true));
-            StackPush(s, NewWrap(node->left, false));
+            StackPush(s, NewTreeNodeWrapper(node->right, false));
+            StackPush(s, NewTreeNodeWrapper(node, true));
+            StackPush(s, NewTreeNodeWrapper(node->left, false));
         } else {
             PrintTreeNode(node);
         }
@@ -192,7 +192,7 @@ void InOrderII(TreeNode *root) {
 // 后序遍历 - 非递归
 void PostOrderII(TreeNode *root) {
     Stack *s = NewStack();
-    StackPush(s, NewWrap(root, false));
+    StackPush(s, NewTreeNodeWrapper(root, false));
 
     while (!IsStackEmpty(s)) {
         TreeNodeWrapper *w = StackPop(s);
@@ -200,14 +200,14 @@ void PostOrderII(TreeNode *root) {
         bool visited = w->visited;
         TreeNode *node = w->node;
 
-        FreeWrap(w);
+        FreeTreeNodeWrapper(w);
 
         if (node == NULL) continue;
 
         if (!visited) {
-            StackPush(s, NewWrap(node, true));
-            StackPush(s, NewWrap(node->right, false));
-            StackPush(s, NewWrap(node->left, false));
+            StackPush(s, NewTreeNodeWrapper(node, true));
+            StackPush(s, NewTreeNodeWrapper(node->right, false));
+            StackPush(s, NewTreeNodeWrapper(node->left, false));
         } else {
             PrintTreeNode(node);
         }
@@ -216,11 +216,11 @@ void PostOrderII(TreeNode *root) {
     FreeStack(s);
 }
 
-TreeNodeWrapper *NewWrap(TreeNode *node, bool visited) {
+TreeNodeWrapper *NewTreeNodeWrapper(TreeNode *node, bool visited) {
     TreeNodeWrapper *w = malloc(sizeof(TreeNodeWrapper));
     w->node = node;
     w->visited = visited;
     return w;
 }
 
-void FreeWrap(TreeNodeWrapper *w) { free(w); }
+void FreeTreeNodeWrapper(TreeNodeWrapper *w) { free(w); }

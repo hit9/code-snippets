@@ -35,5 +35,7 @@ void PreOrderII(TreeNode *root);   // 前序遍历 非递归
 void InOrderII(TreeNode *root);    // 中序遍历 非递归
 void PostOrderII(TreeNode *root);  // 后序遍历 非递归
 
-TreeNodeWrapper *NewWrap(TreeNode *node, bool visited);
-void FreeWrap(TreeNodeWrapper *w);
+// 树节点包装的函数声明
+
+TreeNodeWrapper *NewTreeNodeWrapper(TreeNode *node, bool visited);
+void FreeTreeNodeWrapper(TreeNodeWrapper *w);
