@@ -111,21 +111,24 @@ void BFS(TreeNode *root) {
 }
 
 // 层序遍历
+// https://leetcode-cn.com/problems/binary-tree-level-order-traversal/
 void LevelOrder(TreeNode *root) {
     Queue *q = NewQueue();
-    QueuePush(q, root);
+
+    if (root != NULL) QueuePush(q, root);
 
     while (!IsQueueEmpty(q)) {
         // 队列中的节点是当前层次中的节点
         int qsize = QueueSize(q);
+
         for (int j = 0; j < qsize; j++) {
             TreeNode *node = QueuePop(q);
             if (node == NULL) continue;
 
             PrintTreeNode(node);
 
-            QueuePush(q, node->left);
-            QueuePush(q, node->right);
+            if (node->left != NULL) QueuePush(q, node->left);
+            if (node->right != NULL) QueuePush(q, node->right);
         }
         PrintNewline();  // 打印一层
     }
@@ -150,4 +153,31 @@ void PreOrderII(TreeNode *root) {
     }
 
     FreeStack(s);
+}
+
+// 中序遍历 - 非递归
+void InOrderII(TreeNode *root) {
+    Stack *s = NewStack();
+    TreeNode *node = root;  // 表示需要压栈的节点
+
+    while (1) {
+        if (node != NULL) {  // 不断压左树支入栈
+            StackPush(s, node);
+            node = node->left;
+        } else if (!IsStackEmpty(s)) {
+            // 处理已入栈的节点
+            node = StackPop(s);
+            PrintTreeNode(node);
+            node = node->right;
+        } else {
+            break;
+        }
+    }
+
+    FreeStack(s);
+}
+
+// 后序遍历 - 非递归
+void PostOrderII(TreeNode *root) {
+    // TODO
 }
