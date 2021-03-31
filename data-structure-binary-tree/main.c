@@ -64,6 +64,15 @@ void TestPostOrder() {
     FreeTree(root);
 }
 
+void TestPostOrderII() {
+    printf("post order ii:");
+    int a[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+    TreeNode *root = NewTree(a, 10);
+    PostOrderII(root);
+    printf("\n");
+    FreeTree(root);
+}
+
 void TestLevelOrder() {
     printf("level order:");
     int a[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
@@ -80,6 +89,7 @@ int main(void) {
     TestInOrder();
     TestInOrderII();
     TestPostOrder();
+    TestPostOrderII();
     TestLevelOrder();
     return 0;
 }

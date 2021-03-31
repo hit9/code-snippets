@@ -139,17 +139,16 @@ void LevelOrder(TreeNode *root) {
 // 前序遍历 - 非递归
 void PreOrderII(TreeNode *root) {
     Stack *s = NewStack();
-    StackPush(s, root);
 
-    while (!IsStackEmpty(s)) {
-        TreeNode *node = StackPop(s);
-
-        if (node == NULL) continue;
-
-        PrintTreeNode(node);
-
-        StackPush(s, node->right);
-        StackPush(s, node->left);
+    while (!IsStackEmpty(s) || root != NULL) {
+        if (root != NULL) {
+            PrintTreeNode(root);
+            StackPush(s, root);
+            root = root->left;
+        } else {
+            root = StackPop(s);
+            root = root->right;
+        }
     }
 
     FreeStack(s);
@@ -158,19 +157,15 @@ void PreOrderII(TreeNode *root) {
 // 中序遍历 - 非递归
 void InOrderII(TreeNode *root) {
     Stack *s = NewStack();
-    TreeNode *node = root;  // 表示需要压栈的节点
 
-    while (1) {
-        if (node != NULL) {  // 不断压左树支入栈
-            StackPush(s, node);
-            node = node->left;
-        } else if (!IsStackEmpty(s)) {
-            // 处理已入栈的节点
-            node = StackPop(s);
-            PrintTreeNode(node);
-            node = node->right;
+    while (!IsStackEmpty(s) || root != NULL) {
+        if (root != NULL) {
+            StackPush(s, root);
+            root = root->left;
         } else {
-            break;
+            root = StackPop(s);
+            PrintTreeNode(root);
+            root = root->right;
         }
     }
 
@@ -179,5 +174,24 @@ void InOrderII(TreeNode *root) {
 
 // 后序遍历 - 非递归
 void PostOrderII(TreeNode *root) {
-    // TODO
+    Stack *s = NewStack();
+    Stack *r = NewStack();
+
+    while (!IsStackEmpty(s) || root != NULL) {
+        if (root != NULL) {
+            StackPush(r, root);
+            StackPush(s, root);
+            root = root->right;
+        } else {
+            root = StackPop(s);
+            root = root->left;
+        }
+    }
+
+    while (!IsStackEmpty(r)) {
+        PrintTreeNode(StackPop(r));
+    }
+
+    FreeStack(s);
+    FreeStack(r);
 }
