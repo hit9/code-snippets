@@ -14,3 +14,4 @@ void FreeStack(Stack *stack);
 bool StackPush(Stack *stack, void *v);
 void *StackPop(Stack *stack);
 bool IsStackEmpty(Stack *stack);
+void *StackTop(Stack *stack);

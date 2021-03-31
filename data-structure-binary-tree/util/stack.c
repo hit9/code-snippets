@@ -43,3 +43,8 @@ bool IsStackEmpty(Stack *stack) {
     if (stack == NULL || stack->len == 0) return true;
     return false;
 }
+
+void *StackTop(Stack *stack) {
+    if (stack->len == 0) return NULL;
+    return stack->a[stack->len - 1];
+}
