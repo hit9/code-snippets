@@ -10,6 +10,14 @@
 // 测试
 //////////
 
+void TestNewTree() {
+    int a[] = {0, 1, 2, 3, -1, -1, 6, 7, 8, -1};
+    TreeNode *root = NewTree(a, 10);
+    LevelOrderTraversal(root);
+    printf("\n");
+    FreeTree(root);
+}
+
 // 仅测试打印
 void TestTraversal() {
     int a[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
@@ -39,6 +47,7 @@ void TestTraversal() {
 }
 
 int main(void) {
+    TestNewTree();
     TestTraversal();
 
     return 0;

@@ -26,7 +26,10 @@ TreeNode *NewTreeI(int a[], int n, int i) {
     if (i < n) {
         int v = a[i];
         if (v == -1) return NULL;  // -1 表示空节点
+
         TreeNode *node = NewTreeNode(v);
+        if (node == NULL) return NULL;
+
         node->v = v;
         node->left = NewTreeI(a, n, 2 * i + 1);   // 左孩子
         node->right = NewTreeI(a, n, 2 * i + 2);  // 右孩子
