@@ -13,42 +13,57 @@
 void TestNewTree() {
     int a[] = {0, 1, 2, 3, -1, -1, 6, 7, 8, -1};
     TreeNode *root = NewTree(a, 10);
-    LevelOrderTraversal(root);
+    BFS(root);
     printf("\n");
     FreeTree(root);
 }
 
-// 仅测试打印
-void TestTraversal() {
+void TestPreOrder() {
     int a[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
     TreeNode *root = NewTree(a, 10);
-
-    printf("前序：");
-    PreOrderTraversal(root);
+    PreOrder(root);
     printf("\n");
+    FreeTree(root);
+}
 
-    printf("中序：");
-    InOrderTraversal(root);
+void TestPreOrderII() {
+    int a[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+    TreeNode *root = NewTree(a, 10);
+    PreOrderII(root);
     printf("\n");
+    FreeTree(root);
+}
 
-    printf("后序：");
-    PostOrderTraversal(root);
+void TestInOrder() {
+    int a[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+    TreeNode *root = NewTree(a, 10);
+    InOrder(root);
     printf("\n");
+    FreeTree(root);
+}
 
-    printf("层序：");
-    LevelOrderTraversal(root);
+void TestPostOrder() {
+    int a[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+    TreeNode *root = NewTree(a, 10);
+    PostOrder(root);
     printf("\n");
+    FreeTree(root);
+}
 
-    printf("前序（非递归）：");
-    PreOrderTraversalNonRecur(root);
+void TestLevelOrder() {
+    int a[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+    TreeNode *root = NewTree(a, 10);
+    LevelOrder(root);
     printf("\n");
-
     FreeTree(root);
 }
 
 int main(void) {
     TestNewTree();
-    TestTraversal();
-
+    TestPreOrder();
+    TestPreOrderII();
+    TestInOrder();
+    TestPostOrder();
+    TestLevelOrder();
     return 0;
 }

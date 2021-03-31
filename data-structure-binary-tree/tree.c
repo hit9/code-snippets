@@ -9,6 +9,17 @@
 #include "util/queue.h"
 #include "util/stack.h"
 
+//  Utils
+void PrintTreeNode(TreeNode *node) {
+    if (node != NULL) printf("%d ", node->v);
+}
+
+void PrintNewline() { printf("\n"); }
+
+/////////
+// 实现
+/////////
+
 // 创建节点
 TreeNode *NewTreeNode(int v) {
     TreeNode *node = malloc(sizeof(TreeNode));
@@ -56,36 +67,32 @@ void FreeTree(TreeNode *root) {
     free(root);
 }
 
-void PrintTreeNode(TreeNode *node) { printf("%d ", node->v); }
-
 // 前序遍历 - 递归
-void PreOrderTraversal(TreeNode *root) {
+void PreOrder(TreeNode *root) {
     if (root == NULL) return;
     PrintTreeNode(root);  // 当前节点处理在前
-    PreOrderTraversal(root->left);
-    PreOrderTraversal(root->right);
+    PreOrder(root->left);
+    PreOrder(root->right);
 }
 
 // 中序遍历 - 递归
-void InOrderTraversal(TreeNode *root) {
+void InOrder(TreeNode *root) {
     if (root == NULL) return;
-    InOrderTraversal(root->left);
+    InOrder(root->left);
     PrintTreeNode(root);  // 当前节点处理在中间
-    InOrderTraversal(root->right);
+    InOrder(root->right);
 }
 
 // 后序遍历 - 递归
-void PostOrderTraversal(TreeNode *root) {
+void PostOrder(TreeNode *root) {
     if (root == NULL) return;
-    PostOrderTraversal(root->left);
-    PostOrderTraversal(root->right);
+    PostOrder(root->left);
+    PostOrder(root->right);
     PrintTreeNode(root);  // 当前节点处理在后
 }
 
-// 层序遍历
-void LevelOrderTraversal(TreeNode *root) {
-    if (root == NULL) return;
-
+// 广度优先遍历 - 队列 + 循环
+void BFS(TreeNode *root) {
     Queue *q = NewQueue();
     QueuePush(q, root);
 
@@ -103,10 +110,31 @@ void LevelOrderTraversal(TreeNode *root) {
     FreeQueue(q);
 }
 
-// 前序遍历 - 非递归
-void PreOrderTraversalNonRecur(TreeNode *root) {
-    if (root == NULL) return;
+// 层序遍历
+void LevelOrder(TreeNode *root) {
+    Queue *q = NewQueue();
+    QueuePush(q, root);
 
+    while (!IsQueueEmpty(q)) {
+        // 队列中的节点是当前层次中的节点
+        int qsize = QueueSize(q);
+        for (int j = 0; j < qsize; j++) {
+            TreeNode *node = QueuePop(q);
+            if (node == NULL) continue;
+
+            PrintTreeNode(node);
+
+            QueuePush(q, node->left);
+            QueuePush(q, node->right);
+        }
+        PrintNewline();  // 打印一层
+    }
+
+    FreeQueue(q);
+}
+
+// 前序遍历 - 非递归
+void PreOrderII(TreeNode *root) {
     Stack *s = NewStack();
     StackPush(s, root);
 

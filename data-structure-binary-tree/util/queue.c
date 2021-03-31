@@ -75,3 +75,8 @@ void FreeQueue(Queue *q) {
     while (!IsQueueEmpty(q)) QueuePop(q);
     free(q);
 }
+// 获取队列大小
+int QueueSize(Queue *q) {
+    if (q == NULL) return 0;
+    return q->length;
+}

@@ -23,3 +23,4 @@ bool IsQueueEmpty(Queue *q);        // 是否队空？
 void *QueueFront(Queue *q);         // 获取队头
 void QueuePush(Queue *q, void *v);  // 数据入队
 void *QueuePop(Queue *q);           // 队头出队
+int QueueSize(Queue *q);            // 队列大小
