@@ -6,7 +6,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "queue.h"
+#include "util/queue.h"
 
 // 创建节点
 TreeNode *NewTreeNode(int v) {
