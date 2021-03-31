@@ -7,6 +7,7 @@
 #include <stdlib.h>
 
 #include "util/queue.h"
+#include "util/stack.h"
 
 // 创建节点
 TreeNode *NewTreeNode(int v) {
@@ -83,7 +84,6 @@ void LevelOrderTraversal(TreeNode *root) {
     if (root == NULL) return;
 
     Queue *q = NewQueue();
-
     QueuePush(q, root);
 
     while (!IsQueueEmpty(q)) {
@@ -98,4 +98,25 @@ void LevelOrderTraversal(TreeNode *root) {
     }
 
     FreeQueue(q);
+}
+
+// 前序遍历 - 非递归
+void PreOrderTraversalNonRecur(TreeNode *root) {
+    if (root == NULL) return;
+
+    Stack *s = NewStack();
+    StackPush(s, root);
+
+    while (!IsStackEmpty(s)) {
+        TreeNode *node = StackPop(s);
+
+        if (node == NULL) continue;
+
+        PrintTreeNode(node);
+
+        StackPush(s, node->right);
+        StackPush(s, node->left);
+    }
+
+    FreeStack(s);
 }

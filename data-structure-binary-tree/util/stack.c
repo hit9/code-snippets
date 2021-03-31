@@ -18,7 +18,7 @@ void FreeStack(Stack *stack) {
     free(stack);
 }
 
-bool Push(Stack *stack, void *v) {
+bool StackPush(Stack *stack, void *v) {
     // 如果需要重新申请内存
     if (stack->cap < stack->len + 1) {
         int cap = stack->cap + 32;
@@ -34,12 +34,12 @@ bool Push(Stack *stack, void *v) {
     return true;
 }
 
-void *Pop(Stack *stack) {
+void *StackPop(Stack *stack) {
     if (stack->len == 0) return NULL;
     return stack->a[--stack->len];
 }
 
-bool IsEmpty(Stack *stack) {
+bool IsStackEmpty(Stack *stack) {
     if (stack == NULL || stack->len == 0) return true;
     return false;
 }

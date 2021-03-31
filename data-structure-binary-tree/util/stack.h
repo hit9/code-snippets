@@ -11,6 +11,6 @@ typedef struct _Stack {
 
 Stack *NewStack();
 void FreeStack(Stack *stack);
-bool Push(Stack *stack, void *v);
-void *Pop(Stack *stack);
-bool IsEmpty(Stack *stack);
+bool StackPush(Stack *stack, void *v);
+void *StackPop(Stack *stack);
+bool IsStackEmpty(Stack *stack);
