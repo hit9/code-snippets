@@ -35,7 +35,7 @@ bool IsStringRepeatedPattern(char *s) {
 
     int k = next[n - 1];
     // 如果是周期串，那么 d 就是周期
-    // s[k] 是周期串的第一个字符
+    // s[k] 是第一个周期子串的尾巴字符
     int d = k + 1;
 
     if (d < n && s[k] == s[n - 1] && n % (n - d) == 0) return true;
