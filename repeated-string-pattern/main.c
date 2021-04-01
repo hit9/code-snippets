@@ -1,4 +1,5 @@
 // 判断字符串是否是周期串模式
+// https://writings.sh/post/algorithm-repeated-string-pattern
 // 采用 KMP Next 数组的方法
 
 #include <assert.h>
