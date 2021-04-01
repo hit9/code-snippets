@@ -19,8 +19,10 @@ void ComputeNext(char *p, int m, int next[]) {
     for (int j = 2; j < m; j++) {
         char ch = p[j - 1];
         int k = next[j - 1];
+        // 向前跳跃匹配前缀
         while (k != 0 && ch != p[k]) k = next[k];
-        next[j] = 0;
+        next[j] = 0;  // 找不到默认为 0
+        // 找到了，长度是 匹配位置 + 1
         if (ch == p[k]) next[j] = k + 1;
     }
 }
