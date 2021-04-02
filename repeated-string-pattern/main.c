@@ -33,12 +33,12 @@ bool IsStringRepeatedPattern(char *s) {
     int next[n];
     ComputeNext(s, n, next);
 
-    int k = next[n - 1];
-    // 如果是周期串，那么 d 就是周期
-    // s[k] 是第一个周期子串的尾巴字符
-    int d = k + 1;
+    // s[0:n-1] 的最长的前后公共缀长度
+    int c = next[n - 1];
+    // 预期的周期长度
+    int d = (n - 1) - c;
 
-    if (d < n && s[k] == s[n - 1] && n % (n - d) == 0) return true;
+    if (d > 0 && s[c] == s[n - 1] && n % d == 0) return true;
     return false;
 }
 
