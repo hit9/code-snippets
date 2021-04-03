@@ -104,6 +104,18 @@ void TestMinDepth() {
     FreeTree(root);
 }
 
+void TestIsSymmetric() {
+    int a[] = {1, 2, 2, 3, 4, 4, 3};
+    TreeNode *root = NewTree(a, 7);
+    assert(IsSymmetric(root));
+    FreeTree(root);
+
+    int b[] = {1, 2, 2, -1, 3, -1, 3};
+    TreeNode *root1 = NewTree(b, 7);
+    assert(!IsSymmetric(root1));
+    FreeTree(root1);
+}
+
 void TestToArrayAndFromArray() {
     int n1 = 10;
     int a1[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
@@ -151,6 +163,7 @@ int main(void) {
     TestCount();
     TestMaxDepth();
     TestMinDepth();
+    TestIsSymmetric();
     TestToArrayAndFromArray();
     return 0;
 }

@@ -44,6 +44,7 @@ int Count(TreeNode *root);               // 计算节点数
 int MaxDepth(TreeNode *root);            // 最大深度
 int MinDepth(TreeNode *root);            // 最小深度
 bool Compare(TreeNode *a, TreeNode *b);  // 比较两个树是否相等
+bool IsSymmetric(TreeNode *root);        // 是否对称
 
 IntArray *ToArray(TreeNode *root);    // 转化为数组 广度优先
 TreeNode *FromArray(int a[], int n);  // 从数组建树 广度优先

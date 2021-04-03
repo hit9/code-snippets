@@ -263,6 +263,37 @@ bool Compare(TreeNode *a, TreeNode *b) {
     }
 }
 
+// 判断两个树是否镜像相等
+// 为 IsSymmetric 的辅助函数
+//
+//    2        2
+//  3   4    4   3
+// 5 6 7 8  8 7 6 5
+// 两个树是镜像相等的
+bool IsTwoTreeSymmetric(TreeNode *a, TreeNode *b) {
+    if (a == NULL && b == NULL)
+        return true;
+    else if (a != NULL && b == NULL)
+        return false;
+    else if (a == NULL && b != NULL)
+        return false;
+    else {
+        return a->v == b->v && IsTwoTreeSymmetric(a->left, b->right) &&
+               IsTwoTreeSymmetric(a->right, b->left);
+    }
+}
+
+// 判断一个二叉树是否对称
+//
+//    1
+//  2   2
+// 3 4 4 3
+// => true
+bool IsSymmetric(TreeNode *root) {
+    if (root == NULL) return true;
+    return IsTwoTreeSymmetric(root->left, root->right);
+}
+
 // 二叉树转化为数组
 //
 //    2
