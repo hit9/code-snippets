@@ -128,6 +128,23 @@ void TestIsBalanced() {
     FreeTree(root1);
 }
 
+void TestIsBST1() {
+    int a[] = {5, 3, 7, 2, 4, 6, 8};
+    TreeNode *root = NewTree(a, 7);
+    assert(IsBST1(root));
+    FreeTree(root);
+
+    int a1[] = {2, 1, 3};
+    TreeNode *root1 = NewTree(a1, 3);
+    assert(IsBST1(root1));
+    FreeTree(root1);
+
+    int a2[] = {5, 1, 4, -1, -1, 3, 6};
+    TreeNode *root2 = NewTree(a2, 7);
+    assert(!IsBST1(root2));
+    FreeTree(root2);
+}
+
 void TestToArrayAndFromArray() {
     int n1 = 10;
     int a1[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
@@ -177,6 +194,7 @@ int main(void) {
     TestMinDepth();
     TestIsSymmetric();
     TestIsBalanced();
+    TestIsBST1();
     TestToArrayAndFromArray();
     return 0;
 }

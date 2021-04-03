@@ -2,6 +2,7 @@
 
 #include "tree.h"
 
+#include <limits.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -309,6 +310,22 @@ int IsBalancedHelperDepth(TreeNode *root) {
 // 判断平衡树
 // 二叉树中任意节点的左右子树的深度相差不超过1 为平衡树
 bool IsBalanced(TreeNode *root) { return IsBalancedHelperDepth(root) != -1; }
+
+// IsBST1 的辅助函数
+bool IsBST1Helper(TreeNode *root, long long upper, long long lower) {
+    if (root == NULL) return true;
+    if (root->v <= lower || root->v >= upper) return false;
+    return IsBST1Helper(root->left, root->v, lower) &&
+           IsBST1Helper(root->right, upper, root->v);
+}
+
+// 判断二叉搜索树
+// 二叉搜索树的特征：
+// 1. 节点的左子树只包含小于当前节点的数
+// 2. 节点的右子树只包含大于当前节点的数
+// 3. 所有左子树和右子树自身必须也是二叉搜索树
+// 这是第一种方法：递归验证上下界
+bool IsBST1(TreeNode *root) { return IsBST1Helper(root, LONG_MAX, LONG_MIN); }
 
 // 二叉树转化为数组
 //

@@ -46,6 +46,8 @@ int MinDepth(TreeNode *root);            // 最小深度
 bool Compare(TreeNode *a, TreeNode *b);  // 比较两个树是否相等
 bool IsSymmetric(TreeNode *root);        // 是否对称
 bool IsBalanced(TreeNode *root);         // 是否平衡
+bool IsBST1(TreeNode *root);             // 是否二叉搜索树
+bool IsBST2(TreeNode *root);             // 是否二叉搜索树
 
 IntArray *ToArray(TreeNode *root);    // 转化为数组 广度优先
 TreeNode *FromArray(int a[], int n);  // 从数组建树 广度优先
