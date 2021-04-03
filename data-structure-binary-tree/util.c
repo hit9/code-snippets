@@ -1,6 +1,7 @@
 #include "util.h"
 
 #include <stdbool.h>
+#include <stdio.h>
 #include <stdlib.h>
 
 /////////////////
@@ -86,7 +87,7 @@ int ArraySize(Array *a) {
 }
 
 void *ArrayPop(Array *a) {
-    if (a == NULL) return -1;
+    if (a == NULL) return NULL;
     return a->a[--a->n];
 }
 
@@ -204,4 +205,24 @@ void FreeQueue(Queue *q) {
 int QueueSize(Queue *q) {
     if (q == NULL) return 0;
     return q->length;
+}
+
+/////////////////
+// 辅助函数
+/////////////////
+
+bool IsArrayEqual(int a[], int m, int b[], int n) {
+    if (m != n) return false;
+    for (int i = 0; i < n; i++) {
+        if (a[i] != b[i]) return false;
+    }
+    return true;
+}
+void PrintIntArray(int a[], int n) {
+    printf("[");
+    for (int i = 0; i < n; i++) {
+        printf("%d", a[i]);
+        if (i < n - 1) printf(",");
+    }
+    printf("]\n");
 }

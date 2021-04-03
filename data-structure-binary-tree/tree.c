@@ -6,9 +6,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "util/queue.h"
-#include "util/stack.h"
-
 //  Utils
 void PrintTreeNode(TreeNode *node) {
     if (node != NULL) printf("%d ", node->v);
@@ -32,32 +29,22 @@ TreeNode *NewTreeNode(int v) {
 // 释放节点
 void FreeTreeNode(TreeNode *node) { free(node); }
 
-// 给第 i 个节点创建树
-TreeNode *NewTreeI(int a[], int n, int i) {
-    if (i < n) {
-        int v = a[i];
-        if (v == -1) return NULL;  // -1 表示空节点
-
-        TreeNode *node = NewTreeNode(v);
-        if (node == NULL) return NULL;
-
-        node->v = v;
-        node->left = NewTreeI(a, n, 2 * i + 1);   // 左孩子
-        node->right = NewTreeI(a, n, 2 * i + 2);  // 右孩子
-        return node;
-    }
-    return NULL;
-}
-
 // 从数组构建一个树
 //
 // [0 1 2 3 4 5 -1 6 7] =>
 //
 //      0
 //    1   2
-//   3 4 5 -1
+//   3 4 5
 //  6 7
-TreeNode *NewTree(int a[], int n) { return NewTreeI(a, n, 0); }
+//
+//  [0, -1, 2, -1, 3 -1, 4] =>
+//
+//      0
+//        2
+//           3
+//              4
+TreeNode *NewTree(int a[], int n) { return FromArray(a, n); }
 
 // 释放整个树的内存
 void FreeTree(TreeNode *root) {
@@ -224,3 +211,133 @@ TreeNodeWrapper *NewTreeNodeWrapper(TreeNode *node, bool visited) {
 }
 
 void FreeTreeNodeWrapper(TreeNodeWrapper *w) { free(w); }
+
+// 返回节点数量
+int Count(TreeNode *root) {
+    if (root == NULL) return 0;
+    return 1 + Count(root->left) + Count(root->right);
+}
+
+// 返回最大深度
+//    3
+//  9   20
+//    15  7
+// => MaxDepth = 3
+// https://leetcode-cn.com/problems/maximum-depth-of-binary-tree/
+int MaxDepth(TreeNode *root) {
+    if (root == NULL) return 0;
+    int max_depth_left = MaxDepth(root->left);
+    int max_depth_right = MaxDepth(root->right);
+    return MAX(max_depth_left, max_depth_right) + 1;
+}
+
+// 返回最小深度
+//    3
+//  9   20
+//    15  7
+// => MinDepth = 2
+// 根节点到最近的叶子节点的节点数量
+// https://leetcode-cn.com/problems/minimum-depth-of-binary-tree/
+int MinDepth(TreeNode *root) {
+    if (root == NULL) return 0;
+
+    int min_depth_left = MinDepth(root->left);
+    int min_depth_right = MinDepth(root->right);
+
+    if (root->left == NULL) return min_depth_right + 1;
+    if (root->right == NULL) return min_depth_left + 1;
+    return MIN(min_depth_left, min_depth_right) + 1;
+}
+
+// 比较两个二叉树是否完全相等
+bool Compare(TreeNode *a, TreeNode *b) {
+    if (a == NULL && b == NULL)
+        return true;
+    else if (a == NULL && b != NULL)
+        return false;
+    else if (a != NULL && b == NULL)
+        return false;
+    else {
+        return a->v == b->v && Compare(a->left, b->left) &&
+               Compare(a->right, b->right);
+    }
+}
+
+// 二叉树转化为数组
+//
+//    2
+//  3   4
+//    5   6
+//          7
+// => [2,3,4,-1,5,6,-1,-1,-1,7]
+//
+//    2
+//      3
+//        4
+// => [2,-1,3,-1,4]
+//
+// 采用广度优先遍历
+IntArray *ToArray(TreeNode *root) {
+    IntArray *a = NewIntArray();
+
+    Queue *q = NewQueue();
+    QueuePush(q, root);
+
+    int ec = 0;  // 记录自上一个非空节点以后的空节点数量
+
+    while (!IsQueueEmpty(q)) {
+        // 依次处理完本层节点
+        TreeNode *node = QueuePop(q);
+
+        if (node == NULL) {
+            ec++;
+            continue;
+        } else {
+            // 把前面的空节点放进来
+            // 为了防止数据末尾有 -1，所以遇到非空节点是才把-1刷出来
+            for (int i = 0; i < ec; i++) IntArrayPush(a, -1);
+            ec = 0;
+            // 添加当前非空节点的数据
+            IntArrayPush(a, node->v);
+            // 添加下一层节点到队列
+            QueuePush(q, node->left);
+            QueuePush(q, node->right);
+        }
+    }
+
+    FreeQueue(q);
+    return a;
+}
+
+// 数组转化为树 （即 ToArray 的逆）
+TreeNode *FromArray(int a[], int n) {
+    if (n <= 0) return NULL;
+    if (a[0] == -1) return NULL;
+
+    Queue *q = NewQueue();  // 记录上一层节点
+    TreeNode *root = NewTreeNode(a[0]);
+    QueuePush(q, root);
+
+    int i = 1;
+    int v;
+
+    while (!IsQueueEmpty(q)) {
+        TreeNode *node = QueuePop(q);
+
+        if (i < n) {  // 新建左节点
+            v = a[i++];
+            if (v != -1) node->left = NewTreeNode(v);
+        }
+
+        if (i < n) {  // 新建右节点
+            v = a[i++];
+            if (v != -1) node->right = NewTreeNode(v);
+        }
+
+        if (node->left != NULL) QueuePush(q, node->left);
+        if (node->right != NULL) QueuePush(q, node->right);
+    }
+
+    FreeQueue(q);
+    return root;
+}
