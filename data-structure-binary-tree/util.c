@@ -218,6 +218,7 @@ bool IsArrayEqual(int a[], int m, int b[], int n) {
     }
     return true;
 }
+
 void PrintIntArray(int a[], int n) {
     printf("[");
     for (int i = 0; i < n; i++) {
