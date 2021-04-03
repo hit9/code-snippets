@@ -294,6 +294,22 @@ bool IsSymmetric(TreeNode *root) {
     return IsTwoTreeSymmetric(root->left, root->right);
 }
 
+// IsBalanced 函数的辅助函数
+// 如果树是平衡树，返回其最大深度
+// 否则，返回 -1
+int IsBalancedHelperDepth(TreeNode *root) {
+    if (root == NULL) return 0;
+    int d1 = IsBalancedHelperDepth(root->left);
+    int d2 = IsBalancedHelperDepth(root->right);
+    if (d1 == -1 || d2 == -1) return -1;
+    if (abs(d1 - d2) > 1) return -1;
+    return MAX(d1, d2) + 1;
+}
+
+// 判断平衡树
+// 二叉树中任意节点的左右子树的深度相差不超过1 为平衡树
+bool IsBalanced(TreeNode *root) { return IsBalancedHelperDepth(root) != -1; }
+
 // 二叉树转化为数组
 //
 //    2

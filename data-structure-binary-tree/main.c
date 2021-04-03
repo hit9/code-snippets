@@ -116,6 +116,18 @@ void TestIsSymmetric() {
     FreeTree(root1);
 }
 
+void TestIsBalanced() {
+    int a[] = {3, 9, 20, -1, -1, 15, 7};
+    TreeNode *root = NewTree(a, 7);
+    assert(IsBalanced(root));
+    FreeTree(root);
+
+    int a1[] = {1, 2, 2, 3, 3, -1, -1, 4, 4};
+    TreeNode *root1 = NewTree(a1, 8);
+    assert(!IsBalanced(root1));
+    FreeTree(root1);
+}
+
 void TestToArrayAndFromArray() {
     int n1 = 10;
     int a1[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
@@ -164,6 +176,7 @@ int main(void) {
     TestMaxDepth();
     TestMinDepth();
     TestIsSymmetric();
+    TestIsBalanced();
     TestToArrayAndFromArray();
     return 0;
 }
