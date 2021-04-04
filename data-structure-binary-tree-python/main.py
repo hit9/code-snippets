@@ -66,6 +66,31 @@ def test_from_to_array():
     assert bt_compare(r3, r31)
 
 
+def test_bt_count():
+    a = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+    root = bt_from_array(a)
+    assert bt_count(root) == len(a)
+
+
+def test_bt_max_depth():
+    a = [0, 1, 2, -1, -1, -1, 3, -1, 4]
+    root = bt_from_array(a)
+    assert bt_max_depth(root) == 4
+
+
+def test_bt_min_depth():
+    a = [0, 1, 2, -1, -1, -1, 3, -1, 4]
+    root = bt_from_array(a)
+    assert bt_min_depth(root) == 2
+
+
+def test_bt_is_symmetric():
+    a = [1, 2, 2, 3, 4, 4, 3]
+    assert bt_is_symmetric(bt_from_array(a))
+    b = [1, 2, 2, -1, 3, -1, 3]
+    assert not bt_is_symmetric(bt_from_array(b))
+
+
 def main():
     test_bfs()
     test_bt_preorder()
@@ -75,6 +100,10 @@ def main():
     test_bt_inorder_ii()
     test_bt_postorder_ii()
     test_from_to_array()
+    test_bt_count()
+    test_bt_max_depth()
+    test_bt_min_depth()
+    test_bt_is_symmetric()
 
 
 if __name__ == "__main__":

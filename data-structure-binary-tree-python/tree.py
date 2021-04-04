@@ -157,6 +157,68 @@ def bt_compare(a, b):
     return a.v == b.v and bt_compare(a.left, b.left) and bt_compare(a.right, b.right)
 
 
+def bt_count(root):
+    """返回二叉树的节点数目"""
+    if not root:
+        return 0
+    return 1 + bt_count(root.left) + bt_count(root.right)
+
+
+def bt_max_depth(root):
+    """返回二叉树的最大深度"""
+    if not root:
+        return 0
+    d1 = bt_max_depth(root.left)
+    d2 = bt_max_depth(root.right)
+    return max(d1, d2) + 1
+
+
+def bt_min_depth(root):
+    """返回二叉树的最小深度"""
+    if not root:
+        return 0
+    d1 = bt_min_depth(root.left)
+    d2 = bt_min_depth(root.right)
+    if not root.left:
+        return d2 + 1
+    if not root.right:
+        return d1 + 1
+    return min(d1, d2) + 1
+
+
+def bt_is_two_bt_symmetric(a, b):
+    """判断两个二叉树是否镜像相等
+
+       2         2
+     3   4     4   3
+    5 6 7 8   8 7 6 5
+    => True
+    """
+    if not a and not b:
+        return True
+    if not a and b:
+        return False
+    if not b and a:
+        return False
+    return (
+        a.v == b.v
+        and bt_is_two_bt_symmetric(a.left, b.right)
+        and bt_is_two_bt_symmetric(a.right, b.left)
+    )
+
+
+def bt_is_symmetric(root):
+    """判断二叉树是否镜像
+        1
+      2   2
+    3  4 4  3
+    => True
+    """
+    if not root:
+        return True
+    return bt_is_two_bt_symmetric(root.left, root.right)
+
+
 ########
 # 序列化
 ########
