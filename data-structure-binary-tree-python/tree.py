@@ -352,6 +352,26 @@ def bst_kth1(root, k):
     return a[k - 1]  # 第 k-1 个元素 而不是 -1
 
 
+def bst_kth2(root, k):
+    """找出二叉搜索树的第 k 小的元素
+    非递归版
+    性质：二叉搜索树的中序遍历是有序的"""
+    s = [(root, 0)]
+    while len(s) > 0:
+        node, visited = s.pop()
+        if not node:
+            continue
+        if visited == 0:
+            s.append((node.right, 0))
+            s.append((node, 1))
+            s.append((node.left, 0))
+        else:
+            k -= 1  # 处理此节点
+            if k == 0:
+                return node.v
+    return -1
+
+
 ########
 # 序列化
 ########

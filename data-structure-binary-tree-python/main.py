@@ -67,6 +67,11 @@ def test_bst_kth1():
     assert bst_kth1(a, 3) == 3
 
 
+def test_bst_kth2():
+    a = bt_from_array([5, 3, 6, 2, 4, -1, -1, 1])
+    assert bst_kth2(a, 3) == 3
+
+
 def test_from_to_array():
     a1 = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
     r1 = bt_from_array(a1)
@@ -151,6 +156,7 @@ def main():
     test_is_bst2()
     test_bt_invert()
     test_bst_kth1()
+    test_bst_kth2()
 
 
 if __name__ == "__main__":
