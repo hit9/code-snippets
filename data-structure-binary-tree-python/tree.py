@@ -2,6 +2,7 @@
 二叉树 Python 版
 """
 
+
 class TreeNode:
     """二叉树，值为整型"""
 
@@ -10,9 +11,80 @@ class TreeNode:
         self.left = None
         self.right = None
 
+
+########
+# 遍历
+########
+
+
+def bt_bfs(root):
+    """广度优先遍历"""
+    if not root:
+        return
+    q = [root]
+    a = []  # 数值数组
+    while len(q) > 0:
+        node = q.pop(0)
+        if not node:
+            continue
+        a.append(node.v)
+        q.append(node.left)
+        q.append(node.right)
+    return a
+
+
+def bt_preorder_recur(root, a):
+    """bt_preorder 的辅助函数"""
+    if not root:
+        return
+    a.append(root.v)
+    bt_preorder_recur(root.left, a)
+    bt_preorder_recur(root.right, a)
+
+
+def bt_preorder(root):
+    """前序遍历（递归）"""
+    a = []
+    bt_preorder_recur(root, a)
+    return a
+
+
+def bt_inorder_recur(root, a):
+    """bt_inorder_recur 的辅助函数"""
+    if not root:
+        return
+    bt_inorder_recur(root.left, a)
+    a.append(root.v)
+    bt_inorder_recur(root.right, a)
+
+
+def bt_inorder(root):
+    """中序遍历（递归）"""
+    a = []
+    bt_inorder_recur(root, a)
+    return a
+
+
+def bt_postorder_recur(root, a):
+    """bt_postorder 的辅助函数"""
+    if not root:
+        return
+    bt_postorder_recur(root.left, a)
+    bt_postorder_recur(root.right, a)
+    a.append(root.v)
+
+
+def bt_postorder(root):
+    """后序遍历（递归）"""
+    a = []
+    bt_postorder_recur(root, a)
+    return a
+
+
 ########
 # 简单问题
 ########
+
 
 def bt_compare(a, b):
     """比较两个二叉树是否完全相同"""
@@ -22,13 +94,13 @@ def bt_compare(a, b):
         return False
     if not a and b:
         return False
-    return a.v == b.v and bt_compare(a.left, b.left) \
-            and bt_compare(a.right, b.right)
+    return a.v == b.v and bt_compare(a.left, b.left) and bt_compare(a.right, b.right)
 
 
 ########
 # 序列化
 ########
+
 
 def bt_from_array(a):
     """
@@ -69,7 +141,7 @@ def bt_from_array(a):
             if v != -1:
                 node.left = TreeNode(v)
 
-        if  i < len(a):  # 当前节点的右孩子
+        if i < len(a):  # 当前节点的右孩子
             v = a[i]
             i += 1
             if v != -1:
