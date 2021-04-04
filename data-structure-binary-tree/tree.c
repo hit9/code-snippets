@@ -386,10 +386,6 @@ TreeNode *FromArray(int a[], int n) {
     return root;
 }
 
-/////////
-// 二叉搜索树
-/////////
-
 // IsBalanced 函数的辅助函数
 // 如果树是平衡树，返回其最大深度
 // 否则，返回 -1
@@ -405,6 +401,10 @@ int IsBalancedHelperDepth(TreeNode *root) {
 // 判断平衡树
 // 二叉树中任意节点的左右子树的深度相差不超过1 为平衡树
 bool IsBalanced(TreeNode *root) { return IsBalancedHelperDepth(root) != -1; }
+
+/////////
+// 二叉搜索树
+/////////
 
 // IsBST1 的辅助函数
 bool IsBST1Helper(TreeNode *root, long long upper, long long lower) {
