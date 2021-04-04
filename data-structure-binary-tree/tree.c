@@ -327,6 +327,27 @@ bool IsBST1Helper(TreeNode *root, long long upper, long long lower) {
 // 这是第一种方法：递归验证上下界
 bool IsBST1(TreeNode *root) { return IsBST1Helper(root, LONG_MAX, LONG_MIN); }
 
+// IsBST2Helper 的辅助函数，中序遍历判断是否递增
+bool IsBST2Helper(TreeNode *root, IsBST2HelperLast *last) {
+    if (root == NULL) return true;
+    if (!IsBST2Helper(root->left, last)) return false;
+
+    if (last->init && root->v <= last->v) return false;
+
+    last->v = root->v;
+    last->init = true;
+
+    if (!IsBST2Helper(root->right, last)) return false;
+    return true;
+}
+
+// 判断二叉搜索树
+// 这时第二种方法：中序遍历有序
+bool IsBST2(TreeNode *root) {
+    IsBST2HelperLast last = {0, false};
+    return IsBST2Helper(root, &last);
+}
+
 // 二叉树转化为数组
 //
 //    2
