@@ -1,4 +1,7 @@
 // 二叉树和常见算法问题
+//
+// $ make
+// ./a.out
 
 #include <assert.h>
 #include <stdbool.h>
