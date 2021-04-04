@@ -62,6 +62,11 @@ def test_bt_invert():
     assert bt_to_array(bt_invert(bt_invert(a1))) == c
 
 
+def test_bst_kth1():
+    a = bt_from_array([5, 3, 6, 2, 4, -1, -1, 1])
+    assert bst_kth1(a, 3) == 3
+
+
 def test_from_to_array():
     a1 = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
     r1 = bt_from_array(a1)
@@ -145,6 +150,7 @@ def main():
     test_is_bst1()
     test_is_bst2()
     test_bt_invert()
+    test_bst_kth1()
 
 
 if __name__ == "__main__":

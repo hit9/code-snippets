@@ -330,6 +330,28 @@ def bt_is_bst2(root):
     return bt_is_bst2_helper(root, [])
 
 
+def bst_kth1_helper(root, a, k):
+    """递归收集二叉搜索树的前 k 个元素"""
+    if not root:
+        return
+
+    if len(a) >= k:  # 终止无效递归
+        return
+
+    bst_kth1_helper(root.left, a, k)
+    a.append(root.v)
+    bst_kth1_helper(root.right, a, k)
+
+
+def bst_kth1(root, k):
+    """找出二叉搜索树的第 k 小的元素
+    递归版
+    性质：二叉搜索树的中序遍历是有序的"""
+    a = []
+    bst_kth1_helper(root, a, k)
+    return a[k - 1]  # 第 k-1 个元素 而不是 -1
+
+
 ########
 # 序列化
 ########
