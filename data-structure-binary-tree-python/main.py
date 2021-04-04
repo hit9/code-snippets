@@ -43,6 +43,16 @@ def test_bt_postorder_ii():
     assert a == [7, 8, 3, 9, 4, 1, 5, 6, 2, 0]
 
 
+def test_bt_level_order():
+    root = bt_from_array([2, 3, 4, -1, 5, 6, 7])
+    a = bt_level_order(root)
+    assert a == [[2], [3, 4], [5, 6, 7]]
+
+    root1 = bt_from_array([0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
+    b = bt_level_order(root1)
+    assert b == [[0], [1, 2], [3, 4, 5, 6], [7, 8, 9]]
+
+
 def test_from_to_array():
     a1 = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
     r1 = bt_from_array(a1)
@@ -116,6 +126,7 @@ def main():
     test_bt_preorder_ii()
     test_bt_inorder_ii()
     test_bt_postorder_ii()
+    test_bt_level_order()
     test_from_to_array()
     test_bt_count()
     test_bt_max_depth()

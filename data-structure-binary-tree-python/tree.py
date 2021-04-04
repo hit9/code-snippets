@@ -141,6 +141,34 @@ def bt_postorder_ii(root):
     return a
 
 
+def bt_level_order(root):
+    """层序遍历
+
+        2
+      3   4
+       5 6 7
+    => [[2], [3,4], [5,6,7]]
+    """
+    if not root:
+        return []
+    q = [root]
+    a = []  # 层序遍历结果
+    while len(q) > 0:
+        qsize = len(q)  # 上一层的节点个数
+        b = []
+        while qsize > 0:
+            node = q.pop(0)
+            qsize -= 1
+            if not node:
+                continue
+            b.append(node.v)
+            q.append(node.left)
+            q.append(node.right)
+        if b:
+            a.append(b)
+    return a
+
+
 ########
 # 简单问题
 ########
