@@ -55,6 +55,10 @@ void FreeTree(TreeNode *root) {
     free(root);
 }
 
+/////////
+// 遍历
+/////////
+
 // 前序遍历 - 递归
 void PreOrder(TreeNode *root) {
     if (root == NULL) return;
@@ -213,6 +217,10 @@ TreeNodeWrapper *NewTreeNodeWrapper(TreeNode *node, bool visited) {
 
 void FreeTreeNodeWrapper(TreeNodeWrapper *w) { free(w); }
 
+/////////
+// 简单问题
+/////////
+
 // 返回节点数量
 int Count(TreeNode *root) {
     if (root == NULL) return 0;
@@ -295,58 +303,9 @@ bool IsSymmetric(TreeNode *root) {
     return IsTwoTreeSymmetric(root->left, root->right);
 }
 
-// IsBalanced 函数的辅助函数
-// 如果树是平衡树，返回其最大深度
-// 否则，返回 -1
-int IsBalancedHelperDepth(TreeNode *root) {
-    if (root == NULL) return 0;
-    int d1 = IsBalancedHelperDepth(root->left);
-    int d2 = IsBalancedHelperDepth(root->right);
-    if (d1 == -1 || d2 == -1) return -1;
-    if (abs(d1 - d2) > 1) return -1;
-    return MAX(d1, d2) + 1;
-}
-
-// 判断平衡树
-// 二叉树中任意节点的左右子树的深度相差不超过1 为平衡树
-bool IsBalanced(TreeNode *root) { return IsBalancedHelperDepth(root) != -1; }
-
-// IsBST1 的辅助函数
-bool IsBST1Helper(TreeNode *root, long long upper, long long lower) {
-    if (root == NULL) return true;
-    if (root->v <= lower || root->v >= upper) return false;
-    return IsBST1Helper(root->left, root->v, lower) &&
-           IsBST1Helper(root->right, upper, root->v);
-}
-
-// 判断二叉搜索树
-// 二叉搜索树的特征：
-// 1. 节点的左子树只包含小于当前节点的数
-// 2. 节点的右子树只包含大于当前节点的数
-// 3. 所有左子树和右子树自身必须也是二叉搜索树
-// 这是第一种方法：递归验证上下界
-bool IsBST1(TreeNode *root) { return IsBST1Helper(root, LONG_MAX, LONG_MIN); }
-
-// IsBST2Helper 的辅助函数，中序遍历判断是否递增
-bool IsBST2Helper(TreeNode *root, IsBST2HelperLast *last) {
-    if (root == NULL) return true;
-    if (!IsBST2Helper(root->left, last)) return false;
-
-    if (last->init && root->v <= last->v) return false;
-
-    last->v = root->v;
-    last->init = true;
-
-    if (!IsBST2Helper(root->right, last)) return false;
-    return true;
-}
-
-// 判断二叉搜索树
-// 这时第二种方法：中序遍历有序
-bool IsBST2(TreeNode *root) {
-    IsBST2HelperLast last = {0, false};
-    return IsBST2Helper(root, &last);
-}
+/////////
+// 序列化
+/////////
 
 // 二叉树转化为数组
 //
@@ -425,4 +384,61 @@ TreeNode *FromArray(int a[], int n) {
 
     FreeQueue(q);
     return root;
+}
+
+/////////
+// 二叉搜索树
+/////////
+
+// IsBalanced 函数的辅助函数
+// 如果树是平衡树，返回其最大深度
+// 否则，返回 -1
+int IsBalancedHelperDepth(TreeNode *root) {
+    if (root == NULL) return 0;
+    int d1 = IsBalancedHelperDepth(root->left);
+    int d2 = IsBalancedHelperDepth(root->right);
+    if (d1 == -1 || d2 == -1) return -1;
+    if (abs(d1 - d2) > 1) return -1;
+    return MAX(d1, d2) + 1;
+}
+
+// 判断平衡树
+// 二叉树中任意节点的左右子树的深度相差不超过1 为平衡树
+bool IsBalanced(TreeNode *root) { return IsBalancedHelperDepth(root) != -1; }
+
+// IsBST1 的辅助函数
+bool IsBST1Helper(TreeNode *root, long long upper, long long lower) {
+    if (root == NULL) return true;
+    if (root->v <= lower || root->v >= upper) return false;
+    return IsBST1Helper(root->left, root->v, lower) &&
+           IsBST1Helper(root->right, upper, root->v);
+}
+
+// 判断二叉搜索树
+// 二叉搜索树的特征：
+// 1. 节点的左子树只包含小于当前节点的数
+// 2. 节点的右子树只包含大于当前节点的数
+// 3. 所有左子树和右子树自身必须也是二叉搜索树
+// 这是第一种方法：递归验证上下界
+bool IsBST1(TreeNode *root) { return IsBST1Helper(root, LONG_MAX, LONG_MIN); }
+
+// IsBST2Helper 的辅助函数，中序遍历判断是否递增
+bool IsBST2Helper(TreeNode *root, IsBST2HelperLast *last) {
+    if (root == NULL) return true;
+    if (!IsBST2Helper(root->left, last)) return false;
+
+    if (last->init && root->v <= last->v) return false;
+
+    last->v = root->v;
+    last->init = true;
+
+    if (!IsBST2Helper(root->right, last)) return false;
+    return true;
+}
+
+// 判断二叉搜索树
+// 这时第二种方法：中序遍历有序
+bool IsBST2(TreeNode *root) {
+    IsBST2HelperLast last = {0, false};
+    return IsBST2Helper(root, &last);
 }

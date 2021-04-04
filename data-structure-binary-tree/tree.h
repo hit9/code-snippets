@@ -60,6 +60,13 @@ bool IsSymmetric(TreeNode *root);        // 是否对称
 bool IsBalanced(TreeNode *root);         // 是否平衡
 
 ////////////////
+// 序列化到数组
+////////////////
+
+IntArray *ToArray(TreeNode *root);    // 转化为数组 广度优先
+TreeNode *FromArray(int a[], int n);  // 从数组建树 广度优先
+
+////////////////
 // 二叉搜索树
 ////////////////
 
@@ -72,10 +79,3 @@ typedef struct _IsBST2HelperLast {
 } IsBST2HelperLast;
 
 bool IsBST2(TreeNode *root);  // 是否二叉搜索树
-
-////////////////
-// 序列化到数组
-////////////////
-
-IntArray *ToArray(TreeNode *root);    // 转化为数组 广度优先
-TreeNode *FromArray(int a[], int n);  // 从数组建树 广度优先
