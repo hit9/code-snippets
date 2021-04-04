@@ -219,6 +219,27 @@ def bt_is_symmetric(root):
     return bt_is_two_bt_symmetric(root.left, root.right)
 
 
+def bt_is_balanced_helper(root):
+    """如果是平衡树，返回树的最大深度
+    否则返回 -1"""
+    if not root:
+        return 0
+    d1 = bt_is_balanced_helper(root.left)
+    d2 = bt_is_balanced_helper(root.right)
+    if d1 == -1 or d2 == -1:
+        return -1
+    if abs(d1 - d2) > 1:
+        return -1
+    return max(d1, d2) + 1
+
+
+def bt_is_balanced(root):
+    """判断平衡树
+    二叉树中任意节点的左右子树的深度相差不超过1 为平衡树
+    """
+    return bt_is_balanced_helper(root) != -1
+
+
 ########
 # 序列化
 ########

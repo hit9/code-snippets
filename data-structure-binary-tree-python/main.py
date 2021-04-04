@@ -91,6 +91,11 @@ def test_bt_is_symmetric():
     assert not bt_is_symmetric(bt_from_array(b))
 
 
+def test_is_balanced():
+    assert bt_is_balanced(bt_from_array([3, 9, 20, -1, -1, 15, 7]))
+    assert bt_is_balanced(not bt_from_array([1, 2, 2, 3, 3, -1, -1, 4, 4]))
+
+
 def main():
     test_bfs()
     test_bt_preorder()
@@ -104,6 +109,7 @@ def main():
     test_bt_max_depth()
     test_bt_min_depth()
     test_bt_is_symmetric()
+    test_is_balanced()
 
 
 if __name__ == "__main__":
