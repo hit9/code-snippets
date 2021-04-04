@@ -72,6 +72,8 @@ TreeNode *FromArray(int a[], int n);  // 从数组建树 广度优先
 ////////////////
 
 bool IsBST1(TreeNode *root);  // 是否二叉搜索树
+int BSTKth1(TreeNode *root, int k);  // 找出二叉搜索树的第 k 小元素的值 递归
+int BSTKth2(TreeNode *root, int k);  // 找出二叉搜索树的第 k 小元素的值 非递归
 
 // IsBST2 的辅助数据结构
 typedef struct _IsBST2HelperLast {

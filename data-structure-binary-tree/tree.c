@@ -460,3 +460,51 @@ bool IsBST2(TreeNode *root) {
     IsBST2HelperLast last = {0, false};
     return IsBST2Helper(root, &last);
 }
+
+// BSTKth1 的辅助函数
+void BSTKth1Helper(TreeNode *root, IntArray *a, int k) {
+    if (root == NULL) return;
+    if (IntArraySize(a) >= k) return;  // 终止无效递归
+    BSTKth1Helper(root->left, a, k);
+    IntArrayPush(a, root->v);
+    BSTKth1Helper(root->right, a, k);
+}
+
+// 找出二叉搜索树的第 k 小的元素
+// 递归版
+// 性质：二叉搜索树的中序遍历是有序的
+int BSTKth1(TreeNode *root, int k) {
+    IntArray *a = NewIntArray();
+    BSTKth1Helper(root, a, k);
+    int v = IntArrayUnwrap(a)[k - 1];
+    FreeIntArray(a);
+    return v;
+}
+
+// 找出二叉搜索树的第 k 小的元素
+// 非递归版
+int BSTKth2(TreeNode *root, int k) {
+    if (root == NULL) return -1;
+
+    Stack *s = NewStack();
+    StackPush(s, NewTreeNodeWrapper(root, false));
+
+    while (!IsStackEmpty(s)) {
+        TreeNodeWrapper *w = StackPop(s);
+        TreeNode *node = w->node;
+        bool visited = w->visited;
+        FreeTreeNodeWrapper(w);
+
+        if (node == NULL) continue;
+        if (!visited) {
+            StackPush(s, NewTreeNodeWrapper(node->right, false));
+            StackPush(s, NewTreeNodeWrapper(node, true));
+            StackPush(s, NewTreeNodeWrapper(node->left, false));
+        } else {
+            k--;
+            if (k == 0) return node->v;
+        }
+    }
+    FreeStack(s);
+    return -1;
+}

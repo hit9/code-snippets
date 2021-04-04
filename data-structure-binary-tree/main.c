@@ -176,6 +176,20 @@ void TestInvert() {
     FreeIntArray(b);
 }
 
+void TestBSTKth1() {
+    int a[] = {5, 3, 6, 2, 4, -1, -1, 1};
+    TreeNode *root = NewTree(a, 8);
+    assert(BSTKth1(root, 3) == 3);
+    FreeTree(root);
+}
+
+void TestBSTKth2() {
+    int a[] = {5, 3, 6, 2, 4, -1, -1, 1};
+    TreeNode *root = NewTree(a, 8);
+    assert(BSTKth2(root, 3) == 3);
+    FreeTree(root);
+}
+
 void TestToArrayAndFromArray() {
     int n1 = 10;
     int a1[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
@@ -228,6 +242,8 @@ int main(void) {
     TestIsBST1();
     TestIsBST2();
     TestInvert();
+    TestBSTKth1();
+    TestBSTKth2();
     TestToArrayAndFromArray();
     return 0;
 }
