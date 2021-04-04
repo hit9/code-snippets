@@ -81,6 +81,66 @@ def bt_postorder(root):
     return a
 
 
+def bt_preorder_ii(root):
+    """前序遍历（非递归）"""
+    if not root:
+        return
+    s = [(root, False)]  # 栈 (节点，是否访问过)
+    a = []  # 数值结果集
+
+    while len(s) > 0:
+        node, visited = s.pop()
+        if not node:
+            continue
+        if not visited:
+            s.append((node.right, False))
+            s.append((node.left, False))
+            s.append((node, True))
+        else:
+            a.append(node.v)
+    return a
+
+
+def bt_inorder_ii(root):
+    """中序遍历（非递归）"""
+    if not root:
+        return
+    s = [(root, False)]  # 栈 (节点，是否访问过)
+    a = []  # 数值结果集
+
+    while len(s) > 0:
+        node, visited = s.pop()
+        if not node:
+            continue
+        if not visited:
+            s.append((node.right, False))
+            s.append((node, True))
+            s.append((node.left, False))
+        else:
+            a.append(node.v)
+    return a
+
+
+def bt_postorder_ii(root):
+    """后序遍历（非递归）"""
+    if not root:
+        return
+    s = [(root, False)]  # 栈 (节点，是否访问过)
+    a = []  # 数值结果集
+
+    while len(s) > 0:
+        node, visited = s.pop()
+        if not node:
+            continue
+        if not visited:
+            s.append((node, True))
+            s.append((node.right, False))
+            s.append((node.left, False))
+        else:
+            a.append(node.v)
+    return a
+
+
 ########
 # 简单问题
 ########
