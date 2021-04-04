@@ -53,6 +53,15 @@ def test_bt_level_order():
     assert b == [[0], [1, 2], [3, 4, 5, 6], [7, 8, 9]]
 
 
+def test_bt_invert():
+    a = bt_from_array([4, 2, 7, 1, 3, 6, 9])
+    b = bt_from_array([4, 7, 2, 9, 6, 3, 1])
+    assert bt_compare(b, bt_invert(a))
+    c = [4, 2, 7, 1, 3, 6, 9]
+    a1 = bt_from_array(c)
+    assert bt_to_array(bt_invert(bt_invert(a1))) == c
+
+
 def test_from_to_array():
     a1 = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
     r1 = bt_from_array(a1)
@@ -135,6 +144,7 @@ def main():
     test_is_balanced()
     test_is_bst1()
     test_is_bst2()
+    test_bt_invert()
 
 
 if __name__ == "__main__":

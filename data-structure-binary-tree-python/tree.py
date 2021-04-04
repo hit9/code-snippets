@@ -268,6 +268,14 @@ def bt_is_balanced(root):
     return bt_is_balanced_helper(root) != -1
 
 
+def bt_invert(root):
+    """翻转二叉树（这是个有故事的二叉树问题）"""
+    if not root:
+        return None
+    root.left, root.right = bt_invert(root.right), bt_invert(root.left)
+    return root
+
+
 ########
 # 二叉搜索树
 ########
