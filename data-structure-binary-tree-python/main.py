@@ -96,6 +96,18 @@ def test_is_balanced():
     assert bt_is_balanced(not bt_from_array([1, 2, 2, 3, 3, -1, -1, 4, 4]))
 
 
+def test_is_bst1():
+    assert bt_is_bst1(bt_from_array([5, 3, 7, 2, 4, 6, 8]))
+    assert bt_is_bst1(bt_from_array([2, 1, 3]))
+    assert not bt_is_bst1(bt_from_array([5, 1, 4, -1, -1, 3, 6]))
+
+
+def test_is_bst2():
+    assert bt_is_bst2(bt_from_array([5, 3, 7, 2, 4, 6, 8]))
+    assert bt_is_bst2(bt_from_array([2, 1, 3]))
+    assert not bt_is_bst2(bt_from_array([5, 1, 4, -1, -1, 3, 6]))
+
+
 def main():
     test_bfs()
     test_bt_preorder()
@@ -110,6 +122,8 @@ def main():
     test_bt_min_depth()
     test_bt_is_symmetric()
     test_is_balanced()
+    test_is_bst1()
+    test_is_bst2()
 
 
 if __name__ == "__main__":

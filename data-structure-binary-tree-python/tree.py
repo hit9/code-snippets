@@ -241,6 +241,60 @@ def bt_is_balanced(root):
 
 
 ########
+# 二叉搜索树
+########
+
+
+def bt_is_bst1_helper(root, upper, lower):
+    """bt_is_bst1 的辅助函数"""
+    if not root:
+        return True
+    if root.v >= upper or root.v <= lower:
+        return False
+    return bt_is_bst1_helper(root.left, root.v, lower) and bt_is_bst1_helper(
+        root.right, upper, root.v
+    )
+
+
+def bt_is_bst1(root):
+    """判断二叉搜索
+    二叉搜索树的特征：
+    1. 节点的左子树只包含小于当前节点的数
+    2. 节点的右子树只包含大于当前节点的数
+    3. 所有左子树和右子树自身必须也是二叉搜索树
+    方法一： 递归上下界方法
+    """
+    return bt_is_bst1_helper(root, (1 << 63) - 1, -1 << 63)
+
+
+def bt_is_bst2_helper(root, last):
+    """bt_is_bst2 的辅助函数，
+    last 是一个记录上一次中序遍历的数值的单元素列表"""
+    if not root:
+        return True
+    if not bt_is_bst2_helper(root.left, last):
+        # 左子树必须是二叉搜索树
+        return False
+    if last:
+        if root.v <= last[0]:
+            return False
+        # 更新上一个值
+        last[0] = root.v
+    else:
+        #  初始化 last
+        last.append(root.v)
+    if not bt_is_bst2_helper(root.right, last):
+        # 右子树必须是二叉搜索树
+        return False
+    return True
+
+
+def bt_is_bst2(root):
+    """方法二：二叉搜索树的中序遍历是有序的"""
+    return bt_is_bst2_helper(root, [])
+
+
+########
 # 序列化
 ########
 
