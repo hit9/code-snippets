@@ -165,6 +165,17 @@ void TestIsBST2() {
     FreeTree(root2);
 }
 
+void TestInvert() {
+    int a[] = {4, 2, 7, 1, 3, 6, 9};
+    TreeNode *root = NewTree(a, 7);
+    TreeNode *root2 = Invert(root);
+    IntArray *b = ToArray(root2);
+    int c[] = {4, 7, 2, 9, 6, 3, 1};
+    assert(IsArrayEqual(c, 7, IntArrayUnwrap(b), IntArraySize(b)));
+    FreeTree(root);
+    FreeIntArray(b);
+}
+
 void TestToArrayAndFromArray() {
     int n1 = 10;
     int a1[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
@@ -216,6 +227,7 @@ int main(void) {
     TestIsBalanced();
     TestIsBST1();
     TestIsBST2();
+    TestInvert();
     TestToArrayAndFromArray();
     return 0;
 }

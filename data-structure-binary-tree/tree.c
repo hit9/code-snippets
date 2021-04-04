@@ -303,6 +303,24 @@ bool IsSymmetric(TreeNode *root) {
     return IsTwoTreeSymmetric(root->left, root->right);
 }
 
+// 翻转二叉树
+//
+//    2
+//  3   4
+// 5 6 7
+// =>
+//    2
+//  4   3
+// 7   6 5
+TreeNode *Invert(TreeNode *root) {
+    if (root == NULL) return NULL;
+    TreeNode *left = root->left;
+    TreeNode *right = root->right;
+    root->right = Invert(left);
+    root->left = Invert(right);
+    return root;
+}
+
 /////////
 // 序列化
 /////////

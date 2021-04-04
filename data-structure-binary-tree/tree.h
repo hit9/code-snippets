@@ -58,6 +58,7 @@ int MinDepth(TreeNode *root);            // 最小深度
 bool Compare(TreeNode *a, TreeNode *b);  // 比较两个树是否相等
 bool IsSymmetric(TreeNode *root);        // 是否对称
 bool IsBalanced(TreeNode *root);         // 是否平衡
+TreeNode *Invert(TreeNode *root);        // 翻转二叉树
 
 ////////////////
 // 序列化到数组
