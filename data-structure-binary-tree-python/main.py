@@ -72,6 +72,12 @@ def test_bst_kth2():
     assert bst_kth2(a, 3) == 3
 
 
+def test_bt_is_substructure():
+    a = bt_from_array([4, 2, 3, 4, 5, 6, 7, 8, 9])
+    b = bt_from_array([4, 8, 9])
+    assert bt_is_substructure(a, b)
+
+
 def test_from_to_array():
     a1 = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
     r1 = bt_from_array(a1)
@@ -157,6 +163,7 @@ def main():
     test_bt_invert()
     test_bst_kth1()
     test_bst_kth2()
+    test_bt_is_substructure()
 
 
 if __name__ == "__main__":

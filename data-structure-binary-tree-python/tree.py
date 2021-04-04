@@ -276,6 +276,43 @@ def bt_invert(root):
     return root
 
 
+def bt_is_substructure(a, b):
+    """判断树 b 是否是 a 的子结构
+
+    例如
+                4
+       a    2       3
+          4   5   6   7
+         8 9
+
+            4
+       b   8 9
+       => True
+
+    约定：空树不是任何树的子结构
+    """
+
+    def helper(a, b):
+        """判断 b 是否是 a 的以根节点开始的子树
+        或者说是前缀子树"""
+        if not b:
+            return True
+        if not a or a.v != b.v:
+            return False
+        return helper(a.left, b.left) and helper(a.right, b.right)
+
+    if not b or not a:
+        return False
+    # b 是 a 在根节点即匹配的前缀子树，必然是子结构
+    # 或者 b 是 a 左子树的子结构
+    # 或者 b 是 a 右子树的子结构
+    return (
+        helper(a, b)
+        or bt_is_substructure(a.left, b)
+        or bt_is_balanced_helper(a.right, b)
+    )
+
+
 ########
 # 二叉搜索树
 ########
