@@ -31,7 +31,7 @@ algorithms
 * [栈 - 动态内存版](data-structure-stack/main-dynamic-mem-stack.c)  ....................................... [stack-dynamic-mem](data-structure-stack/main-dynamic-mem-stack.c)
 * [输出最小值的栈](https://writings.sh/post/monotonous-stack-and-monotonous-queue)  ....................................... [min-stack](data-structure-stack/main-min-stack.c)
 * [输出最大值的队列](https://writings.sh/post/monotonous-stack-and-monotonous-queue)  ....................................... [max-queue](data-structure-queue/max-queue.c)
-* [二叉树](TODO) ....................................... [data-structure-binary-tree](data-structure-binary-tree)
+* [二叉树](https://writings.sh/post/data-structure-binary-tree) ....................................... [data-structure-binary-tree](data-structure-binary-tree)
 
 
 排序：
