@@ -331,9 +331,8 @@ def bt_is_substructure(a, b):
 def bt_lowest_common_ancestor(root, p, q):
     """返回 p 和 q 在二叉树 root 中的最近公共祖先节点
 
-
          3
-      5     1
+      5     2
     1  6   0  8
       7 4
 
