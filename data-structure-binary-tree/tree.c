@@ -321,6 +321,46 @@ TreeNode *Invert(TreeNode *root) {
     return root;
 }
 
+// 查找值为 v 的节点
+TreeNode *Find(TreeNode *root, int v) {
+    if (root == NULL) return NULL;
+    if (root->v == v) return root;
+    TreeNode *left = Find(root->left, v);
+    TreeNode *right = Find(root->right, v);
+    if (left != NULL) return left;
+    if (right != NULL) return right;
+    return NULL;
+}
+
+// 找出 p 和 q 的最低公共祖先
+//
+//         3
+//      5     2
+//    1  6   0  8
+//      7 4
+//
+//    p=7, q=8 => 3
+TreeNode *LowestCommonAncestor(TreeNode *root, TreeNode *p, TreeNode *q) {
+    if (root == NULL) return NULL;
+    if (p == root || q == root) return root;
+
+    // LowestCommonAncestor 函数的作用：
+    // 如果 p 和 q 都在树中，则返回其最近的公共祖先节点
+    // 如果其中一个在树中，另一个不在，则返回这个节点
+    // 如果都不在树中，返回 NULL
+    TreeNode *left = LowestCommonAncestor(root->left, p, q);
+    TreeNode *right = LowestCommonAncestor(root->right, p, q);
+
+    if (left != NULL && right != NULL)
+        return root;
+    else if (left != NULL && right == NULL)
+        return left;
+    else if (left == NULL && right != NULL)
+        return right;
+    else
+        return NULL;
+}
+
 /////////
 // 序列化
 /////////

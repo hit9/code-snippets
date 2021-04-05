@@ -176,6 +176,16 @@ void TestInvert() {
     FreeIntArray(b);
 }
 
+void TestLowestCommonAncestor() {
+    int a[] = {3, 5, 2, 1, 6, 0, 8, -1, -1, 7, 4};
+    TreeNode *root = NewTree(a, 11);
+    TreeNode *p = Find(root, 7);
+    TreeNode *q = Find(root, 8);
+    TreeNode *r = LowestCommonAncestor(root, p, q);
+    assert(r != NULL);
+    assert(r->v == 3);
+}
+
 void TestBSTKth1() {
     int a[] = {5, 3, 6, 2, 4, -1, -1, 1};
     TreeNode *root = NewTree(a, 8);
@@ -242,6 +252,7 @@ int main(void) {
     TestIsBST1();
     TestIsBST2();
     TestInvert();
+    TestLowestCommonAncestor();
     TestBSTKth1();
     TestBSTKth2();
     TestToArrayAndFromArray();
