@@ -532,6 +532,18 @@ bool IsBST2(TreeNode *root) {
     return IsBST2Helper(root, &last);
 }
 
+// 二叉搜索树的查找
+TreeNode *BSTFind(TreeNode *root, int v) {
+    if (root == NULL) return NULL;
+    if (root->v == v)
+        return root;
+    else if (root->v > v)
+        return BSTFind(root->left, v);
+    else if (root->v < v)
+        return BSTFind(root->right, v);
+    return NULL;
+}
+
 // BSTKth1 的辅助函数
 void BSTKth1Helper(TreeNode *root, IntArray *a, int k) {
     if (root == NULL) return;

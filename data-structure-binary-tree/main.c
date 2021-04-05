@@ -211,6 +211,15 @@ void TestBSTKth2() {
     FreeTree(root);
 }
 
+void TestBSTFind() {
+    int a[] = {5, 3, 6, 2, 4, -1, -1, 1};
+    TreeNode *root = NewTree(a, 8);
+    TreeNode *b = BSTFind(root, 3);
+    assert(b != NULL);
+    assert(b->v == 3);
+    FreeTree(root);
+}
+
 void TestToArrayAndFromArray() {
     int n1 = 10;
     int a1[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
@@ -267,6 +276,7 @@ int main(void) {
     TestIsSubStructure();
     TestBSTKth1();
     TestBSTKth2();
+    TestBSTFind();
     TestToArrayAndFromArray();
     return 0;
 }
