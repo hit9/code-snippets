@@ -322,9 +322,7 @@ def bt_is_substructure(a, b):
     # 或者 b 是 a 左子树的子结构
     # 或者 b 是 a 右子树的子结构
     return (
-        helper(a, b)
-        or bt_is_substructure(a.left, b)
-        or bt_is_balanced_helper(a.right, b)
+        helper(a, b) or bt_is_substructure(a.left, b) or bt_is_substructure(a.right, b)
     )
 
 
