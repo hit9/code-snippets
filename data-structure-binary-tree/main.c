@@ -184,6 +184,17 @@ void TestLowestCommonAncestor() {
     TreeNode *r = LowestCommonAncestor(root, p, q);
     assert(r != NULL);
     assert(r->v == 3);
+    FreeTree(root);
+}
+
+void TestIsSubStructure() {
+    int a[] = {4, 2, 3, 4, 5, 6, 7, 8, 9};
+    int b[] = {4, 8, 9};
+    TreeNode *a1 = NewTree(a, 9);
+    TreeNode *b1 = NewTree(b, 3);
+    assert(IsSubStructure(a1, b1));
+    FreeTree(a1);
+    FreeTree(b1);
 }
 
 void TestBSTKth1() {
@@ -253,6 +264,7 @@ int main(void) {
     TestIsBST2();
     TestInvert();
     TestLowestCommonAncestor();
+    TestIsSubStructure();
     TestBSTKth1();
     TestBSTKth2();
     TestToArrayAndFromArray();

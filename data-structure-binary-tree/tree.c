@@ -361,6 +361,37 @@ TreeNode *LowestCommonAncestor(TreeNode *root, TreeNode *p, TreeNode *q) {
         return NULL;
 }
 
+// 函数 IsSubStructure 的辅助函数
+// 判断树 b 是否是 a 的前缀子树
+// 即必须在根节点处匹配
+bool IsSubStructureHelper(TreeNode *a, TreeNode *b) {
+    if (b == NULL) return true;
+    if (a == NULL) return false;
+    if (a->v != b->v) return false;
+    return IsSubStructureHelper(a->left, b->left) &&
+           IsSubStructureHelper(a->right, b->right);
+}
+
+// 判断二叉树 b 是否是 a 的子结构
+//
+//    例如
+//                4
+//       a    2       3
+//          4   5   6   7
+//         8 9
+//
+//            4
+//       b   8 9
+//       => True
+//
+//    约定：空树不是任何树的子结构
+bool IsSubStructure(TreeNode *a, TreeNode *b) {
+    if (b == NULL) return false;
+    if (a == NULL) return false;
+    return IsSubStructureHelper(a, b) || IsSubStructure(a->left, b) ||
+           IsSubStructure(a->right, b);
+}
+
 /////////
 // 序列化
 /////////

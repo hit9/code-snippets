@@ -61,7 +61,8 @@ bool IsBalanced(TreeNode *root);         // 是否平衡
 TreeNode *Invert(TreeNode *root);        // 翻转二叉树
 TreeNode *Find(TreeNode *root, int v);   // 查找
 TreeNode *LowestCommonAncestor(TreeNode *root, TreeNode *p,
-                               TreeNode *q);  // 最低公共祖先
+                               TreeNode *q);    // 最低公共祖先
+bool IsSubStructure(TreeNode *a, TreeNode *b);  // 判断子结构
 
 ////////////////
 // 序列化到数组
