@@ -361,7 +361,7 @@ def bt_lowest_common_ancestor(root, p, q):
         return None
 
 
-def bt_flatten1(root):
+def bt_flatten(root):
     """将二叉树展开为链表，先序顺序
 
          1                  1
@@ -371,7 +371,6 @@ def bt_flatten1(root):
                                 5
                                  6
 
-    此方法是方法一：递归版
     """
 
     def helper(root):
@@ -414,6 +413,7 @@ def bt_flatten1(root):
 
     helper(root)
     return root
+
 
 
 ########
