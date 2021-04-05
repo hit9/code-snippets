@@ -415,6 +415,18 @@ def bt_is_bst2(root):
     return bt_is_bst2_helper(root, [])
 
 
+def bst_find(root, v):
+    """二叉搜索树的查找"""
+    if not root:
+        return None
+    if root.v == v:
+        return root
+    elif root.v > v:
+        return bst_find(root.left, v)
+    elif root.v < v:
+        return bst_find(root.right, v)
+
+
 def bst_kth1_helper(root, a, k):
     """递归收集二叉搜索树的前 k 个元素"""
     if not root:
