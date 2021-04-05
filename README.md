@@ -61,3 +61,4 @@ algorithms
 * [字符串的全排列](permutation) ....................................... [permutation](permutation)
 * [周期字符串](https://writings.sh/post/algorithm-repeated-string-pattern) ....................................... [repeated-string-pattern](repeated-string-pattern)
 * [无重复字符的最长子串](https://writings.sh/post/algorithm-longest-substring-without-repeat-chars) ....................................... [longest-substring-without-repeat-chars](longest-substring-without-repeat-chars)
+* [最短编辑距离](https://writings.sh/post/algorithm-minimum-edit-distance) ....................................... [min-edit-distance](min-edit-distance)
