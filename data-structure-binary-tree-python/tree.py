@@ -469,6 +469,17 @@ def bst_kth2(root, k):
     return -1
 
 
+def bst_lowest_common_ancestor(root, p, q):
+    """二叉搜索树的最近公共祖先"""
+    if not root:
+        return None
+    if root.v < p.v and root.v < q.v:
+        return bst_lowest_common_ancestor(root.right, p, q)
+    if root.v > p.v and root.v > q.v:
+        return bst_lowest_common_ancestor(root.left, p, q)
+    return root
+
+
 ########
 # 序列化
 ########

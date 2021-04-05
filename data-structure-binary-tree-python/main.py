@@ -157,6 +157,14 @@ def test_lowest_common_ancestor():
     assert r and r.v == 3
 
 
+def test_bst_lowest_common_ancestor():
+    a = bt_from_array([6, 2, 8, 0, 4, 7, 9, -1, -1, 3, 5])
+    p = bst_find(a, 2)
+    q = bst_find(a, 8)
+    b = bst_lowest_common_ancestor(a, p, q)
+    assert b and b.v == 6
+
+
 def main():
     test_bfs()
     test_bt_preorder()
@@ -180,6 +188,7 @@ def main():
     test_bst_kth2()
     test_bt_is_substructure()
     test_lowest_common_ancestor()
+    test_bst_lowest_common_ancestor()
 
 
 if __name__ == "__main__":
