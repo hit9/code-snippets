@@ -591,3 +591,16 @@ int BSTKth2(TreeNode *root, int k) {
     FreeStack(s);
     return -1;
 }
+
+// 二叉搜索树的最近公共祖先
+TreeNode *BSTLowestCommonAncestor(TreeNode *root, TreeNode *p, TreeNode *q) {
+    if (root == NULL) return NULL;
+    if (root->v < p->v && root->v < q->v)
+        // p 和 q 都在右子树
+        return BSTLowestCommonAncestor(root->right, p, q);
+    if (root->v > p->v && root->v > q->v)
+        // p 和 q 都在左子树
+        return BSTLowestCommonAncestor(root->left, p, q);
+    // p 和 q 分别位于两个子树
+    return root;
+}

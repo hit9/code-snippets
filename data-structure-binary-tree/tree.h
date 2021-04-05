@@ -79,6 +79,8 @@ bool IsBST1(TreeNode *root);               // 是否二叉搜索树
 TreeNode *BSTFind(TreeNode *root, int v);  // 二叉搜索树的查找
 int BSTKth1(TreeNode *root, int k);  // 找出二叉搜索树的第 k 小元素的值 递归
 int BSTKth2(TreeNode *root, int k);  // 找出二叉搜索树的第 k 小元素的值 非递归
+TreeNode *BSTLowestCommonAncestor(TreeNode *root, TreeNode *p,
+                                  TreeNode *q);  // 二叉搜索树的最近公共祖先
 
 // IsBST2 的辅助数据结构
 typedef struct _IsBST2HelperLast {
