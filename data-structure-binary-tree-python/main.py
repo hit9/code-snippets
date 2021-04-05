@@ -165,6 +165,12 @@ def test_bst_lowest_common_ancestor():
     assert b and b.v == 6
 
 
+def test_bt_flatten1():
+    a = bt_from_array([1, 2, 5, 3, 4, -1, 6])
+    b = bt_from_array([1, -1, 2, -1, 3, -1, 4, -1, 5, -1, 6])
+    assert bt_compare(bt_flatten1(a), b)
+
+
 def main():
     test_bfs()
     test_bt_preorder()
@@ -189,6 +195,7 @@ def main():
     test_bt_is_substructure()
     test_lowest_common_ancestor()
     test_bst_lowest_common_ancestor()
+    test_bt_flatten1()
 
 
 if __name__ == "__main__":

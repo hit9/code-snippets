@@ -361,6 +361,61 @@ def bt_lowest_common_ancestor(root, p, q):
         return None
 
 
+def bt_flatten1(root):
+    """将二叉树展开为链表，先序顺序
+
+         1                  1
+      2     5        =>      2
+    3   4     6               3
+                               4
+                                5
+                                 6
+
+    此方法是方法一：递归版
+    """
+
+    def helper(root):
+        """展开给定的二叉树，返回展开后的尾巴节点（非空）
+        如果树是空的，才返回空节点
+        """
+        if not root:
+            return None
+
+        if not root.left and not root.right:
+            # 左右都空，链表尾巴是 root
+            return root
+        elif not root.left and root.right:
+            # 左空、右不空
+            # 右孩子展开链表，返回其尾巴
+            return helper(root.right)
+        elif root.left and not root.left:
+            # 左不空、右空
+            # 左孩子展开链表，挂在到右孩子上，返回其尾巴
+            tail = helper(root.left)
+            root.right = root.left
+            root.left = None
+            return tail
+        else:
+            # 左右都不空
+            # 左右展开链表
+            left_tail = helper(root.left)
+            right_tail = helper(root.right)
+
+            # 右孩子链表挂在左孩子链表上
+            left_tail.right = root.right
+            left_tail.left = None
+
+            # 拼接后的链表挂载到右孩子上
+            root.right = root.left
+            root.left = None
+
+            # 返回右孩子链表的尾巴
+            return right_tail
+
+    helper(root)
+    return root
+
+
 ########
 # 二叉搜索树
 ########
