@@ -231,6 +231,16 @@ void TestBSTLowestCommonAncestor() {
     FreeTree(root);
 }
 
+void TestFlatten() {
+    int a[] = {1, 2, 5, 3, 4, -1, 6};
+    TreeNode *a1 = NewTree(a, 7);
+    int b[] = {1, -1, 2, -1, 3, -1, 4, -1, 5, -1, 6};
+    TreeNode *b1 = NewTree(b, 11);
+    assert(Compare(b1, Flatten(a1)));
+    FreeTree(a1);
+    FreeTree(b1);
+}
+
 void TestToArrayAndFromArray() {
     int n1 = 10;
     int a1[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
@@ -288,6 +298,7 @@ int main(void) {
     TestBSTKth1();
     TestBSTKth2();
     TestBSTFind();
+    TestFlatten();
     TestToArrayAndFromArray();
     TestBSTLowestCommonAncestor();
     return 0;

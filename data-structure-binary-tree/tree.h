@@ -63,6 +63,7 @@ TreeNode *Find(TreeNode *root, int v);   // 查找
 TreeNode *LowestCommonAncestor(TreeNode *root, TreeNode *p,
                                TreeNode *q);    // 最低公共祖先
 bool IsSubStructure(TreeNode *a, TreeNode *b);  // 判断子结构
+TreeNode *Flatten(TreeNode *root);              // 先序展开为链表
 
 ////////////////
 // 序列化到数组

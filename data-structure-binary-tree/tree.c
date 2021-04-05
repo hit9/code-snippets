@@ -392,6 +392,54 @@ bool IsSubStructure(TreeNode *a, TreeNode *b) {
            IsSubStructure(a->right, b);
 }
 
+// Flatten 的辅助函数
+// 展开给定的二叉树，返回展开后的尾巴节点（非空）
+// 如果树是空的，才返回空节点
+TreeNode *FlattenHelper(TreeNode *root) {
+    if (root == NULL) return NULL;
+    // 左右都空，链表尾巴是 root
+    if (root->left == NULL && root->right == NULL) return root;
+    // 左空右不空，展开右边，返回其尾巴
+    if (root->left == NULL && root->right != NULL)
+        return FlattenHelper(root->right);
+    // 左不空，右空
+    if (root->left != NULL && root->right == NULL) {
+        // 展开左边，挂在右孩子上，返回其尾巴
+        TreeNode *tail = FlattenHelper(root->left);
+        root->right = root->left;
+        root->left = NULL;
+        return tail;
+    }
+    // 左右都不空
+    // 展开左右链表
+    TreeNode *left_tail = FlattenHelper(root->left);
+    TreeNode *right_tail = FlattenHelper(root->right);
+
+    // 右侧链表挂在左侧链表后面
+    left_tail->right = root->right;
+    left_tail->left = NULL;
+
+    // 拼接后的大链表挂在 root 的右孩子位置上
+    root->right = root->left;
+    root->left = NULL;
+
+    // 返回右孩子链表的尾巴
+    return right_tail;
+}
+
+// 将二叉树展开为链表，先序顺序
+//
+//         1                  1
+//      2     5        =>      2
+//    3   4     6               3
+//                               4
+//                                5
+//                                 6
+TreeNode *Flatten(TreeNode *root) {
+    FlattenHelper(root);
+    return root;
+}
+
 /////////
 // 序列化
 /////////
