@@ -415,7 +415,6 @@ def bt_flatten(root):
     return root
 
 
-
 ########
 # 二叉搜索树
 ########
