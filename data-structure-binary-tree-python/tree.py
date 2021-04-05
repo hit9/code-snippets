@@ -276,6 +276,21 @@ def bt_invert(root):
     return root
 
 
+def bt_find(root, v):
+    """从二叉树中找到值为 v 的节点"""
+    if not root:
+        return None
+    if root.v == v:
+        return root
+    left = bt_find(root.left, v)
+    right = bt_find(root.right, v)
+    if left:
+        return left
+    if right:
+        return right
+    return None
+
+
 def bt_is_substructure(a, b):
     """判断树 b 是否是 a 的子结构
 
@@ -311,6 +326,42 @@ def bt_is_substructure(a, b):
         or bt_is_substructure(a.left, b)
         or bt_is_balanced_helper(a.right, b)
     )
+
+
+def bt_lowest_common_ancestor(root, p, q):
+    """返回 p 和 q 在二叉树 root 中的最近公共祖先节点
+
+
+         3
+      5     1
+    1  6   0  8
+      7 4
+
+    p=7, q=8 => 3
+    """
+    if not root:
+        return None
+    if root == q or root == p:
+        return root
+
+    # bt_lowest_common_ancestor 函数的作用：
+    # 如果 p 和 q 都在树中，则返回其最近的公共祖先节点
+    # 如果其中一个在树中，另一个不在，则返回这个节点
+    # 如果都不在树中，返回 None
+    left = bt_lowest_common_ancestor(root.left, p, q)
+    right = bt_lowest_common_ancestor(root.right, p, q)
+
+    if left and right:
+        # p 和 q 一个在左子树，一个在右子树
+        return root
+    elif left and not right:
+        # p 和 q 都在左子树
+        return left
+    elif right and not left:
+        # p 和 q 都在右子树
+        return right
+    else:
+        return None
 
 
 ########

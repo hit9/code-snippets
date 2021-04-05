@@ -143,6 +143,14 @@ def test_is_bst2():
     assert not bt_is_bst2(bt_from_array([5, 1, 4, -1, -1, 3, 6]))
 
 
+def test_lowest_common_ancestor():
+    a = bt_from_array([3, 5, 2, 1, 6, 0, 8, -1, -1, 7, 4])
+    p = bt_find(a, 7)
+    q = bt_find(a, 8)
+    r = bt_lowest_common_ancestor(a, p, q)
+    assert r and r.v == 3
+
+
 def main():
     test_bfs()
     test_bt_preorder()
@@ -164,6 +172,7 @@ def main():
     test_bst_kth1()
     test_bst_kth2()
     test_bt_is_substructure()
+    test_lowest_common_ancestor()
 
 
 if __name__ == "__main__":
