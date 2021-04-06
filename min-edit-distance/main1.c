@@ -134,12 +134,6 @@ void PrintMinEditSteps(char *a, char *b) {
     int path[m + 1][n + 1];
     // 规划过程，返回最少步数 k
     DP(a, b, m, n, dp, path);
-    for (int i = 0; i < m + 1; i++) {
-        for (int j = 0; j < n + 1; j++) {
-            printf("%d ", dp[i][j]);
-        }
-        printf("\n");
-    }
     // 记录一种最短编辑的操作序列
     Operation ops[m + n];
     // 记录当且递归深度
