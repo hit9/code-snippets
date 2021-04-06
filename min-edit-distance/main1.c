@@ -145,8 +145,8 @@ void PrintMinEditSteps(char *a, char *b) {
 }
 
 int main(void) {
-    /* PrintMinEditSteps("horse", "ros"); */
+    PrintMinEditSteps("horse", "ros");
     PrintMinEditSteps("simple", "example");
-    /* PrintMinEditSteps("intention", "execution"); */
+    PrintMinEditSteps("intention", "execution");
     return 0;
 }
