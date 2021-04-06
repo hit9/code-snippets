@@ -87,18 +87,31 @@ void DFS(char *a, char *b, int m, int n, int path[m + 1][n + 1], int i, int j,
         // 左边方格，插入一个字符 b[j-1] 而来
         op->flag = 1;
         op->ch1 = b[j - 1];
-    } else if (path[i][j] & FROM_UP) {
+        // 向左 DFS
+        DFS(a, b, m, n, path, i, j - 1, depth + 1, ops);
+    }
+
+    if (path[i][j] & FROM_UP) {
         // 上面方格，删除一个字符 a[i-1] 而来
         op->flag = 2;
         op->ch1 = a[i - 1];
-    } else if (path[i][j] & FROM_LEFT_UP_REPLACE) {
-        // 左上方格，替换 a[i-1] 到 b[j-1] 而来
-        op->flag = 3;
-        op->ch1 = a[i - 1];
-        op->ch2 = b[j - 1];
-    } else {
-        // 其他，比如左上方拷贝，置 0 表示忽略
-        op->flag = 0;
+        // 向上 DFS
+        DFS(a, b, m, n, path, i - 1, j, depth + 1, ops);
+    }
+
+    if (path[i][j] & FROM_LEFT_UP_COPY || path[i][j] & FROM_LEFT_UP_REPLACE) {
+        if (path[i][j] & FROM_LEFT_UP_REPLACE) {
+            // 左上方格，替换 a[i-1] 到 b[j-1] 而来
+            op->flag = 3;
+            op->ch1 = a[i - 1];
+            op->ch2 = b[j - 1];
+        } else {
+            // 拷贝而来，无需记录
+            // 置 0 表示忽略
+            op->flag = 0;
+        }
+        // 向左上 DFS
+        DFS(a, b, m, n, path, i - 1, j - 1, depth + 1, ops);
     }
 
     if (i == 1 && j == 1) {
@@ -108,14 +121,6 @@ void DFS(char *a, char *b, int m, int n, int path[m + 1][n + 1], int i, int j,
         printf("已结束一种编辑方式\n");
         return;
     }
-
-    // 向左 DFS
-    if (path[i][j] & FROM_LEFT) DFS(a, b, m, n, path, i, j - 1, depth + 1, ops);
-    // 向上 DFS
-    if (path[i][j] & FROM_UP) DFS(a, b, m, n, path, i - 1, j, depth + 1, ops);
-    // 向左上 DFS
-    if (path[i][j] & FROM_LEFT_UP_COPY || path[i][j] & FROM_LEFT_UP_REPLACE)
-        DFS(a, b, m, n, path, i - 1, j - 1, depth + 1, ops);
 }
 
 // 打印把字符串 a 编辑为 b 的所有最短编辑方式
