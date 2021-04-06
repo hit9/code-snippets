@@ -95,7 +95,7 @@ void DFS(char *a, char *b, int m, int n, int path[m + 1][n + 1], int i, int j,
         // 左上方格，替换 a[i-1] 到 b[j-1] 而来
         op->flag = 3;
         op->ch1 = a[i - 1];
-        op->ch2 = b[i - 1];
+        op->ch2 = b[j - 1];
     } else {
         // 其他，比如左上方拷贝，置 0 表示忽略
         op->flag = 0;
@@ -129,6 +129,12 @@ void PrintMinEditSteps(char *a, char *b) {
     int path[m + 1][n + 1];
     // 规划过程，返回最少步数 k
     DP(a, b, m, n, dp, path);
+    for (int i = 0; i < m + 1; i++) {
+        for (int j = 0; j < n + 1; j++) {
+            printf("%d ", dp[i][j]);
+        }
+        printf("\n");
+    }
     // 记录一种最短编辑的操作序列
     Operation ops[m + n];
     // 记录当且递归深度
@@ -140,8 +146,8 @@ void PrintMinEditSteps(char *a, char *b) {
 }
 
 int main(void) {
-    PrintMinEditSteps("horse", "ros");
+    /* PrintMinEditSteps("horse", "ros"); */
     PrintMinEditSteps("simple", "example");
-    PrintMinEditSteps("intention", "execution");
+    /* PrintMinEditSteps("intention", "execution"); */
     return 0;
 }
