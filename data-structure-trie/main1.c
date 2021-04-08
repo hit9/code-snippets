@@ -1,5 +1,5 @@
 // 字典树
-// https://writings.sh/post/data-structure-trie
+// https://zh.wikipedia.org/zh-hans/Trie
 
 // 基于数组的基本实现
 // 假设字符集 a-z 共 26 个字符，最多 MAXN 个节点

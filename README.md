@@ -32,7 +32,7 @@ algorithms
 * [输出最小值的栈](https://writings.sh/post/monotonous-stack-and-monotonous-queue)  ....................................... [min-stack](data-structure-stack/main-min-stack.c)
 * [输出最大值的队列](https://writings.sh/post/monotonous-stack-and-monotonous-queue)  ....................................... [max-queue](data-structure-queue/max-queue.c)
 * [二叉树](https://writings.sh/post/data-structure-binary-tree) ....................................... [data-structure-binary-tree](data-structure-binary-tree)
-
+* [字典树](data-structure-trie) ....................................... [data-structure-trie](data-structure-trie)
 
 排序：
 
