@@ -1,4 +1,5 @@
 // 数据结构 - 最小栈 - 在栈的基础上，实现一个常数时间的最小值函数
+// https://writings.sh/post/monotonous-stack-and-monotonous-queue
 // https://leetcode-cn.com/problems/min-stack/
 // 要求 Push() Pop() Min() 三个函数平均时间复杂度 O(1)
 
