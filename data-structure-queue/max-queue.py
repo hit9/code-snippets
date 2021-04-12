@@ -3,6 +3,8 @@
 # https://leetcode-cn.com/problems/dui-lie-de-zui-da-zhi-lcof/
 # 要求 PushBack() PopFront() Max() 三个函数平均时间复杂度 O(1)
 
+from collections import deque
+
 
 class MaxQueue:
     """两个队列实现最大值队列，要求 O(1) 时间返回最大值
@@ -12,8 +14,8 @@ class MaxQueue:
     """
 
     def __init__(self):
-        self.a = []  # FIFO 队列
-        self.b = []  # 单调递减队列
+        self.a = deque()  # FIFO 队列
+        self.b = deque()  # 单调递减队列
 
     def push_back(self, value):
         self.a.append(value)
@@ -24,10 +26,10 @@ class MaxQueue:
     def pop_front(self):
         if len(self.a) <= 0:
             return -1
-        value = self.a.pop(0)
+        value = self.a.popleft()
 
         if value == self.b[0]:
-            self.b.pop(0)
+            self.b.popleft()
         return value
 
     def max(self):
