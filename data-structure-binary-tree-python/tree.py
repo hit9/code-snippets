@@ -2,6 +2,8 @@
 二叉树 Python 版
 """
 
+from collections import deque
+
 
 class TreeNode:
     """二叉树，值为整型"""
@@ -21,10 +23,10 @@ def bt_bfs(root):
     """广度优先遍历"""
     if not root:
         return
-    q = [root]
+    q = deque([root])
     a = []  # 数值数组
     while len(q) > 0:
-        node = q.pop(0)
+        node = q.popleft()
         if not node:
             continue
         a.append(node.v)
@@ -151,13 +153,13 @@ def bt_level_order(root):
     """
     if not root:
         return []
-    q = [root]
+    q = deque([root])
     a = []  # 层序遍历结果
     while len(q) > 0:
         qsize = len(q)  # 上一层的节点个数
         b = []
         while qsize > 0:
-            node = q.pop(0)
+            node = q.popleft()
             qsize -= 1
             if not node:
                 continue
@@ -563,11 +565,11 @@ def bt_from_array(a):
         return None
 
     root = TreeNode(a[0])
-    q = [root]  # 存放上一层节点
+    q = deque([root])  # 存放上一层节点
     i = 1  # 迭代数组 a
 
     while len(q) > 0:
-        node = q.pop(0)
+        node = q.popleft()
 
         if not node:
             continue
@@ -598,11 +600,11 @@ def bt_to_array(root):
     """
     if not root:
         return []
-    q = [root]  # 记录上一层节点
+    q = deque([root])  # 记录上一层节点
     a = []  # 数值数组
     ec = 0  # 记录自上一非空节点依赖的空节点数量
     while len(q) > 0:
-        node = q.pop(0)
+        node = q.popleft()
         if not node:
             ec += 1
             continue
