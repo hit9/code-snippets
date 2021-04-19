@@ -29,7 +29,7 @@ algorithms
 * [链表 类问题](https://writings.sh/post/data-structure-list-common-algorithm-problems)  ....................................... [data-structure-list](data-structure-list)
 * [双头队列](data-structure-queue/main-dequeue.c)  ....................................... [dequeue](data-structure-queue/main-dequeue.c)
 * [栈 - 动态内存版](data-structure-stack/main-dynamic-mem-stack.c)  ....................................... [stack-dynamic-mem](data-structure-stack/main-dynamic-mem-stack.c)
-* [输出最小值的栈](data-structure-stack/main-min-stack.c))  ....................................... [min-stack](data-structure-stack/main-min-stack.c)
+* [输出最小值的栈](data-structure-stack/main-min-stack.c)  ....................................... [min-stack](data-structure-stack/main-min-stack.c)
 * [输出最大值的队列](data-structure-queue/max-queue.c)  ....................................... [max-queue](data-structure-queue/max-queue.c)
 * [二叉树](data-structure-binary-tree)....................................... [data-structure-binary-tree](data-structure-binary-tree)
 * [字典树](data-structure-trie) ....................................... [data-structure-trie](data-structure-trie)
