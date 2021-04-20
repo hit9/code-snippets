@@ -50,6 +50,10 @@ algorithms
 * [素数筛法](https://writings.sh/post/algorithm-number-theory#%E5%9F%83%E6%8B%89%E6%89%98%E6%96%AF%E7%89%B9%E5%B0%BC%E7%B4%A0%E6%95%B0%E7%AD%9B%E6%B3%95) ....................................... [math-number-theory](math-number-theory)
 * [快速素数筛法](https://writings.sh/post/algorithm-number-theory#%E5%BF%AB%E9%80%9F%E7%B4%A0%E6%95%B0%E7%AD%9B%E6%B3%95) ....................................... [math-number-theory](math-number-theory)
 
+随机化：
+
+* [蓄水池抽样](random-reservoir-sampling) ....................................... [random-reservoir-sampling](random-reservoir-sampling)
+
 经典问题：
 
 * [最长公共子串](https://writings.sh/post/algorithm-longest-common-substring-and-longest-common-subsequence) ....................................... [longest-common-substring](longest-common-substring)
