@@ -53,6 +53,7 @@ algorithms
 随机化：
 
 * [蓄水池抽样](random-reservoir-sampling) ....................................... [random-reservoir-sampling](random-reservoir-sampling)
+* [洗牌算法](random-shuffule) ....................................... [random-shuffle](random-shuffle)
 
 经典问题：
 
