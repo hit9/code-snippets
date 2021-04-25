@@ -1,0 +1,137 @@
+// 二分查找的变种问题
+
+#include <assert.h>
+
+// 一个数组前面是 0 后面是 1
+// 找到第一个 1 的位置
+int First1(int n, int a[n]) {
+    if (n <= 0) return -1;
+    int l = 0;       // [, l) 是已知的 0 的区间
+    int r = n - 1;   // [r,) 是已知的 1 的区间
+    while (l < r) {  // 当 l==r 时，所有未知变已知
+        int m = l + (r - l) / 2;
+        if (a[m] == 0) {
+            l = m + 1;
+        } else {
+            r = m;
+        }
+    }
+    return r;
+}
+
+// 找出升序数组中元素的左边界
+int BinarySearchStart(int n, int a[n], int t) {
+    if (n <= 0) return -1;
+    int l = 0;      // ,l) 是已知的 < t 的区间
+    int r = n - 1;  // [r, 是已知的 >= t 的区间
+    while (l < r) {
+        int m = l + (r - l) / 2;  // 左边更激进, m 向左靠
+        if (a[m] < t) {
+            l = m + 1;
+        } else {
+            r = m;
+        }
+    }
+    if (a[l] == t) return l;  // 如果遇到
+    return -1;
+}
+
+// 找出升序数组中元素右边界
+int BinarySearchEnd(int n, int a[n], int t) {
+    if (n <= 0) return -1;
+    int l = 0;      // ,l] 是已知的 <= t 的区间
+    int r = n - 1;  // (r, 是已知的 > t 的区间
+    while (l < r) {
+        int m = r - (r - l) / 2;  // 右边更激进, m 向右靠
+        if (a[m] > t) {
+            r = m - 1;
+        } else {
+            l = m;
+        }
+    }
+    if (a[r] == t) return r;  // 如果遇到
+    return -1;
+}
+
+// 升序数组中元素可能重复，找出一个元素的左右边界
+// 结果写入 start 和 end;
+void BinarySearchRange(int n, int a[n], int t, int *start, int *end) {
+    *start = BinarySearchStart(n, a, t);
+    *end = BinarySearchEnd(n, a, t);
+}
+
+// 升序数组中元素可能重复，找出一个元素的左右边界（第二种方法）
+// 结果写入 start 和 end;
+void BinarySearchRange2(int n, int a[n], int t, int *start, int *end) {
+    if (n <= 0) return;
+    int l = 0;      // ,l) 是已知的 < t 的区间
+    int r = n - 1;  // (r, 是已知的 > t 的区间
+    while (l < r) {
+        int m = l + (r - l) / 2;
+        if (a[m] < t) {
+            l = m + 1;
+        } else if (a[m] > t) {
+            r = m - 1;
+        } else {  // == t
+            if (a[r] > t)
+                r--;
+            else if (a[l] < t)
+                l++;
+            else  // 左右都t，找到边界
+                break;
+        }
+    }
+    *start = l;
+    *end = r;
+}
+
+////////
+// 测试
+////////
+
+void TestFirst1() {
+    int a[] = {0, 0, 0, 0, 1, 1, 1};
+    int n = 7;
+    assert(First1(n, a) == 4);
+}
+
+void TestBinarySearchStart() {
+    int a[] = {0, 1, 2, 3, 3, 3, 5};
+    int n = 7;
+    assert(BinarySearchStart(n, a, 3) == 3);
+}
+
+void TestBinarySearchEnd() {
+    int a[] = {0, 1, 2, 3, 3, 3, 5};
+    int n = 7;
+    assert(BinarySearchEnd(n, a, 3) == 5);
+}
+
+void TestBinarySearchRange() {
+    int a[] = {0, 1, 2, 3, 3, 3, 5};
+    int n = 7;
+    int t = 3;
+    int start = 0;
+    int end = 0;
+    BinarySearchRange(n, a, t, &start, &end);
+    assert(start == 3 && end == 5);
+}
+
+void TestBinarySearchRange2() {
+    int a[] = {0, 1, 2, 3, 3, 3, 5};
+    int n = 7;
+    int t = 3;
+    int start = 0;
+    int end = 0;
+    BinarySearchRange2(n, a, t, &start, &end);
+    assert(start == 3 && end == 5);
+}
+
+int main(void) {
+    TestFirst1();
+    TestBinarySearchStart();
+    TestBinarySearchEnd();
+    TestBinarySearchRange();
+    TestBinarySearchRange2();
+    return 0;
+}
