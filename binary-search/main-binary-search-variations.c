@@ -85,6 +85,14 @@ void BinarySearchRange2(int n, int a[n], int t, int *start, int *end) {
     *end = r;
 }
 
+// 统计一个数字在有序数组中出现的次数
+// 思路1)找出其左右边界
+// 思路2)找出t和t-1的右边界
+int BinarySearchCount(int n, int a[n], int t) {
+    if (n <= 0) return 0;
+    return BinarySearchEnd(n, a, t) - BinarySearchEnd(n, a, t - 1);
+}
+
 ////////
 // 测试
 ////////
@@ -127,11 +135,19 @@ void TestBinarySearchRange2() {
     assert(start == 3 && end == 5);
 }
 
+void TestBinarySearchCount() {
+    int a[] = {0, 1, 2, 3, 3, 3, 5};
+    int n = 7;
+    int t = 3;
+    assert(BinarySearchCount(n, a, t) == 3);
+}
+
 int main(void) {
     TestFirst1();
     TestBinarySearchStart();
     TestBinarySearchEnd();
     TestBinarySearchRange();
     TestBinarySearchRange2();
+    TestBinarySearchCount();
     return 0;
 }
