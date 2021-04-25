@@ -93,6 +93,24 @@ int BinarySearchCount(int n, int a[n], int t) {
     return BinarySearchEnd(n, a, t) - BinarySearchEnd(n, a, t - 1);
 }
 
+// 旋转数组中查找最小值的位置（可能存在重复元素）
+// https://leetcode-cn.com/problems/find-minimum-in-rotated-sorted-array-ii/
+int BinarySearchRotatedPeak(int n, int a[n]) {
+    if (n <= 0) return -1;
+    int l = 0;
+    int r = n - 1;
+    while (l < r) {
+        int m = l + (r - l) / 2;
+        if (a[m] == a[r])  //  例如 [2,2,2,0,2] 最小值一定在 r 左边
+            r--;
+        else if (a[m] < a[r])  // 例如 [2,2,1,2,2] 最小值一定不在区间 (m,
+            r = m;
+        else if (a[m] > a[r])  // 例如 [2,3,4,1,2] 最小值一定不在区间 ,m]
+            l = m + 1;
+    }
+    return a[l];
+}
+
 ////////
 // 测试
 ////////
@@ -142,6 +160,12 @@ void TestBinarySearchCount() {
     assert(BinarySearchCount(n, a, t) == 3);
 }
 
+void TestBinarySearchRotatedPeak() {
+    int a[] = {4, 5, 6, 6, 6, 7, 7, 7, 1, 1, 2, 3, 3, 3, 3};
+    int n = 15;
+    assert(BinarySearchRotatedPeak(n, a) == 1);
+}
+
 int main(void) {
     TestFirst1();
     TestBinarySearchStart();
@@ -149,5 +173,6 @@ int main(void) {
     TestBinarySearchRange();
     TestBinarySearchRange2();
     TestBinarySearchCount();
+    TestBinarySearchRotatedPeak();
     return 0;
 }
