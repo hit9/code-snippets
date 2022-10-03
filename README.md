@@ -69,3 +69,4 @@ algorithms
 * [无重复字符的最长子串](https://leetcode-cn.com/problems/longest-substring-without-repeating-characters) ....................................... [longest-substring-without-repeat-chars](longest-substring-without-repeat-chars)
 * [最短编辑距离](https://writings.sh/post/algorithm-minimum-edit-distance) ....................................... [min-edit-distance](min-edit-distance)
 * [校验表示数值的字符串](https://leetcode-cn.com/problems/biao-shi-shu-zhi-de-zi-fu-chuan-lcof/)  ....................................... [validate-number-string](validate-number-string)
+* [除自身以外数组的乘积](https://leetcode.cn/problems/product-of-array-except-self/)  ....................................... [product-of-array-except-self](product-of-array-except-self)
