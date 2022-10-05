@@ -10,15 +10,15 @@
 # 倒酒的动作
 ACTION_VOID = ""  # 空标志
 ACTION_INIT = "(init)"  # 初始标志
-ACTION_A_TO_B = "(a->b)"  # A容器倒入B容器，以下雷同
-ACTION_A_TO_C = "(a->c)"
-ACTION_B_TO_A = "(b->a)"
-ACTION_B_TO_C = "(b->c)"
-ACTION_C_TO_A = "(c->a)"
-ACTION_C_TO_B = "(c->b)"
+ACTION_A_TO_B = "(A->B)"  # A容器倒入B容器，以下雷同
+ACTION_A_TO_C = "(A->C)"
+ACTION_B_TO_A = "(B->A)"
+ACTION_B_TO_C = "(B->C)"
+ACTION_C_TO_A = "(C->A)"
+ACTION_C_TO_B = "(C->B)"
 
 
-def pour_visited_matrix():
+def pour_visited_matrix_dfs():
     # 共六种倒酒情况: A->B, A->C, B->C, B->A, C->A, C->B
     # a, b, c 记录每个状态下的酒的容量
     # 采用 DFS 深度优先遍历的方式，计算所有可能的状态
@@ -43,6 +43,7 @@ def pour_visited_matrix():
             continue
 
         d[a][b] = actions
+        print(f"{a},{b}=> {actions}")
 
         # A -> B
         if a > 0 and b < 7:
@@ -89,7 +90,7 @@ def pour_visited_matrix():
 
 
 if __name__ == "__main__":
-    d = pour_visited_matrix()
+    d = pour_visited_matrix_dfs()
 
     # 是否存在 (2,x) 和 (x,2) 的情况?
     for a in range(5):
