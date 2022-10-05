@@ -28,12 +28,12 @@ def pour_visited_matrix_bfs():
     d = [[ACTION_VOID for _ in range(8)] for _ in range(5)]
 
     # 起始情况，a=4, b=7
-    # 入栈 A, B 容器的现状 和 当前累积的动作
+    # 入队 A, B 容器的现状 和 当前累积的动作
     s = [[4, 7, ACTION_INIT]]
     d[4][4] = ACTION_INIT
 
     while len(s) > 0:
-        # 获取栈顶 a, b
+        # 获取队头 a, b
         a, b, actions = s.pop(0)
         # 推导当前第三个容器的状态
         c = 11 - a - b
