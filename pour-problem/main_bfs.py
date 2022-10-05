@@ -43,7 +43,7 @@ def pour_visited_matrix_bfs():
             continue
 
         d[a][b] = actions
-        print(f"{a},{b}=> {actions}")
+        print(f"{a},{b} => {actions}")
 
         # A -> B
         if a > 0 and b < 7:

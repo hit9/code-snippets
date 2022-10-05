@@ -70,4 +70,4 @@ algorithms
 * [最短编辑距离](https://writings.sh/post/algorithm-minimum-edit-distance) ....................................... [min-edit-distance](min-edit-distance)
 * [校验表示数值的字符串](https://leetcode-cn.com/problems/biao-shi-shu-zhi-de-zi-fu-chuan-lcof/)  ....................................... [validate-number-string](validate-number-string)
 * [除自身以外数组的乘积](https://leetcode.cn/problems/product-of-array-except-self/)  ....................................... [product-of-array-except-self](product-of-array-except-self)
-* 倒酒问题/注水问题 ....................................... [pour-problem](pour-problem)
+* [倒酒问题/注水问题/分酒问题](https://writings.sh/post/pour-problem) ....................................... [pour-problem](pour-problem)
