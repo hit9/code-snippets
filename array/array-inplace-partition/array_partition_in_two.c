@@ -3,6 +3,7 @@
 
 #include <stdio.h>
 
+// Swap 交换数组 arr 的第 i 和 j 项元素
 void Swap(int arr[], int i, int j) {
     int tmp = arr[i];
     arr[i] = arr[j];
