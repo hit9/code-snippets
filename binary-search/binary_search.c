@@ -36,4 +36,5 @@ int main(void) {
 
     printf("Search 4 in a: %d\n", BinarySearch(a, 9, 4));    // Expect: 2
     printf("Search 12 in a: %d\n", BinarySearch(a, 9, 12));  // Expect: -1
+    return 0;
 }

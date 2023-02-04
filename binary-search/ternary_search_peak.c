@@ -35,4 +35,5 @@ int main(void) {
     int pos = ternary_search_peak(a, 10);
     int peak = a[pos];
     printf("ternary_search_peak of a: %d\n", peak);  // Expect: 1
+    return 0;
 }

@@ -43,4 +43,5 @@ int LargestSumContiguousSubarraySpaceO1(int nums[], int length) {
 int main(void) {
     int nums1[] = {-2, 1, -3, 4, -1, 2, 1, -5, 4};
     assert(LargestSumContiguousSubarraySpaceO1(nums1, 9) == 6);
+    return 0;
 }
