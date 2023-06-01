@@ -51,7 +51,9 @@ int BoyerMoore(char *s, int n, char *p, int m) {
             return i + 1;
         }
 
-        // 失配时，跳转的多少，选取坏字符表和好后缀表中最大的跳转量
+        // 失配时，跳转的多少
+        // 如果只是采用 i = bad_char_table[s[i]] 的话，会有可能发生匹配回溯
+        // 我们要至少子串右移对齐一位，即主串迭代至少 m-j 才行
         i += max(bad_char_table[s[i]], m - j);
     }
 
