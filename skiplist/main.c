@@ -12,5 +12,6 @@ int main(void) {
     Put(sl, 7);
     Put(sl, 8);
     Print(sl);
+    FreeSkiplist(sl);
     return 0;
 }
