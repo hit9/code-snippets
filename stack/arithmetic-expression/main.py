@@ -46,7 +46,6 @@ def evaluate(s):
             # 括号包裹的表达式，是指不必考虑优先级规则，
             # 直接先计算括号内的运算
             while ops and ops[-1] != "(":
-                # TODO: 此处有bug
                 calc(nums, ops)
             ops.pop()  # 弹出左括号
         elif x.isdigit():
