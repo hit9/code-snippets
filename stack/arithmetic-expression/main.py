@@ -1,3 +1,9 @@
+"""
+双栈法 算术表达式求值 - Python 版本
+
+支持多位整数
+"""
+
 # 四则运算符的优先级，越高值越大
 P = {
     "+": 1,
@@ -28,14 +34,17 @@ def evaluate(s):
     # 存放待运算的四则运算符
     # 栈底到栈顶运算符的优先级应该是非降的
     ops = []
-    # 将 s 用 () 包裹起来，算作一个规整的表达式
-    s = "(" + s + ")"
     i = 0
     while i < len(s):
         x = s[i]
         i += 1
-        if x.isspace():  # 忽略空白
-            continue
+        if x.isdigit():
+            # 向右吸取所有的数字，按十进制取值
+            v = int(x)
+            while i < len(s) and s[i].isdigit():
+                v = v * 10 + int(s[i])
+                i += 1
+            nums.append(v)
         elif x in P:
             # 当前运算符优先级比如栈顶运算的优先级高
             # 则优先计算栈内
@@ -49,15 +58,9 @@ def evaluate(s):
             while ops and ops[-1] != "(":
                 calc(nums, ops)
             ops.pop()  # 弹出左括号
-        elif x.isdigit():
-            # 向右吸取所有的数字，按十进制取值
-            v = int(x)
-            while i < len(s) and s[i].isdigit():
-                v = v * 10 + int(s[i])
-                i += 1
-            nums.append(v)
-        else:
-            raise Exception("bad token")
+    # 把栈内剩余运算执行完
+    while ops:
+        calc(nums, ops)
     return nums.pop()
 
 
