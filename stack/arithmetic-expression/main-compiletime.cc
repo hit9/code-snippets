@@ -2,8 +2,7 @@
 // 支持多位整数
 // 编译选项: -std=c++20
 #include <algorithm>
-#include <array>
-#include <type_traits>
+#include <cstddef>
 
 // Complie-time stack.
 template <typename T, size_t N>
