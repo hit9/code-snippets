@@ -29,9 +29,11 @@ def is_right_acting_operator(x: str) -> bool:
     return x in {op_concat, op_union, op_left_pair}
 
 
-def is_symbol(x: str) -> bool:
-    """是否符号? (非操作符)"""
-    return x not in {op_concat, op_union, op_closure, op_left_pair, op_right_pair}
+def is_able_insert_concat(x: str) -> bool:
+    """是否可以在 x 左侧插入 连接符?"""
+    if x in {op_concat, op_union, op_closure, op_right_pair}:
+        return False
+    return True  # 左括号, 一般字符可以
 
 
 class NfaState:
@@ -157,14 +159,12 @@ class NfaParser:
         """
         chs: list[str] = []
         for x in s:
-            # 如果当前是非操作符的符号，比如 'a'
-            # 且前一个符号没有对右侧有贴合的作用，那么可以插入连接符
-            if is_symbol(x) and chs and not is_right_acting_operator(chs[-1]):
-                chs.append(op_concat)
-
-            if x == op_left_pair and chs and is_symbol(chs[-1]):
-                # 如果当前是一个做括号, 且左侧是字符
-                # 那么可以插入连接符; 比如 a(...) => a&(...)
+            if (
+                is_able_insert_concat(x)
+                # 并且前一个符号没有向右贴合的作用，那么可以插入连接符
+                and chs
+                and not is_right_acting_operator(chs[-1])
+            ):
                 chs.append(op_concat)
 
             chs.append(x)
@@ -331,10 +331,13 @@ class DfaBuilder:
 
 
 if __name__ == "__main__":
-    nfa = NfaParser().parse("a(a|b)*c(d|e)")
+    nfa = NfaParser().parse("a(a|b)*c(d|e)(x|y|z)*")
     dfa = DfaBuilder().from_nfa(nfa)
     print(dfa.match("aabbace"))  # True
     print(dfa.match("aabbbbbbace"))  # True
     print(dfa.match("aabbbbbbacd"))  # True
     print(dfa.match("aabbbbbbad"))  # False
     print(dfa.match("aabbbbbbaf"))  # False
+    print(dfa.match("aabbbbbbacdxxx"))  # True
+    print(dfa.match("aabbbbbbacdxzy"))  # True
+    print(dfa.match("aabbbbbbacdxzy1"))  # False
