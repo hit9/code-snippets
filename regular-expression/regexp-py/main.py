@@ -330,9 +330,12 @@ class DfaBuilder:
         return dfa
 
 
+def compile(s: str) -> "Dfa":
+    return DfaBuilder().from_nfa(NfaParser().parse(s))
+
+
 if __name__ == "__main__":
-    nfa = NfaParser().parse("a(a|b)*c(d|e)(x|y|z)*")
-    dfa = DfaBuilder().from_nfa(nfa)
+    dfa = compile("a(a|b)*c(d|e)(x|y|z)*")
     print(dfa.match("aabbace"))  # True
     print(dfa.match("aabbbbbbace"))  # True
     print(dfa.match("aabbbbbbacd"))  # True
