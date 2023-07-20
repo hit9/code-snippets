@@ -7,8 +7,9 @@
     取并 a|b
 
 核心步骤:
-    NfaParser().parse()  解析正则表达式，构造 NFA
+    NfaParser().parse()      解析正则表达式，构造 NFA
     DfaBuilder().from_nfa()  NFA 转换为 DFA
+    DfaMinifier().minify()   压缩 DFA 状态数
 
 """
 
@@ -218,33 +219,59 @@ class NfaParser:
 class DfaState:
     """DFA 的一个状态是多个 Nfa 状态的集合"""
 
-    def __init__(self, nfa_states: set[NfaState]):
+    def __init__(self, name: str, is_end: bool):
+        self.name = name
+        self.is_end = is_end
+
+        # NFA 状态集合，仅在 DfaBuilder 过程中用到
+        self.nfa_states: set[NfaState] = set()
+        # 非空跳转 { Symbol => { NfaStates...}}, 仅在 DfaBuilder 过程中用到
+        self.nfa_transitions: dict[Symbol, set[NfaState]] = {}
+
+    @classmethod
+    def from_nfa_states(cls, nfa_states: set[NfaState]) -> "DfaState":
+        """DfaBuilder 过程中从 NfaState 列表构建一个 DfaState."""
+        nfa_state_no_strings = map(str, sorted(list(nfa_states), key=lambda x: x.no))
+        name = ",".join(nfa_state_no_strings)
+
+        state = cls(name=name, is_end=False)
         # NFA 状态集合
-        self.nfa_states = frozenset(nfa_states)
+        state.nfa_states = nfa_states
 
         # 是否终态: 但凡有含义 NfaState 终态
-        self.is_end = False
+        state.is_end = False
         for s in nfa_states:
             if s.is_end:
-                self.is_end = True
+                state.is_end = True
                 break
 
         # 非空跳转 { Symbol => { NfaStates...}}
-        self.nfa_transitions: dict[Symbol, set[NfaState]] = {}
         for s in nfa_states:
             for symbol, targets in s.transitions.items():
                 if symbol != epsilon:  # 只关注非空边跳转
-                    self.nfa_transitions.setdefault(symbol, set())
-                    self.nfa_transitions[symbol] |= targets
+                    state.nfa_transitions.setdefault(symbol, set())
+                    state.nfa_transitions[symbol] |= targets
+        return state
+
+    @classmethod
+    def from_dfa_states(cls, dfa_states: "DfaStateGroup") -> "DfaState":
+        """DfaMinifier 过程中从 DfaState 列表构建一个 DfaState."""
+        dfa_state_names = sorted([x.name for x in dfa_states])
+        is_end = False
+        for s in dfa_states:
+            if s.is_end:
+                is_end = True
+                break
+        return cls(name=";".join(dfa_state_names), is_end=is_end)
 
     def __hash__(self) -> int:
-        return hash(self.nfa_states)
+        return hash(self.name)
 
     def __eq__(self, o: object) -> bool:
         return isinstance(o, DfaState) and hash(self) == hash(o)
 
     def __repr__(self) -> str:
-        return repr(self.nfa_states)
+        return self.name
 
 
 class Dfa:
@@ -273,6 +300,8 @@ class Dfa:
 
 
 class DfaBuilder:
+    """从 NFA 构造 DFA"""
+
     def epsilon_closure(self, S: DfaState | set[NfaState]) -> DfaState:
         """
         输入 DFA 的状态 S, 计算 S 中每个状态 s 可以只沿空边 epsilon 到达的状态集合 T.:
@@ -295,11 +324,11 @@ class DfaBuilder:
                     T.add(t)
                     # 压入栈中
                     stack.append(t)
-        return DfaState(T)
+        return DfaState.from_nfa_states(T)
 
     def move(self, S: DfaState, symbol: Symbol) -> DfaState:
         """move(S, symbol) 记录一个非空边跳转到的目标 DfaState"""
-        return DfaState(S.nfa_transitions[symbol])
+        return DfaState.from_nfa_states(S.nfa_transitions[symbol])
 
     def from_nfa(self, nfa: Nfa) -> Dfa:
         """
@@ -336,8 +365,54 @@ class DfaBuilder:
         return dfa
 
 
+# Dfa 化简过程中的 DFA 状态分组
+DfaStateGroup = set[DfaState]
+
+# Dfa 化简过程中的所有分组的集合
+DfaStateGroupSet = set[DfaStateGroup]
+
+
+class DfaMinifier:
+    """采用 Hopcroft 压缩 DFA"""
+
+    def partition(
+        self, g0: DfaStateGroup, a: DfaState, b: DfaState
+    ) -> tuple[DfaStateGroup, DfaStateGroup]:
+        """将小组 g0 分为两部分 g1, g2，确保状态 a 和 b 分到不同的组.
+        返回 g1, g2.
+        """
+        g = list(g0)
+        g1 = {a}
+        g2 = {b}
+        i = 0
+        while i < len(g):
+            if i < len(g) and g[i] not in {a, b}:
+                g1.add(g[i])
+                i += 1
+            if i < len(g) and g[i] not in {a, b}:
+                g2.add(g[i])
+                i += 1
+        return g1, g2
+
+    def refine(self, gs: DfaStateGroupSet) -> bool:
+        """检查 gs 中的每个分组 g:
+        如果 g 中存在两个状态 a, b, 其目标状态不在同一个小组中
+        则对 g 进行切分.
+        """
+        # TODO
+        pass
+
+    def minify(self, dfa: Dfa) -> None:
+        # TODO
+        pass
+
+
 def compile(s: str) -> "Dfa":
-    return DfaBuilder().from_nfa(NfaParser().parse(s))
+    """compile 将给定的正则表达式字符串编译到最小 DFA"""
+    nfa = NfaParser().parse(s)
+    dfa = DfaBuilder().from_nfa(nfa)
+    DfaMinifier().minify(dfa)
+    return dfa
 
 
 if __name__ == "__main__":
