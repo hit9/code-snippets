@@ -12,6 +12,7 @@
     DfaMinifier().minify()   压缩 DFA 状态数
 
 """
+from typing import Optional
 
 Symbol = str  # 正则符号
 epsilon = ""  # 空符号
@@ -219,50 +220,54 @@ class NfaParser:
 class DfaState:
     """DFA 的一个状态是多个 Nfa 状态的集合"""
 
-    def __init__(self, name: str, is_end: bool):
+    def __init__(self, name: str = "", is_end: bool = False):
         self.name = name
         self.is_end = is_end
 
         # NFA 状态集合，仅在 DfaBuilder 过程中用到
         self.nfa_states: set[NfaState] = set()
+
         # 非空跳转 { Symbol => { NfaStates...}}, 仅在 DfaBuilder 过程中用到
         self.nfa_transitions: dict[Symbol, set[NfaState]] = {}
 
-    @classmethod
-    def from_nfa_states(cls, nfa_states: set[NfaState]) -> "DfaState":
-        """DfaBuilder 过程中从 NfaState 列表构建一个 DfaState."""
-        nfa_state_no_strings = map(str, sorted(list(nfa_states), key=lambda x: x.no))
-        name = ",".join(nfa_state_no_strings)
+        # 所归属的 DfaStateGroup 信息
+        # 仅在化简过程中使用
+        self.group: Optional["DfaStateGroup"] = None
 
-        state = cls(name=name, is_end=False)
+    def init_from_nfa_states(self, nfa_states: set[NfaState]) -> "DfaState":
+        """DfaBuilder 过程中从 NfaState 列表初始化一个 DfaState."""
+        nfa_state_no_strings = map(str, sorted(list(nfa_states), key=lambda x: x.no))
+        self.name = ",".join(nfa_state_no_strings)
+
         # NFA 状态集合
-        state.nfa_states = nfa_states
+        self.nfa_states = nfa_states
 
         # 是否终态: 但凡有含义 NfaState 终态
-        state.is_end = False
+        self.is_end = False
         for s in nfa_states:
             if s.is_end:
-                state.is_end = True
+                self.is_end = True
                 break
 
         # 非空跳转 { Symbol => { NfaStates...}}
         for s in nfa_states:
             for symbol, targets in s.transitions.items():
                 if symbol != epsilon:  # 只关注非空边跳转
-                    state.nfa_transitions.setdefault(symbol, set())
-                    state.nfa_transitions[symbol] |= targets
-        return state
+                    self.nfa_transitions.setdefault(symbol, set())
+                    self.nfa_transitions[symbol] |= targets
+        return self
 
-    @classmethod
-    def from_dfa_states(cls, dfa_states: "DfaStateGroup") -> "DfaState":
+    def init_from_dfa_states(self, dfa_states: set["DfaState"]) -> "DfaState":
         """DfaMinifier 过程中从 DfaState 列表构建一个 DfaState."""
         dfa_state_names = sorted([x.name for x in dfa_states])
-        is_end = False
+        self.name = ";".join(dfa_state_names)
+
+        self.is_end = False
         for s in dfa_states:
             if s.is_end:
-                is_end = True
+                self.is_end = True
                 break
-        return cls(name=";".join(dfa_state_names), is_end=is_end)
+        return self
 
     def __hash__(self) -> int:
         return hash(self.name)
@@ -274,12 +279,15 @@ class DfaState:
         return self.name
 
 
+# DFA 跳转表的类型: { from_state => { symbol => to_state } }
+DfaTable = dict[DfaState, dict[Symbol, DfaState]]
+
+
 class Dfa:
     def __init__(self, start: DfaState):
         self.start = start
         self.states: set[DfaState] = set()
-        # 跳转表 { from_state => { symbol => to_state } }
-        self.transitions: dict[DfaState, dict[Symbol, DfaState]] = {}
+        self.transitions: DfaTable = {}  # 跳转表
 
     def size(self) -> int:
         return len(self.states)
@@ -324,11 +332,11 @@ class DfaBuilder:
                     T.add(t)
                     # 压入栈中
                     stack.append(t)
-        return DfaState.from_nfa_states(T)
+        return DfaState().init_from_nfa_states(T)
 
     def move(self, S: DfaState, symbol: Symbol) -> DfaState:
         """move(S, symbol) 记录一个非空边跳转到的目标 DfaState"""
-        return DfaState.from_nfa_states(S.nfa_transitions[symbol])
+        return DfaState().init_from_nfa_states(S.nfa_transitions[symbol])
 
     def from_nfa(self, nfa: Nfa) -> Dfa:
         """
@@ -365,53 +373,94 @@ class DfaBuilder:
         return dfa
 
 
-# Dfa 化简过程中的 DFA 状态分组
-DfaStateGroup = set[DfaState]
+class DfaStateGroup(set[DfaState], DfaState):
+    """Dfa 化简过程中的 DFA 状态小组"""
+
+    def __init__(self, dfa_states: Optional[set[DfaState]] = None):
+        dfa_states = dfa_states or set()
+        super(DfaStateGroup, self).__init__(dfa_states)
+        self.init_from_dfa_states(dfa_states)
+
+    def __hash__(self) -> int:  # type: ignore
+        return hash(self.name)
+
+    def __eq__(self, o: object):
+        return isinstance(o, DfaStateGroup) and hash(self) == hash(o)
+
+    def add(self, s: DfaState):
+        super(DfaStateGroup, self).add(s)
+        # 在添加时，更改此状态归属的小组
+        s.group = self
+
 
 # Dfa 化简过程中的所有分组的集合
 DfaStateGroupSet = set[DfaStateGroup]
 
 
 class DfaMinifier:
-    """采用 Hopcroft 压缩 DFA"""
+    """采用 Hopcroft 算法压缩 DFA"""
 
-    def partition(
-        self, g0: DfaStateGroup, a: DfaState, b: DfaState
-    ) -> tuple[DfaStateGroup, DfaStateGroup]:
-        """将小组 g0 分为两部分 g1, g2，确保状态 a 和 b 分到不同的组.
-        返回 g1, g2.
-        """
-        g = list(g0)
-        g1 = {a}
-        g2 = {b}
-        i = 0
-        while i < len(g):
-            if i < len(g) and g[i] not in {a, b}:
-                g1.add(g[i])
-                i += 1
-            if i < len(g) and g[i] not in {a, b}:
-                g2.add(g[i])
-                i += 1
-        return g1, g2
+    def __init__(self, dfa: Dfa):
+        self.dfa = dfa
 
-    def refine(self, gs: DfaStateGroupSet) -> bool:
+    def remove_dead_states(self):
+        """清理死状态: 即非终态但是没有任何出边的状态"""
+        pass  # TODO
+
+    def remove_unreachable_states(self):
+        """清理无法状态的状态"""
+        pass  # TODO
+
+    def refine(self, gs: DfaStateGroupSet, ts: DfaTable) -> bool:
         """检查 gs 中的每个分组 g:
-        如果 g 中存在两个状态 a, b, 其目标状态不在同一个小组中
+        如果 g 中, 对于某个出边 symbol, 存在两个状态 a, b, 其目标状态不在同一个小组中
         则对 g 进行切分.
+        返回是否发生了分割
         """
-        # TODO
-        pass
+        for g in gs:  # 检查每个小组
+            for a in g:  # 考察小组 g 中的状态 a
+                # TODO 如果 a 是 终态?
+                for symbol in self.dfa.transitions[a]:  # 考察其每个出边
+                    ta = self.dfa.transitions[a][symbol]  # ta 是此出边的目标状态
+                    # 检查同小组的每个其他状态 b
+                    g2 = DfaStateGroup()  # 记录所有目标状态不等于 ta 的 b
+                    for b in g:
+                        if b != a:
+                            # tb 是 b 在此符号下的目标状态, 注意可能是 None
+                            tb = self.dfa.transitions[b].get(symbol)
+                            if tb is None or ta.group != tb.group:
+                                # 目标状态所在小组不同, 记录一下
+                                g2.add(b)
+                    if g2:
+                        # 执行切分, 把表现不一致的 g2 拆出来
+                        g1 = DfaStateGroup(g - g2)
+                        # 加入新的小组，移除废弃的分组
+                        gs.add(g1)
+                        gs.add(g2)
+                        gs.remove(g)
+                        return True
+        return False
 
-    def minify(self, dfa: Dfa) -> None:
-        # TODO
-        pass
+    def minify(self) -> None:
+        self.remove_unreachable_states()
+        self.remove_dead_states()
+
+        if dfa.size() >= 2:
+            # 仍然有至少 2 个状态, 才有继续简化的意义
+            g0 = DfaStateGroup(dfa.states)  # 初始分组
+            gs = {g0}  # 初始分组集合
+            # 新的跳转表, 同步维护
+            transitions: DfaTable = {}
+
+            while self.refine(gs):  # 不断分割，直到无法分割
+                pass
 
 
 def compile(s: str) -> "Dfa":
     """compile 将给定的正则表达式字符串编译到最小 DFA"""
     nfa = NfaParser().parse(s)
     dfa = DfaBuilder().from_nfa(nfa)
-    DfaMinifier().minify(dfa)
+    DfaMinifier(dfa).minify()
     return dfa
 
 
