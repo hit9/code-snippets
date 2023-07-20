@@ -5,6 +5,11 @@
     连接 ab
     克林闭包 a*
     取并 a|b
+
+核心步骤:
+    NfaParser().parse()  解析正则表达式，构造 NFA
+    DfaBuilder().from_nfa()  NFA 转换为 DFA
+
 """
 
 Symbol = str  # 正则符号
@@ -245,8 +250,12 @@ class DfaState:
 class Dfa:
     def __init__(self, start: DfaState):
         self.start = start
+        self.states: set[DfaState] = set()
         # 跳转表 { from_state => { symbol => to_state } }
         self.transitions: dict[DfaState, dict[Symbol, DfaState]] = {}
+
+    def size(self) -> int:
+        return len(self.states)
 
     def add_transition(self, from_: DfaState, symbol: Symbol, to: DfaState):
         self.transitions.setdefault(from_, {})[symbol] = to
@@ -305,9 +314,6 @@ class DfaBuilder:
         # 最终要构建的 DFA
         dfa = Dfa(S0)
 
-        # 标记过的状态
-        x = set()
-
         while q:
             # 弹出一个待处理的状态 S
             S = q.pop(0)
@@ -318,7 +324,7 @@ class DfaBuilder:
                 # TODO: 如何避免 epsilon_closure 的重复计算?
                 # 跳入的是一个其他状态 T
                 T = self.epsilon_closure(self.move(S, symbol))
-                if T not in x:
+                if T not in dfa.states:
                     # T 尚未打标，加入队列
                     q.append(T)
 
@@ -326,7 +332,7 @@ class DfaBuilder:
                 dfa.add_transition(S, symbol, T)
 
             # S 打标
-            x.add(S)
+            dfa.states.add(S)
         return dfa
 
 
@@ -336,6 +342,7 @@ def compile(s: str) -> "Dfa":
 
 if __name__ == "__main__":
     dfa = compile("a(a|b)*c(d|e)(x|y|z)*")
+    print("dfa size: ", dfa.size())
     print(dfa.match("aabbace"))  # True
     print(dfa.match("aabbbbbbace"))  # True
     print(dfa.match("aabbbbbbacd"))  # True
