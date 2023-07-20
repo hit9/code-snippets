@@ -12,6 +12,7 @@
     DfaMinifier().minify()   压缩 DFA 状态数
 
 """
+
 from typing import Optional
 
 C = str  # 符号
@@ -373,11 +374,25 @@ class DfaMinifier:
 
     def remove_dead_states(self):
         """清理死状态: 即非终态但是没有任何出边的状态"""
-        pass  # TODO
+        dead = set()
+        for s in self.dfa.states:
+            if s.is_end:
+                continue
+            if not s.transitions:
+                dead.add(s)
+        self.dfa.states -= dead
 
     def remove_unreachable_states(self):
-        """清理无法状态的状态"""
-        pass  # TODO
+        """清理无法状态的状态 (dfs)"""
+        stack = [self.dfa.start]
+        reachable = {self.dfa.start}
+        while stack:
+            s = stack.pop()
+            for _, t in s.transitions.items():
+                if t not in reachable:
+                    stack.append(t)
+                    reachable.add(t)
+        self.dfa.states = reachable
 
     def find_distinguishable(self, g: DfaStateGroup, a: DfaState) -> DfaStateGroup:
         """refine 函数的子过程
@@ -487,3 +502,10 @@ if __name__ == "__main__":
     print(dfa1.match("aabc"))  # True
     print(dfa1.match("aabaabc"))  # False
     print(dfa1.match("abbabc"))  # True
+    print(dfa1.match("aacx"))  # False
+
+    dfa2 = compile("abc(e|f)g*(ab)*ab")
+    print(dfa2.match("abcegabab"))  # True
+    print(dfa2.match("abcegababab"))  # True
+    print(dfa2.match("abcfgababab"))  # True
+    print(dfa2.match("abckgababab"))  # False
