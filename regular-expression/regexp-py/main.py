@@ -266,10 +266,14 @@ class DfaBuilder:
         # states 缓存已经生成过的 DfaState
         self.states: dict[str, DfaState] = {}
 
-    def make_dfa_state(self, N: set[NfaState]) -> DfaState:
+    def make_dfa_state_id(self, N: set[NfaState]) -> str:
+        # 从一批 NfaState 构造 DfaState 的标号
+        return ",".join(map(str, sorted(N, key=lambda x: x.id)))
+
+    def make_dfa_state(self, N: set[NfaState], id: str = "") -> DfaState:
         """从一批 NfaState 创建一个 DfaState."""
-        # id 格式: '1,2,3,4,5'
-        id = ",".join(map(str, sorted(N, key=lambda x: x.id)))
+        if not id:
+            id = self.make_dfa_state_id(N)
         # 只要有一个是终态，DfaState 就算做终态
         is_end = any(s.is_end for s in N)
         # 记录可以由非空边跳转到的 NfaState 列表
@@ -279,7 +283,9 @@ class DfaBuilder:
                     self.d.setdefault(id, {})
                     self.d[id].setdefault(ch, set())
                     self.d[id][ch] |= s.transitions[ch]
-        return DfaState(id, is_end)
+        st = DfaState(id, is_end)
+        self.states[id] = st
+        return st
 
     def epsilon_closure(self, N: set[NfaState]) -> None:
         """
@@ -306,9 +312,11 @@ class DfaBuilder:
         N = self.d[S.id][ch]
         # TODO: 似乎无法避免 epsilon_closure 的重复计算?
         self.epsilon_closure(N)
-        S = self.make_dfa_state(N)
-        # 如果已经生成过，则返回，不再新建
-        return self.states.setdefault(S.id, S)
+        id = self.make_dfa_state_id(N)
+        if id not in self.states:
+            # 如果已经生成过，则返回，不再新建
+            self.make_dfa_state(N, id=id)
+        return self.states[id]
 
     def build(self) -> Dfa:
         """将 NFA 转化为 DFA"""
