@@ -11,6 +11,7 @@
     DfaBuilder().build()     NFA 转换为 DFA
     DfaMinifier().minify()   压缩 DFA 状态数
 
+需要 Python >= 3.7 (typing hint)
 """
 
 from typing import Optional
