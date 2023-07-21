@@ -195,7 +195,6 @@ class NfaParser {
 
     // 新建一个 NfaState.
     std::shared_ptr<NfaState> NewState(bool is_end) {
-        // TODO 如何 free NfaState 的问题
         return std::make_shared<NfaState>(++state_no, is_end);
     };
 
