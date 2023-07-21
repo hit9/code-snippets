@@ -1,3 +1,3 @@
-- [算术表达式求值 Python 版](main.py)
-- [算术表达式求值 C++ 版](main.cc)
-- [算术表达式求值 C++ 版 - 编译期计算](main-compiletime.cc)
+- [算术表达式求值 Python 版](arithmetic-expression-py/main.py)
+- [算术表达式求值 C++ 版](arithmetic-expression-cpp/main.cc)
+- [算术表达式求值 C++ 版 - 编译期计算](arithmetic-expression-compiletime/main-compiletime.cc)
