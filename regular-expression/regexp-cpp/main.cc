@@ -1,4 +1,19 @@
+// 实现一个简单的正则表达式引擎 (C++ 版本)
+//
+// 支持的操作符:
+//     连接 ab
+//     克林闭包 a*
+//     取并 a|b
+//
+// 核心步骤:
+//     NfaParser().Parse()      解析正则表达式，构造 NFA
+//     DfaBuilder().Build()     NFA 转换为 DFA
+//     DfaMinifier().Minify()   压缩 DFA 状态数
+//
+// 编译选项: -std=c++11 以上
+
 #include <algorithm>
+#include <chrono>
 #include <functional>
 #include <iostream>
 #include <memory>
@@ -7,9 +22,8 @@
 #include <stack>
 #include <string>
 #include <unordered_map>
-#include <vector>
 
-// std::stack 不好用，这里封一个简单的 wrapper
+// Util: std::stack 的 pop 不方便，这里封一个简单的 wrapper
 template <typename T>
 class stack {
    public:
@@ -25,6 +39,14 @@ class stack {
    private:
     std::stack<T> s;
 };
+
+// Copy elements in set a but not in set b to set c.
+template <typename T, typename Cmp = std::less<T>>
+void set_sub(const std::set<T, Cmp>& a, const std::set<T, Cmp>& b,
+             std::set<T, Cmp>& c) {
+    for (auto& x : a)
+        if (b.find(x) == b.end()) c.insert(x);
+}
 
 // 符号
 typedef char C;
@@ -107,32 +129,46 @@ class State {
     bool is_end;
 
    public:
+    // 用于比较两个状态的 Comparator
+    class PtrCmp {
+       public:
+        bool operator()(const std::shared_ptr<State> a,
+                        const std::shared_ptr<State> b) const {
+            return a->Id() < b->Id();
+        };
+    };
+
     State(int id, bool is_end) : id(id), is_end(is_end){};
     int Id() const { return id; };
     bool IsEnd() const { return is_end; };
 };
 
-// 用于比较两个状态的 Comparator
-class StateComparator {
-   public:
-    bool operator()(const std::shared_ptr<State> a,
-                    const std::shared_ptr<State> b) const {
-        return a->Id() < b->Id();
-    };
-};
-
 class NfaState : public State {
    public:
-    typedef std::set<std::shared_ptr<NfaState>, StateComparator> Set;
+    // Set of NfaState pointers.
+    typedef std::set<std::shared_ptr<NfaState>, PtrCmp> Set;
+    // Transition table: Char => Set of NfaStates.
     typedef std::unordered_map<C, Set> Table;
 
+    // 构造函数
     NfaState(int id, bool is_end) : State(id, is_end){};
+
+    // 返回只读的跳转表
     const Table& Transitions() const { return transitions; };
+
+    // 添加从此状态出发的一条跳转, 出边字符是 c, 目标状态是 to
     void AddTransition(C c, const std::shared_ptr<NfaState> to) {
         transitions[c].insert(to);
-        // 不在能成为终态
+        // 不再能成为终态
         if (is_end) is_end = false;
-    }
+    };
+
+    // 返回此状态经过给定符号可跳转到的目标状态集合
+    // 如果不接受此符号，抛错.
+    const NfaState::Set& Nexts(C c) const { return transitions.at(c); }
+
+    // 判断状态转换是否接受符号 c.
+    bool AcceptC(C c) const { return transitions.find(c) != transitions.end(); }
 
    private:
     Table transitions;
@@ -328,11 +364,16 @@ class NfaParser {
 
 class DfaState : public State {
    public:
+    // Set of DfaState pointers.
+    typedef std::set<std::shared_ptr<DfaState>, State::PtrCmp> Set;
+
+    // 非空边跳转表: Char => DfaState pointer.
     typedef std::unordered_map<C, std::shared_ptr<DfaState>> Table;
 
     DfaState(int id, bool is_end) : State(id, is_end){};
 
     const Table& Transitions() const { return transitions; };
+
     // 返回跳转的目标状态
     std::shared_ptr<DfaState> Next(C c) const {
         // 找不到此符号的跳转边, 则返回 nullptr
@@ -343,24 +384,35 @@ class DfaState : public State {
         transitions[c] = to;
     }
 
+    // 实现比较操作符
+    bool operator==(const DfaState& st) const { return Id() == st.Id(); }
+    bool operator!=(const DfaState& st) const { return Id() != st.Id(); }
+
    private:
     Table transitions;
 };
 
 class Dfa {
-    typedef std::set<std::shared_ptr<DfaState>, StateComparator> Set;
-
    public:
     std::shared_ptr<DfaState> start = nullptr;
-    Set states;  // 状态集合
+    DfaState::Set states;  // 状态集合
 
     Dfa(std::shared_ptr<DfaState> start) : start(start){};
+
+    // 返回状态的个数
     std::size_t Size() const { return states.size(); }
-    Set& States() { return states; };
+    // 返回状态列表，可被修改
+    DfaState::Set& States() { return states; };
+    // 是否含有状态 s?
     bool HasState(std::shared_ptr<DfaState> s) {
         return states.find(s) != states.end();
-    }
-
+    };
+    // 过滤终态到给定的 Set 容器中
+    void EndStates(DfaState::Set& x) {
+        for (auto s : states) {
+            if (s->IsEnd()) x.insert(s);
+        }
+    };
     // 匹配一个输入的字符串
     bool Match(std::string s) {
         auto st = start;
@@ -387,14 +439,10 @@ class DfaBuilder {
     // 从一批 NfaState 构造 DfaState 的 ID 号
     // Hash("1,2,3,...")
     int MakeDfaStateId(const NfaState::Set& N) {
-        // 新建一个 vector 将 NfaState 按标号排序
-        std::vector v(N.begin(), N.end());
-        std::sort(v.begin(), v.end(),
-                  [](auto a, auto b) { return a->Id() < b->Id(); });
-
         // 构造状态标号 hash("1,2,3,4,5")
+        // std::set 本身是有序的, 不必排序即可拼接
         std::string str;
-        for (auto& s : v) str += "," + std::to_string(s->Id());
+        for (auto& s : N) str += "," + std::to_string(s->Id());
         return std::hash<std::string>{}(str);
     }
 
@@ -415,7 +463,7 @@ class DfaBuilder {
         for (auto& s : N) {
             for (auto& p : s->Transitions()) {
                 auto& c = p.first;    // 符号
-                auto& st = p.second;  //  符号的目标 NfaState 状态集合
+                auto& st = p.second;  // 符号的目标 NfaState 状态集合
                 if (c != EPSILON) {
                     d[id][c].insert(st.begin(), st.end());  // Union
                 }
@@ -437,10 +485,8 @@ class DfaBuilder {
         while (!stack.empty()) {
             auto s = stack.pop();
             // 沿着空边，找所有可以到达的状态，加入集合
-            auto& transitions = s->Transitions();
-            auto it = transitions.find(EPSILON);
-            if (it == transitions.end()) continue;  // 找不到空边
-            for (auto& t : it->second) {
+            if (!s->AcceptC(EPSILON)) continue;  // 找不到空边
+            for (auto& t : s->Nexts(EPSILON)) {
                 if (N.find(t) == N.end()) {  // t 不在 N 中
                     // 加入并压入栈
                     N.insert(t);
@@ -480,7 +526,7 @@ class DfaBuilder {
         std::queue<std::shared_ptr<DfaState>> q;
         q.push(S0);
 
-        // 最终要构建的 DFA
+        // 最终要构建的 DFA, 初始状态 S0
         auto dfa = std::make_shared<Dfa>(S0);
 
         while (!q.empty()) {
@@ -505,17 +551,326 @@ class DfaBuilder {
             // S 已处理完成，放入 dfa
             dfa->States().insert(S);
         }
-
         return dfa;
     };
 };
 
-int main(void) {
-    auto nfa = NfaParser().Parse("a(a|b)*c(d|e)(x|y|z)*");
+// DfaMinifier 是 DFA 化简器
+class DfaMinifier {
+   private:
+    // 化简过程中的状态小组, 是对 std::set 的一层包装
+    // Group 一旦初始化，不可再更改其内容, 类似 frozenset.
+    class Group {
+       public:
+        // 用于比较两个 Group 的 Comparator
+        // GroupSet 的元素是 pointer, 所以要实现一个 PtrCmp 结构
+        class PtrCmp {
+           public:
+            bool operator()(const std::shared_ptr<Group> a,
+                            const std::shared_ptr<Group> b) const {
+                return a->Id() < b->Id();
+            };
+        };
+
+        // 用于计算 Group* 的 Hash.
+        // 这样 Group 可以作为 map 的 Key.
+        class PtrHash {
+           public:
+            std::size_t operator()(
+                const std::shared_ptr<Group> g) const noexcept {
+                return std::hash<int>{}(g->Id());
+            }
+        };
+
+        // 采用左值集合构造, 走复制
+        Group(const DfaState::Set& g1) : g(g1) { initId(); };
+
+        // 采用右值集合构造: 走内容 swap
+        Group(DfaState::Set&& g1) noexcept {
+            g.swap(g1);
+            initId();
+        };
+
+        int Id() const { return id; };
+
+        // 是否包含终态?
+        bool HasEndState() const {
+            for (auto& st : g) {
+                if (st->IsEnd()) return true;
+            }
+            return false;
+        }
+
+        const DfaState::Set& Set() const { return g; };
+
+        // 实现比较操作符
+        bool operator==(const Group& g1) const { return g1.Id() == id; }
+        bool operator!=(const Group& g1) const { return g1.Id() != id; }
+
+       private:
+        DfaState::Set g;
+        int id;
+
+        void initId() {
+            // id 设置为 hash(DfaState.id list ...)
+            // Set 本身是有序的，所以不必排序
+            std::string s;
+            for (auto& st : g) s += "," + std::to_string(st->Id());
+            id = std::hash<std::string>{}(s);
+        }
+    };
+
+    // Dfa 化简过程中的所有分组的集合
+    typedef std::set<std::shared_ptr<Group>, Group::PtrCmp> GroupSet;
+
+    // 要化简的 DFA
+    std::shared_ptr<Dfa> dfa;
+
+    // d 记录一个 DfaState 在哪个 Group 中
+    // DfaState Id => Group
+    std::unordered_map<int, std::shared_ptr<Group>> d;
+
+    // 新建一个 Group (同时支持右值的完美转发)
+    std::shared_ptr<Group> MakeGroup(DfaState::Set&& states) {
+        auto g = std::make_shared<Group>(std::forward<DfaState::Set>(states));
+        // 记录状态归属关系
+        for (auto& s : g->Set()) d[s->Id()] = g;
+        return g;
+    }
+
+    // 查询一个 DfaState 目前所在的分组
+    std::shared_ptr<Group> GroupOf(const std::shared_ptr<DfaState> s) const {
+        // 在任何一个时刻, 任何一个 DfaState 必然属于一个分组
+        return d.at(s->Id());
+    }
+
+    // 清理死状态, 即非终态但是没有任何出边的状态
+    void RemoveDeadStates() {
+        auto new_states = new DfaState::Set;
+        new_states->insert(dfa->start);
+
+        for (auto st : dfa->States()) {
+            // 跳过没有出边的非终态
+            if (!st->IsEnd() && st->Transitions().empty()) continue;
+            new_states->insert(st);
+        }
+
+        // 重写 dfa states.
+        dfa->States().swap(*new_states);
+        delete new_states;
+    };
+
+    // 清理无法到达的状态 (dfs)
+    void RemoveUnreachableStates() {
+        auto reachable = new DfaState::Set;
+
+        stack<std::shared_ptr<DfaState>> stack;
+        stack.push(dfa->start);
+
+        while (!stack.empty()) {
+            auto st = stack.pop();
+            for (auto& p : st->Transitions()) {
+                auto& target = p.second;  // 可到达的目标状态
+                if (reachable->find(target) == reachable->end()) {
+                    // 不在已发现的目标中，则加入，并入栈
+                    stack.push(target);
+                    reachable->insert(target);
+                }
+            }
+        }
+        // 重写 dfa states.
+        dfa->States().swap(*reachable);
+        delete reachable;
+    }
+
+    // refine 函数的子过程
+    // 在小组 g 中找到和 a 不等价的所有其他状态 b 的集合 g2
+    // 如果不存在，返回的就是 nullptr
+    std::shared_ptr<Group> FindDistinguishable(std::shared_ptr<Group> g,
+                                               std::shared_ptr<DfaState> a) {
+        // x 记录 distinguishable DfaStates.
+        // 采用堆上内存，以在 MakeGroup 时交换指针
+        auto x = new DfaState::Set;
+
+        for (auto& p : a->Transitions()) {
+            // 对于 a 有出边的情况, 考察每个出边所到达的目标状态
+            auto c = p.first;
+            auto ta = p.second;
+            // 检查同小组的每个其他状态 b
+            for (auto b : g->Set()) {
+                if (*b != *a) {  // 注意比较的是对象本身, 不是指针
+                    // tb 是 b 在此符号下的目标状态, 注意可能是 null
+                    auto tb = b->Next(c);
+                    if (tb == nullptr || *GroupOf(ta) != *GroupOf(tb)) {
+                        // 目标状态所在小组不同, 记录一下
+                        x->insert(b);
+                    }
+                }
+            }
+
+            if (!x->empty()) {
+                // 对于一个出边，可以区分，就直接 break
+                break;
+            }
+        }
+
+        // 不存在，返回 nullptr
+        if (x->empty()) return nullptr;
+
+        auto gp = MakeGroup(std::move(*x));
+        delete x;
+        return gp;
+    }
+
+    // 检查 gs 中的每个分组 g:
+    // 如果 g 中, 对于某个出边 ch, 存在两个状态 a, b, 其目标状态不在同一个小组中
+    // 则对 g 进行切分.
+    // 返回是否发生了分割
+    bool Refine(GroupSet& gs) {
+        for (auto g : gs) {
+            // 检查每个小组
+            for (auto a : g->Set()) {
+                // 找到小组内与 a 不同的状态集
+                auto g2 = FindDistinguishable(g, a);
+
+                if (g2 != nullptr) {
+                    // 执行切分
+
+                    // g1 是 g 中去除 g2 的部分
+                    auto x = new DfaState::Set;
+                    set_sub(g->Set(), g2->Set(), *x);
+                    auto g1 = MakeGroup(std::move(*x));
+                    delete x;
+
+                    // 加入新的小组，移除老的小组
+                    gs.erase(g);
+                    gs.insert(g1);
+                    gs.insert(g2);
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    // minify 的子过程
+    // 最终从 Group 列表再构造一个新的 DfaState 集合和跳转表，重写 DFA
+    void RewriteDfa(GroupSet& gs) {
+        // group => new dfa state 的映射
+        std::unordered_map<std::shared_ptr<Group>, std::shared_ptr<DfaState>,
+                           Group::PtrHash>
+            d;
+
+        // 新建的 state 集合
+        // 在堆上申请，以避免后续内存拷贝, 而可以采用 swap
+        auto new_states = new DfaState::Set;
+
+        // 先创建一轮 state
+        for (auto g : gs) {
+            auto st = std::make_shared<DfaState>(g->Id(), g->HasEndState());
+            new_states->insert(st);
+            d[g] = st;
+        }
+
+        // 维护一下跳转关系
+        for (auto g : gs) {
+            for (auto s : g->Set()) {
+                for (auto p : s->Transitions()) {
+                    auto c = p.first;      // 跳转字符
+                    auto t = p.second;     // 目标状态
+                    auto gt = GroupOf(t);  // 目标状态所在的分组
+                    auto st = d[gt];       // 目标状态的新 DfaState
+
+                    // 对每个字符，目标跳转状态就是每个目标 DfaState
+                    // 所在分组对应的新建的 DfaState
+                    d[g]->AddTransition(c, st);
+                }
+            }
+        }
+
+        // 原来起始状态所在分组目前的对应状态就是新的起始状态
+        dfa->start = d[GroupOf(dfa->start)];
+
+        // 因为 new_states 是一个栈上局部变量
+        dfa->States().swap(*new_states);
+        delete new_states;
+    }
+
+    // 初始分组，终态单独成组，其他的成一组
+    void InitGroupSet(GroupSet& gs) {
+        // 所有终态分组
+        auto ends = new DfaState::Set;
+        dfa->EndStates(*ends);
+        auto g1 = MakeGroup(std::move(*ends));
+        delete ends;
+
+        // 其他一组
+        auto others = new DfaState::Set;
+        set_sub(dfa->States(), g1->Set(), *others);
+        auto g2 = MakeGroup(std::move(*others));
+        delete others;
+
+        gs.insert({g1, g2});
+    }
+
+   public:
+    // 构造函数
+    DfaMinifier(std::shared_ptr<Dfa> dfa) : dfa(dfa){};
+
+    // 采用 Hopcroft 算法原地压缩 DFA
+    void Minify() {
+        RemoveUnreachableStates();
+        RemoveDeadStates();
+
+        auto original_size = dfa->Size();
+
+        if (dfa->Size() > 1) {
+            GroupSet gs;
+            InitGroupSet(gs);
+            // 不断分割，直到无法分割
+            while (Refine(gs)) {
+            }
+            // 重写 DFA
+            RewriteDfa(gs);
+        }
+
+        std::cout << "Minified from " << original_size << " to " << dfa->Size()
+                  << std::endl;
+    }
+};
+
+// Compile 把一个字符串格式的正则表达式编译成为一个 DFA
+std::shared_ptr<Dfa> Compile(const std::string& s) {
+    auto nfa = NfaParser().Parse(s);
     auto dfa = DfaBuilder(nfa).Build();
-    std::cout << dfa->Match("aabbace") << std::endl;
-    std::cout << dfa->Match("aabbbbbbace") << std::endl;
-    std::cout << dfa->Match("aabbbbbbacd") << std::endl;
-    std::cout << dfa->Match("aabbbbbbad") << std::endl;
+    DfaMinifier(dfa).Minify();
+    return dfa;
+}
+
+int main(void) {
+    auto dfa = Compile("a(a|b)*c(d|e)(x|y|z)*");
+    std::cout << dfa->Match("aabbace") << std::endl;          // 1
+    std::cout << dfa->Match("aabbbbbbace") << std::endl;      // 1
+    std::cout << dfa->Match("aabbbbbbacd") << std::endl;      // 1
+    std::cout << dfa->Match("aabbbbbbad") << std::endl;       // 0
+    std::cout << dfa->Match("aabbbbbbaf") << std::endl;       // 0
+    std::cout << dfa->Match("aabbbbbbacdxxx") << std::endl;   // 1
+    std::cout << dfa->Match("aabbbbbbacdxzy") << std::endl;   // 1
+    std::cout << dfa->Match("aabbbbbbacdxzy1") << std::endl;  // 0
+
+    auto dfa1 = Compile("aa*(b|c)*abc");
+    std::cout << dfa1->Match("aababc") << std::endl;
+    std::cout << dfa1->Match("acabc") << std::endl;
+    std::cout << dfa1->Match("aabc") << std::endl;
+    std::cout << dfa1->Match("aabaabc") << std::endl;
+    std::cout << dfa1->Match("abbabc") << std::endl;
+    std::cout << dfa1->Match("aacx") << std::endl;
+
+    auto dfa2 = Compile("abc(e|f)g*(ab)*ab");
+    std::cout << dfa2->Match("abcegabab") << std::endl;
+    std::cout << dfa2->Match("abcegababab") << std::endl;
+    std::cout << dfa2->Match("abcfgababab") << std::endl;
+    std::cout << dfa2->Match("abckgababab") << std::endl;
+
     return 0;
 }
