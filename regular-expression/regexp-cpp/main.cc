@@ -52,7 +52,7 @@ void set_sub(const std::set<T, Cmp>& a, const std::set<T, Cmp>& b,
 typedef char C;
 
 // 空符号
-static C EPSILON = '\0';
+static const C EPSILON = '\0';
 
 // 操作符
 enum Op : C {
@@ -870,6 +870,13 @@ int main(void) {
     std::cout << dfa2->Match("abcegababab") << std::endl;
     std::cout << dfa2->Match("abcfgababab") << std::endl;
     std::cout << dfa2->Match("abckgababab") << std::endl;
+
+    auto dfa3 = Compile("abab(ab)*cd(e|f)*abc");
+    std::cout << dfa3->Match("abababcdeabc") << std::endl;        // 1
+    std::cout << dfa3->Match("abababcdfabc") << std::endl;        // 1
+    std::cout << dfa3->Match("ababababababcdfabc") << std::endl;  // 1
+    std::cout << dfa3->Match("abababababacdfabc") << std::endl;   // 0
+    std::cout << dfa3->Match("abababababacdeabc") << std::endl;   // 0
 
     return 0;
 }
