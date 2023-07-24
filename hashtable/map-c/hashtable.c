@@ -4,7 +4,7 @@
 // 实现
 ///////
 
-// 简单哈希函数 i^2 + 3 永远非负
+// 简单哈希函数 k^2 + i 永远非负
 int Hash(int k, int i, int n) { return (k * k + i) % n; }
 
 // 初始化表格为未使用
@@ -34,7 +34,11 @@ bool Set(T m[], int n, int k, int v) {
     for (int i = 0; i < n; i++) {
         int p = Hash(k, i, n);
         T *s = &m[p];
-        if (!s->used || s->k == k) {  // 添加或更新
+        // 添加或更新
+        // 哈希冲突: 即 used 且 s->k != k 的情况:
+        // 会继续向前 Hash 来找新的槽, 由于 i 是 Hash
+        // 的入参，所以下一位置不同于当前位置
+        if (!s->used || s->k == k) {
             s->k = k;
             s->v = v;
             s->used = true;
