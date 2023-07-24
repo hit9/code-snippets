@@ -1,6 +1,6 @@
 // clang++ main.cc -std=c++20
 
-#include "skiplist.hh"
+#include "skiplist.hpp"
 
 int main(void) {
     Skiplist<int> s;
