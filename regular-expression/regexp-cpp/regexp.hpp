@@ -23,6 +23,9 @@
 #include <string>
 #include <unordered_map>
 
+#ifndef REGEXP_H
+#define REGEXP_H
+
 namespace regexp {
 // Util: std::stack 的 pop 不方便，这里封一个简单的 wrapper
 template <typename T>
@@ -848,3 +851,4 @@ static std::shared_ptr<Dfa> Compile(const std::string& s) {
 }
 
 };  // namespace regexp
+#endif
