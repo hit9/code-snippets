@@ -1,5 +1,7 @@
 // clang++ main.cc -std=c++20
 
+#include <iostream>
+
 #include "skiplist.hpp"
 
 int main(void) {
