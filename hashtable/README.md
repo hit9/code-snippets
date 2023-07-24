@@ -7,4 +7,4 @@
 实现:
 
 - [C 语言实现](map-c)
-- [C++ 语言实现 - 编译时版本](map-cpp-compiletime)
+- [C++ 语言实现](map-cpp)
