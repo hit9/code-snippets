@@ -135,8 +135,8 @@ class State {
     // 用于比较两个状态的 Comparator
     class PtrCmp {
        public:
-        bool operator()(const std::shared_ptr<State> a,
-                        const std::shared_ptr<State> b) const {
+        bool operator()(const std::shared_ptr<State>& a,
+                        const std::shared_ptr<State>& b) const {
             return a->Id() < b->Id();
         };
     };
@@ -160,7 +160,7 @@ class NfaState : public State {
     const Table& Transitions() const { return transitions; };
 
     // 添加从此状态出发的一条跳转, 出边字符是 c, 目标状态是 to
-    void AddTransition(C c, const std::shared_ptr<NfaState> to) {
+    void AddTransition(C c, const std::shared_ptr<NfaState>& to) {
         transitions[c].insert(to);
         // 不再能成为终态
         if (is_end) is_end = false;
@@ -181,7 +181,8 @@ class Nfa {
    public:
     std::shared_ptr<NfaState> start = nullptr;
     std::shared_ptr<NfaState> end = nullptr;
-    Nfa(std::shared_ptr<NfaState> start, std::shared_ptr<NfaState> end)
+    Nfa(const std::shared_ptr<NfaState>& start,
+        const std::shared_ptr<NfaState>& end)
         : start(start), end(end){};
 };
 
@@ -215,8 +216,8 @@ class NfaParser {
     //    b: 3 -> 4
     //               e
     //    ab: 1 -> 2 -> 3 -> 4
-    std::shared_ptr<Nfa> NfaConcat(std::shared_ptr<Nfa> a,
-                                   std::shared_ptr<Nfa> b) {
+    std::shared_ptr<Nfa> NfaConcat(const std::shared_ptr<Nfa>& a,
+                                   const std::shared_ptr<Nfa>& b) {
         a->end->AddTransition(EPSILON, b->start);  // 2->3
         return std::make_shared<Nfa>(a->start, b->end);
     };
@@ -230,8 +231,8 @@ class NfaParser {
     //       5->+           +-> 6
     //          +-> 3 -> 4 -+
     //           e         e
-    std::shared_ptr<Nfa> NfaUnion(std::shared_ptr<Nfa> a,
-                                  std::shared_ptr<Nfa> b) {
+    std::shared_ptr<Nfa> NfaUnion(const std::shared_ptr<Nfa>& a,
+                                  const std::shared_ptr<Nfa>& b) {
         auto start = NewState(false);             // 5
         auto end = NewState(true);                // 6
         start->AddTransition(EPSILON, a->start);  // 5->1
@@ -252,7 +253,7 @@ class NfaParser {
     //        |              ^
     //        +--------------+
     //                e
-    std::shared_ptr<Nfa> NfaClosure(std::shared_ptr<Nfa> a) {
+    std::shared_ptr<Nfa> NfaClosure(const std::shared_ptr<Nfa>& a) {
         auto start = NewState(false);              // 3
         auto end = NewState(true);                 // 4
         a->end->AddTransition(EPSILON, a->start);  // 2->1
@@ -382,7 +383,7 @@ class DfaState : public State {
         if (transitions.find(c) == transitions.end()) return nullptr;
         return transitions.at(c);
     }
-    void AddTransition(C c, std::shared_ptr<DfaState> to) {
+    void AddTransition(C c, const std::shared_ptr<DfaState>& to) {
         transitions[c] = to;
     }
 
@@ -406,7 +407,7 @@ class Dfa {
     // 返回状态列表，可被修改
     DfaState::Set& States() { return states; };
     // 是否含有状态 s?
-    bool HasState(std::shared_ptr<DfaState> s) {
+    bool HasState(const std::shared_ptr<DfaState>& s) {
         return states.find(s) != states.end();
     };
     // 过滤终态到给定的 Set 容器中
@@ -499,7 +500,7 @@ class DfaBuilder {
     };
 
     // 返回从状态 S 经过非空边 c 跳转到的目标状态
-    std::shared_ptr<DfaState> Move(std::shared_ptr<DfaState> S, C c) {
+    std::shared_ptr<DfaState> Move(const std::shared_ptr<DfaState>& S, C c) {
         // 经过符号 c 到达的目标状态集合
         auto N = d.at(S->Id()).at(c);
         // 扩张
@@ -515,7 +516,7 @@ class DfaBuilder {
     };
 
    public:
-    DfaBuilder(std::shared_ptr<Nfa> nfa) : nfa(nfa){};
+    DfaBuilder(const std::shared_ptr<Nfa>& nfa) : nfa(nfa){};
     // 将 Nfa 转换为 Dfa
     std::shared_ptr<Dfa> Build() {
         // 初始状态: 从 NFA 的开始状态沿空边可达的整个闭包
@@ -568,8 +569,8 @@ class DfaMinifier {
         // GroupSet 的元素是 pointer, 所以要实现一个 PtrCmp 结构
         class PtrCmp {
            public:
-            bool operator()(const std::shared_ptr<Group> a,
-                            const std::shared_ptr<Group> b) const {
+            bool operator()(const std::shared_ptr<Group>& a,
+                            const std::shared_ptr<Group>& b) const {
                 return a->Id() < b->Id();
             };
         };
@@ -579,7 +580,7 @@ class DfaMinifier {
         class PtrHash {
            public:
             std::size_t operator()(
-                const std::shared_ptr<Group> g) const noexcept {
+                const std::shared_ptr<Group>& g) const noexcept {
                 return std::hash<int>{}(g->Id());
             }
         };
@@ -641,7 +642,7 @@ class DfaMinifier {
     }
 
     // 查询一个 DfaState 目前所在的分组
-    std::shared_ptr<Group> GroupOf(const std::shared_ptr<DfaState> s) const {
+    std::shared_ptr<Group> GroupOf(const std::shared_ptr<DfaState>& s) const {
         // 在任何一个时刻, 任何一个 DfaState 必然属于一个分组
         return d.at(s->Id());
     }
@@ -688,8 +689,8 @@ class DfaMinifier {
     // refine 函数的子过程
     // 在小组 g 中找到和 a 不等价的所有其他状态 b 的集合 g2
     // 如果不存在，返回的就是 nullptr
-    std::shared_ptr<Group> FindDistinguishable(std::shared_ptr<Group> g,
-                                               std::shared_ptr<DfaState> a) {
+    std::shared_ptr<Group> FindDistinguishable(
+        const std::shared_ptr<Group>& g, const std::shared_ptr<DfaState>& a) {
         // x 记录 distinguishable DfaStates.
         // 采用堆上内存，以在 MakeGroup 时交换指针
         auto x = new DfaState::Set;
