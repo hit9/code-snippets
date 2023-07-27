@@ -322,6 +322,9 @@ class DfaState:
     def __eq__(self, o: object) -> bool:
         return isinstance(o, DfaState) and hash(self) == hash(o)
 
+    def __ne__(self, o: object) -> bool:
+        return not (self == o)
+
     def __repr__(self) -> str:
         return self.id
 
@@ -419,12 +422,18 @@ class DfaBuilder:
         # 所谓 "处理", 就是给每个 DfaState S 填写非空边的跳转表
         q = [S0]
 
+        # q_d 是已经在队列中的所有状态的 ID
+        # 如果已经加入到队列了，就不必重复加入了
+        # 实际上 q 是一种 unique 队列
+        q_d = {S0.id}
+
         # 最终要构建的 DFA
         dfa = Dfa(S0)
 
         while q:
             # 弹出一个待处理的状态 S
             S = q.pop(0)
+            q_d.remove(S.id)
 
             # 对于每一个可能的 **非空** 跳转边 ch
             for ch in self.d.get(S.id, {}):
@@ -436,8 +445,10 @@ class DfaBuilder:
                 S.add_transition(ch, T)
 
                 if T not in dfa.states:
-                    # T 尚未打标，加入队列
-                    q.append(T)
+                    if T.id not in q_d:
+                        # T 尚未打标，加入队列
+                        q.append(T)
+                        q_d.add(T.id)
 
             # S 已处理完成，放入 dfa
             dfa.states.add(S)
@@ -560,6 +571,7 @@ class DfaMinifier:
         self.dfa.states = set(d.values())
 
     def minify(self) -> None:
+        original_size = self.dfa.size()
         self.remove_unreachable_states()
         self.remove_dead_states()
 
@@ -573,7 +585,7 @@ class DfaMinifier:
                 pass
             self._rewrite_dfa(gs)
 
-        print("minified size:", self.dfa.size())
+        print("minified size: {} to {}".format(original_size, self.dfa.size()))
 
 
 def compile(s: str) -> "Dfa":
@@ -619,6 +631,8 @@ if __name__ == "__main__":
     assert dfa4.match("abcd12345")
     assert not dfa4.match("0abcd12345")
     assert not dfa4.match("0")
+    assert not dfa4.match("02837")
+    assert not dfa4.match("a02837!")
 
     dfa5 = compile("[a-z]([0-9]+|[A-Z])?")
     assert dfa5.match("b")
