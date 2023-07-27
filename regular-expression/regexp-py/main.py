@@ -7,6 +7,7 @@
     取并 a|b
     一个或多个 a+
     一个或0个 a?
+    范围 [a-Z] 或 [0-9]
 
 核心步骤:
     NfaParser().parse()      解析正则表达式，构造 NFA
@@ -28,6 +29,10 @@ op_left_pair = "("
 op_right_pair = ")"
 op_plus = "+"
 op_optional = "?"
+op_range_start = "["
+op_range_end = "]"
+op_range_to = "-"
+
 
 # 运算符 => 优先级
 P = {
@@ -46,7 +51,16 @@ def is_right_acting_operator(x: str) -> bool:
 
 def is_able_insert_concat(x: str) -> bool:
     """是否可以在 x 左侧插入 连接符?"""
-    if x in {op_concat, op_union, op_closure, op_right_pair, op_plus, op_optional}:
+    if x in {
+        op_concat,
+        op_union,
+        op_closure,
+        op_right_pair,
+        op_plus,
+        op_optional,
+        op_range_end,
+        op_range_to,
+    }:
         return False
     return True  # 左括号, 一般字符可以
 
@@ -96,6 +110,25 @@ class NfaParser:
         end = self.new_state(True)
         start.add_transition(ch, end)
         return Nfa(start, end)
+
+    def create_nfa_from_symbols(self, chs: set[C]) -> Nfa:
+        start = self.new_state(False)
+        end = self.new_state(True)
+        if chs:
+            for ch in chs:
+                start.add_transition(ch, end)
+        else:
+            start.add_transition(epsilon, end)
+        return Nfa(start, end)
+
+    def create_nfa_from_ranges(self, ranges: list[tuple[C, C]]) -> Nfa:
+        """从范围列表创建 NFA"""
+        chs = set()
+        for r in ranges:
+            start, end = r
+            for x in range(ord(start), ord(end) + 1):
+                chs.add(chr(x))
+        return self.create_nfa_from_symbols(chs)
 
     def nfa_concat(self, a: Nfa, b: Nfa) -> Nfa:
         """
@@ -197,16 +230,24 @@ class NfaParser:
             'a*c' => 'a*&c'
             '(a)b' => '(a)&b'
             'a(ab)' => 'a&(a&b)'
+        范围内不可插入连接符号.
         """
         chs: list[str] = []
+        is_in_range = False
         for x in s:
             if (
                 is_able_insert_concat(x)
                 # 并且前一个符号没有向右贴合的作用，那么可以插入连接符
                 and chs
                 and not is_right_acting_operator(chs[-1])
+                and not is_in_range  # range 内不可插入
             ):
                 chs.append(op_concat)
+
+            if x == op_range_start:  # 范围开始
+                is_in_range = True
+            if x == op_range_end:  # 范围结束
+                is_in_range = False
 
             chs.append(x)
         return "".join(chs)
@@ -239,6 +280,21 @@ class NfaParser:
                 while op_stack and op_stack[-1] != op_left_pair:
                     self.calc(nfa_stack, op_stack)
                 op_stack.pop()  # 弹出左括号
+            elif x == op_range_start:
+                # 解析范围, 比如: [a-zA-z]
+                i += 1  # 跳过左方括号
+                ranges = []
+                range_start = ""  # 当前开始的范围，比如'a'
+                while s[i] != op_range_end and i < len(s):
+                    x = s[i]
+                    if x != "-":
+                        if range_start == "":
+                            range_start = x
+                        else:
+                            ranges.append((range_start, x))
+                            range_start = ""
+                    i += 1
+                nfa_stack.append(self.create_nfa_from_ranges(ranges))
             else:
                 # 待计算的符号
                 nfa_stack.append(self.create_nfa_from_symbol(x))
@@ -558,3 +614,15 @@ if __name__ == "__main__":
     assert dfa3.match("abx")
     assert not dfa3.match("ab")
     assert dfa3.match("aaabbdxxx")
+
+    dfa4 = compile("[a-zA-Z][0-9a-zA-Z]*")
+    assert dfa4.match("abcd12345")
+    assert not dfa4.match("0abcd12345")
+    assert not dfa4.match("0")
+
+    dfa5 = compile("[a-z]([0-9]+|[A-Z])?")
+    assert dfa5.match("b")
+    assert dfa5.match("a78")
+    assert dfa5.match("aZ")
+    assert not dfa5.match("aa")
+    assert not dfa5.match("a09a")
