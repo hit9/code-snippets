@@ -5,6 +5,8 @@
     连接 ab
     克林闭包 a*
     取并 a|b
+    一个或多个 a+
+    一个或0个 a?
 
 核心步骤:
     NfaParser().parse()      解析正则表达式，构造 NFA
@@ -24,12 +26,16 @@ op_union = "|"
 op_closure = "*"
 op_left_pair = "("
 op_right_pair = ")"
+op_plus = "+"
+op_optional = "?"
 
 # 运算符 => 优先级
 P = {
     op_concat: 1,
     op_union: 1,
     op_closure: 2,
+    op_plus: 2,
+    op_optional: 2,
 }
 
 
@@ -40,7 +46,7 @@ def is_right_acting_operator(x: str) -> bool:
 
 def is_able_insert_concat(x: str) -> bool:
     """是否可以在 x 左侧插入 连接符?"""
-    if x in {op_concat, op_union, op_closure, op_right_pair}:
+    if x in {op_concat, op_union, op_closure, op_right_pair, op_plus, op_optional}:
         return False
     return True  # 左括号, 一般字符可以
 
@@ -141,6 +147,28 @@ class NfaParser:
         start.add_transition(epsilon, end)  # 3->4
         return Nfa(start, end)
 
+    def nfa_plus(self, a: Nfa) -> Nfa:
+        """a+ 即 aa*"""
+        return self.nfa_concat(a, self.nfa_closure(a))
+
+    def nfa_optional(self, a: Nfa) -> Nfa:
+        """
+        a: 1->2
+        a?:
+
+              e         3
+            3 -> 1 -> 2 -> 4
+            |              ^
+            +--------------+
+                    e
+        """
+        start = self.new_state(False)  # 3
+        end = self.new_state(True)  # 4
+        start.add_transition(epsilon, a.start)  # 3->1
+        a.end.add_transition(epsilon, end)  # 2->4
+        start.add_transition(epsilon, end)  # 3->4
+        return Nfa(start, end)
+
     def calc(self, nfa_stack: list[Nfa], op_stack: list[str]):
         if not op_stack:
             return
@@ -156,6 +184,12 @@ class NfaParser:
             b = nfa_stack.pop()
             a = nfa_stack.pop()
             nfa_stack.append(self.nfa_union(a, b))
+        elif op == op_plus:
+            a = nfa_stack.pop()
+            nfa_stack.append(self.nfa_plus(a))
+        elif op == op_optional:
+            a = nfa_stack.pop()
+            nfa_stack.append(self.nfa_optional(a))
 
     def normalize(self, s: str) -> str:
         """规整输入字符串, 在相邻符号间插入 & 符号
@@ -496,25 +530,31 @@ def compile(s: str) -> "Dfa":
 
 if __name__ == "__main__":
     dfa = compile("a(a|b)*c(d|e)(x|y|z)*")
-    print(dfa.match("aabbace"))  # True
-    print(dfa.match("aabbbbbbace"))  # True
-    print(dfa.match("aabbbbbbacd"))  # True
-    print(dfa.match("aabbbbbbad"))  # False
-    print(dfa.match("aabbbbbbaf"))  # False
-    print(dfa.match("aabbbbbbacdxxx"))  # True
-    print(dfa.match("aabbbbbbacdxzy"))  # True
-    print(dfa.match("aabbbbbbacdxzy1"))  # False
+    assert dfa.match("aabbace")  # True
+    assert dfa.match("aabbbbbbace")  # True
+    assert dfa.match("aabbbbbbacd")  # True
+    assert not dfa.match("aabbbbbbad")  # False
+    assert not dfa.match("aabbbbbbaf")  # False
+    assert dfa.match("aabbbbbbacdxxx")  # True
+    assert dfa.match("aabbbbbbacdxzy")  # True
+    assert not dfa.match("aabbbbbbacdxzy1")  # False
 
     dfa1 = compile("aa*(b|c)*abc")
-    print(dfa1.match("aababc"))  # True
-    print(dfa1.match("acabc"))  # True
-    print(dfa1.match("aabc"))  # True
-    print(dfa1.match("aabaabc"))  # False
-    print(dfa1.match("abbabc"))  # True
-    print(dfa1.match("aacx"))  # False
+    assert dfa1.match("aababc")  # True
+    assert dfa1.match("acabc")  # True
+    assert dfa1.match("aabc")  # True
+    assert not dfa1.match("aabaabc")  # False
+    assert dfa1.match("abbabc")  # True
+    assert not dfa1.match("aacx")  # False
 
     dfa2 = compile("abc(e|f)g*(ab)*ab")
-    print(dfa2.match("abcegabab"))  # True
-    print(dfa2.match("abcegababab"))  # True
-    print(dfa2.match("abcfgababab"))  # True
-    print(dfa2.match("abckgababab"))  # False
+    assert dfa2.match("abcegabab")  # True
+    assert dfa2.match("abcegababab")  # True
+    assert dfa2.match("abcfgababab")  # True
+    assert not dfa2.match("abckgababab")  # False
+
+    dfa3 = compile("a+b*(c|d)?x+")
+    assert dfa3.match("abcx")
+    assert dfa3.match("abx")
+    assert not dfa3.match("ab")
+    assert dfa3.match("aaabbdxxx")
