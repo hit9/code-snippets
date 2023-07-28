@@ -16,7 +16,7 @@ int RandLevel() {
 
 // 新建一个节点
 Node *NewNode(int v, int level) {
-    Node *node = malloc(sizeof(Node));
+    Node *node = (Node *)malloc(sizeof(Node));
     if (node != NULL) {
         node->v = v;
         node->level = level;
@@ -32,7 +32,7 @@ void FreeNode(Node *node) {
 
 // 新建一个跳跃表
 Skiplist *NewSkiplist() {
-    Skiplist *sl = malloc(sizeof(Skiplist));
+    Skiplist *sl = (Skiplist *)malloc(sizeof(Skiplist));
     if (sl != NULL) {
         sl->head = NewNode(-1, 1);
         sl->level = 1;
