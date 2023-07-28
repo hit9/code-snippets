@@ -37,5 +37,24 @@ int main(void) {
     assert(!dfa3->Match("abababababacdfabc"));
     assert(!dfa3->Match("abababababacdeabc"));
 
+    auto dfa4 = regexp::Compile("a+b*(c|d)?x+");
+    assert(dfa4->Match("abcx"));
+    assert(dfa4->Match("abx"));
+    assert(!dfa4->Match("ab"));
+    assert(dfa4->Match("aaabbdxxx"));
+
+    auto dfa5 = regexp::Compile("[a-zA-Z][0-9a-zA-Z]*");
+    assert(dfa5->Match("abcd12345"));
+    assert(!dfa5->Match("0"));
+    assert(!dfa5->Match("0abcd123"));
+    assert(!dfa5->Match("02384"));
+    assert(!dfa5->Match("a02384!"));
+
+    auto dfa6 = regexp::Compile("[a-z]([0-9]+|[A-Z])?");
+    assert(dfa6->Match("b"));
+    assert(dfa6->Match("a78"));
+    assert(dfa6->Match("aZ"));
+    assert(!dfa6->Match("aa"));
+    assert(!dfa6->Match("a09a"));
     return 0;
 }

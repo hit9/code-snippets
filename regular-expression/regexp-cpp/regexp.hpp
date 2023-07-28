@@ -4,7 +4,9 @@
 //     连接 ab
 //     克林闭包 a*
 //     取并 a|b
-//
+//     一个或多个 a+
+//     一个或0个 a?
+//     范围 比如 [a-Z], [0-9]
 // 核心步骤:
 //     NfaParser().Parse()      解析正则表达式，构造 NFA
 //     DfaBuilder().Build()     NFA 转换为 DFA
@@ -21,6 +23,8 @@
 #include <stack>
 #include <string>
 #include <unordered_map>
+#include <utility>
+#include <vector>
 
 #ifndef REGEXP_H
 #define REGEXP_H
@@ -64,6 +68,11 @@ enum Op : C {
     OP_CLOSURE = '*',
     OP_LEFT_PAIR = '(',
     OP_RIGHT_PAIR = ')',
+    OP_PLUS = '+',
+    OP_OPTIONAL = '?',
+    OP_RANGE_START = '[',
+    OP_RANGE_END = ']',
+    OP_RANGE_TO = '-',
 };
 
 // 是否是运算符
@@ -74,6 +83,10 @@ static bool IsCalculationOperator(C c) {
         case OP_UNION:
             return true;
         case OP_CLOSURE:
+            return true;
+        case OP_PLUS:
+            return true;
+        case OP_OPTIONAL:
             return true;
         default:
             return false;
@@ -88,6 +101,10 @@ static int GetOperatorPriority(Op op) {
         case OP_UNION:
             return 1;
         case OP_CLOSURE:
+            return 2;
+        case OP_PLUS:
+            return 2;
+        case OP_OPTIONAL:
             return 2;
         default:
             return 0;
@@ -118,6 +135,14 @@ static bool IsAbleInsertConcat(C c) {
         case OP_CLOSURE:
             [[fallthrough]];
         case OP_RIGHT_PAIR:
+            [[fallthrough]];
+        case OP_PLUS:
+            [[fallthrough]];
+        case OP_OPTIONAL:
+            [[fallthrough]];
+        case OP_RANGE_END:
+            [[fallthrough]];
+        case OP_RANGE_TO:
             return false;
         default:
             // 左括号, 一般字符可以
@@ -192,6 +217,8 @@ class NfaParser {
     typedef stack<std::shared_ptr<Nfa>> NfaStack;
     // 待运算的运算符栈
     typedef stack<Op> OpStack;
+    // 范围, start, end
+    typedef std::pair<C, C> range;
 
    private:
     // 状态计数器
@@ -211,6 +238,32 @@ class NfaParser {
         start->AddTransition(c, end);
         return std::make_shared<Nfa>(start, end);
     }
+
+    // 从多个符号创建一个 Nfa.
+    std::shared_ptr<Nfa> CreateNfaFromSymbols(const std::set<C>& chs) {
+        auto start = NewState(false);
+        auto end = NewState(true);
+        if (!chs.empty()) {
+            for (auto& c : chs) {
+                start->AddTransition(c, end);
+            }
+        } else {
+            start->AddTransition(EPSILON, end);
+        }
+        return std::make_shared<Nfa>(start, end);
+    }
+
+    // 从范围列表创建 Nfa
+    std::shared_ptr<Nfa> CreateNfaFromRanges(std::vector<range>& ranges) {
+        std::set<C> chs;
+        for (auto& range : ranges) {
+            for (auto x = range.first; x <= range.second; x++) {
+                chs.insert(x);
+            }
+        }
+        return CreateNfaFromSymbols(chs);
+    }
+
     // 连接两个 Nfa
     //    a: 1 -> 2
     //    b: 3 -> 4
@@ -263,6 +316,28 @@ class NfaParser {
         return std::make_shared<Nfa>(start, end);
     };
 
+    // a+ 即 aa*
+    std::shared_ptr<Nfa> NfaPlus(const std::shared_ptr<Nfa>& a) {
+        return NfaConcat(a, NfaClosure(a));
+    }
+
+    // a? 可选
+    //    a: 1->2
+    //    a?:
+    //          e         3
+    //        3 -> 1 -> 2 -> 4
+    //        |              ^
+    //        +--------------+
+    //                e
+    std::shared_ptr<Nfa> NfaOptional(const std::shared_ptr<Nfa>& a) {
+        auto start = NewState(false);             // 3
+        auto end = NewState(true);                // 4
+        start->AddTransition(EPSILON, a->start);  // 3->1
+        a->end->AddTransition(EPSILON, end);      // 2->4
+        start->AddTransition(EPSILON, end);       // 3->4
+        return std::make_shared<Nfa>(start, end);
+    }
+
     void Calc(NfaStack& nfa_stack, OpStack& op_stack) {
         if (op_stack.empty()) return;
         // 弹出一个运算符
@@ -282,6 +357,14 @@ class NfaParser {
                 auto a = nfa_stack.pop();
                 nfa_stack.push(NfaUnion(a, b));
             }; break;
+            case OP_PLUS: {
+                auto a = nfa_stack.pop();
+                nfa_stack.push(NfaPlus(a));
+            } break;
+            case OP_OPTIONAL: {
+                auto a = nfa_stack.pop();
+                nfa_stack.push(NfaOptional(a));
+            } break;
             default:
                 break;
         }
@@ -292,15 +375,21 @@ class NfaParser {
     //     'a*c' => 'a*&c'
     //     '(a)b' => '(a)&b'
     //     'a(ab)' => 'a&(a&b)'
+    // 范围内不可插入连接符号.
     std::string Normalize(const std::string& s) {
         std::string s1;
+        bool is_in_range = false;
         for (auto& c : s) {
             if (IsAbleInsertConcat(c) && !s1.empty() &&
-                !IsRightActingOperator(s1.back())) {
+                !IsRightActingOperator(s1.back()) && !is_in_range) {
                 // 可以插入 & 符号,
                 // 并且前一个符号有向右贴合的作用，那么可以插入连接符
                 s1.push_back(OP_CONCAT);
             }
+            if (c == OP_RANGE_START)
+                is_in_range = true;
+            else if (c == OP_RANGE_END)
+                is_in_range = false;
             s1.push_back(c);
         }
         std::cout << "Normalized to :" << s1 << std::endl;
@@ -327,6 +416,10 @@ class NfaParser {
                     [[fallthrough]];
                 case OP_UNION:
                     [[fallthrough]];
+                case OP_PLUS:
+                    [[fallthrough]];
+                case OP_OPTIONAL:
+                    [[fallthrough]];
                 case OP_CLOSURE: {
                     // 如栈内有待运算的，且栈顶优先级较高，先计算、再入栈
                     auto op = static_cast<Op>(x);
@@ -351,6 +444,28 @@ class NfaParser {
                     // 弹出左括号
                     op_stack.pop();
                 }; break;
+                case OP_RANGE_START: {
+                    // 解析范围, 例如 [a-zA-Z]
+                    std::vector<range> ranges;
+                    // 当前开始的范围
+                    C range_start = EPSILON;
+
+                    while (s1[i] != OP_RANGE_END && i < s1.size()) {
+                        x = s1[i++];
+                        if (x != OP_RANGE_TO) {
+                            if (range_start == EPSILON)
+                                range_start = x;
+                            else {
+                                ranges.push_back(
+                                    std::make_pair(range_start, x));
+                                range_start = EPSILON;
+                            }
+                        }
+                    }
+                    nfa_stack.push(CreateNfaFromRanges(ranges));
+                } break;
+                case OP_RANGE_END:  // 跳过右方括号
+                    break;
                 default:
                     // 待计算的符号
                     nfa_stack.push(CreateNfaFromSymbol(x));
@@ -529,12 +644,19 @@ class DfaBuilder {
         std::queue<std::shared_ptr<DfaState>> q;
         q.push(S0);
 
+        // qd 是已经在队列中的所有状态的 ID
+        // 如果已经加入到队列了，就不必重复加入了
+        // 实际上 q 是一种 unique 队列
+        DfaState::Set qd;
+        qd.insert(S0);
+
         // 最终要构建的 DFA, 初始状态 S0
         auto dfa = std::make_shared<Dfa>(S0);
 
         while (!q.empty()) {
             auto S = q.front();
             q.pop();
+            qd.erase(S);
 
             // 对于每一个可能的 **非空** 跳转边
             auto id = S->Id();
@@ -544,10 +666,15 @@ class DfaBuilder {
                     auto& c = p.first;
                     // 跳入的是一个其他状态 T
                     auto T = Move(S, c);
+
                     // 记录跳转边
                     S->AddTransition(c, T);
+
                     // T 尚未打标，加入队列
-                    if (!dfa->HasState(T)) q.push(T);
+                    if (!dfa->HasState(T) && qd.find(T) == qd.end()) {
+                        q.push(T);
+                        qd.insert(T);
+                    };
                 }
             }
 
