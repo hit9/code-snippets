@@ -295,6 +295,8 @@ class NfaParser:
                             range_start = ""
                     i += 1
                 nfa_stack.append(self.create_nfa_from_ranges(ranges))
+            elif x == op_range_end:  # 跳过右方括号
+                pass
             else:
                 # 待计算的符号
                 nfa_stack.append(self.create_nfa_from_symbol(x))
