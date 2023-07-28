@@ -45,6 +45,8 @@ int main(void) {
 
     auto dfa5 = regexp::Compile("[a-zA-Z][0-9a-zA-Z]*");
     assert(dfa5->Match("abcd12345"));
+    assert(dfa5->Match("name123"));
+    assert(dfa5->Match("name1abac23"));
     assert(!dfa5->Match("0"));
     assert(!dfa5->Match("0abcd123"));
     assert(!dfa5->Match("02384"));
