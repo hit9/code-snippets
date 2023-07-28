@@ -287,7 +287,7 @@ class NfaParser:
                 range_start = ""  # 当前开始的范围，比如'a'
                 while s[i] != op_range_end and i < len(s):
                     x = s[i]
-                    if x != "-":
+                    if x != op_range_to:
                         if range_start == "":
                             range_start = x
                         else:
