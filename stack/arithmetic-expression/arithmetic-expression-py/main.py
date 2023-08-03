@@ -2,6 +2,9 @@
 双栈法 算术表达式求值 - Python 版本
 
 支持多位整数
+
+博客 - 算术表达式求值（双栈法）
+https://writings.sh/post/arithmetic-expression
 """
 
 # 四则运算符的优先级，越高值越大
