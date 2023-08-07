@@ -1,45 +1,50 @@
-// NFA 识别一个简单的浮点数
+// DFA 识别一个简单的浮点数
 // 合法例子: '31.25' '0.2' '.2'  '1.'  '-5.28'  '+1.2' '1.0' '123'
 // 非法例子: '-.'  '-'  '+'  '-.5' '+-1'   '1.1.1'  '' '.'
-//
-// 对应的正则表达式 (其中点不是任意的意思，是小数点; 问号表示可选)
-// ((+|-)[0-9])?[0-9]*(([0-9].)|(.[0-9]))?[0-9]*
 
 #include <cassert>
 #include <string>
 
 bool IsDigit(char ch) { return ch >= '0' && ch <= '9'; }
 
-// NFA 跳转函数
-// 共 9 个状态:
+// DFA 跳转函数
+// 共 6 个状态:
 // 0 是初始状态
-// 8 是唯一终态
+// 2, 4, 5 是终态
+// 返回 6 表示正确跳到终态
+// 0 号状态  等待第一个字符，可能是数字, 小数点 或者 +- 号
+// 1 号状态  输入正负号后，等待输入数字的状态
+// 4 号状态  输入正负号后，已经输入数字的状态
+// 2 号状态  整数部分循环输入数字的状态
+// 3 号状态  第一位或者第二位输入小数点后的状态
+// 5 号状态  输入小数点后循环输入数字的状态，同时是终态
 int Jump(int state, char ch, bool is_end) {
     switch (state) {
         case 0:
             if (ch == '+' || ch == '-') return 1;
-            return Jump(2, ch, is_end);
-        case 1:
+            if (ch == '.') return 3;
             if (IsDigit(ch)) return 2;
             return -1;
-        case 2:
-            return Jump(3, ch, is_end);
-        case 3:
+        case 1:
             if (IsDigit(ch)) return 4;
-            if (ch == '.') return 6;
-            return Jump(5, ch, is_end);
-        case 4:
-            if (IsDigit(ch)) return 3;
-            if (ch == '.') return 5;
             return -1;
-        case 5:
-            return Jump(7, ch, is_end);
-        case 6:
+        case 2:
+            if (is_end) return 6;
+            if (ch == '.') return 5;
+            if (IsDigit(ch)) return 2;
+            return -1;
+        case 3:
             if (IsDigit(ch)) return 5;
             return -1;
-        case 7:
-            if (is_end) return 8;
-            if (IsDigit(ch)) return 7;
+        case 4:
+            if (is_end) return 6;
+            if (ch == '.') return 3;
+            if (IsDigit(ch)) return 2;
+            return -1;
+        case 5:
+            if (is_end) return 6;
+            if (IsDigit(ch)) return 5;
+            return -1;
         default:
             return -1;
     }
@@ -54,7 +59,7 @@ bool IsFloat(const std::string& s) {
         if (state == -1) return false;
     }
     state = Jump(state, '\0', true);
-    return state == 8;
+    return state == 6;
 }
 
 int main(void) {
@@ -69,6 +74,8 @@ int main(void) {
     assert(IsFloat(".0"));
     assert(IsFloat("1.0"));
     assert(IsFloat("123"));
+    assert(IsFloat("+3"));
+    assert(IsFloat("-123"));
     assert(!IsFloat("+"));
     assert(!IsFloat("-"));
     assert(!IsFloat("-."));

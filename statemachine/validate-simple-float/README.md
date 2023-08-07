@@ -13,6 +13,9 @@
 '-5.28'
 '+1.2'
 '1.0'
+'123'
+'+123'
+'-2'
 ```
 
 非法例子:
@@ -29,3 +32,4 @@
 ```
 
 - [NFA 状态机实现 - C++](validate-simple-float-nfa-cpp)
+- [DFA 状态机实现 - C++](validate-simple-float-dfa-cpp)
