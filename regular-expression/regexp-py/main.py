@@ -664,4 +664,4 @@ if __name__ == "__main__":
     assert not dfa6.match("1.1.1")
 
     for x in dfa6.states:
-        print(x.id, x.transitions)
+        print(x.id, x.transitions, x.is_end)
