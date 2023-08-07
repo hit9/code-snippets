@@ -7,6 +7,7 @@
 
 #include <cassert>
 #include <string>
+#include <unordered_set>
 
 bool IsDigit(char ch) { return ch >= '0' && ch <= '9'; }
 
@@ -14,47 +15,58 @@ bool IsDigit(char ch) { return ch >= '0' && ch <= '9'; }
 // 共 9 个状态:
 // 0 是初始状态
 // 8 是唯一终态
-int Jump(int state, char ch, bool is_end) {
+std::unordered_set<int> Jump(int state, char ch, bool is_end) {
     switch (state) {
         case 0:
-            if (ch == '+' || ch == '-') return 1;
+            if (ch == '+' || ch == '-') return {1};
             return Jump(2, ch, is_end);
         case 1:
-            if (IsDigit(ch)) return 2;
-            return -1;
+            if (IsDigit(ch)) return {2};
+            return std::unordered_set<int>{};
         case 2:
             return Jump(3, ch, is_end);
         case 3:
-            if (IsDigit(ch)) return 4;
-            if (ch == '.') return 6;
+            if (IsDigit(ch)) return {3, 4};
+            if (ch == '.') return {6};
             return Jump(5, ch, is_end);
         case 4:
-            if (IsDigit(ch)) return 3;
-            if (ch == '.') return 5;
-            return -1;
+            if (ch == '.') return {5};
+            return std::unordered_set<int>{};
         case 5:
             return Jump(7, ch, is_end);
         case 6:
-            if (IsDigit(ch)) return 5;
-            return -1;
+            if (IsDigit(ch)) return {5};
+            return std::unordered_set<int>{};
         case 7:
-            if (is_end) return 8;
-            if (IsDigit(ch)) return 7;
+            if (is_end) return {8};
+            if (IsDigit(ch)) return {7};
         default:
-            return -1;
+            return std::unordered_set<int>{};
     }
 }
 
 bool IsFloat(const std::string& s) {
     if (s.size() == 0) return false;
-    int state = 0;
+
+    std::unordered_set<int> states{0};
+
+    // 更新当前的可达状态列表
+    auto update = [&](char ch, bool is_end) {
+        std::unordered_set<int> new_states;
+        for (auto state : states) {
+            auto targets = Jump(state, ch, is_end);
+            new_states.insert(targets.begin(), targets.end());
+        }
+        states = new_states;
+    };
 
     for (auto& ch : s) {
-        state = Jump(state, ch, false);
-        if (state == -1) return false;
+        update(ch, false);
+        if (states.empty()) return false;
     }
-    state = Jump(state, '\0', true);
-    return state == 8;
+
+    update('\0', true);
+    return states.count(8) > 0;
 }
 
 int main(void) {
@@ -68,7 +80,9 @@ int main(void) {
     assert(IsFloat("-5.28"));
     assert(IsFloat(".0"));
     assert(IsFloat("1.0"));
+    assert(IsFloat("+123"));
     assert(IsFloat("123"));
+    assert(IsFloat("-1"));
     assert(!IsFloat("+"));
     assert(!IsFloat("-"));
     assert(!IsFloat("-."));
