@@ -1,1 +1,2 @@
 - [校验字符串是否是数值](validate-number-string)
+- [识别一个简单的浮点数](validate-simple-float)
