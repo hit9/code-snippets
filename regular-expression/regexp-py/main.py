@@ -297,6 +297,12 @@ class NfaParser:
                 nfa_stack.append(self.create_nfa_from_ranges(ranges))
             elif x == op_range_end:  # 跳过右方括号
                 pass
+            elif x == "\\":
+                # 转义处理
+                i += 1
+                x = s[i]
+                # 默认就转义到下一个字符
+                nfa_stack.append(self.create_nfa_from_symbol(x))
             else:
                 # 待计算的符号
                 nfa_stack.append(self.create_nfa_from_symbol(x))
@@ -556,8 +562,13 @@ class DfaMinifier:
         d = {}  # group => state
 
         # 先创建一轮 state
-        for g in gs:
-            d[g] = DfaState(str(hash(g)), any(s.is_end for s in g))
+        g0 = self.group(self.dfa.start)
+        d[g0] = DfaState("0", False)  # 0号状态
+
+        n = 1
+        for g in gs - {g0}:
+            d[g] = DfaState(str(n), any(s.is_end for s in g))
+            n += 1
 
         # 再维护下跳转关系
         for g in gs:
@@ -643,10 +654,14 @@ if __name__ == "__main__":
     assert not dfa5.match("aa")
     assert not dfa5.match("a09a")
 
-    dfa6 = compile("((+|-)[0-9])?[0-9]*(([0-9].)|(.[0-9]))?[0-9]*")
+    dfa6 = compile("((\+|\-)[0-9])?[0-9]*(([0-9].)|(.[0-9]))?[0-9]*")
+    assert dfa6.match("+31.25")
     assert dfa6.match("-31.25")
     assert not dfa6.match("-.25")
     assert not dfa6.match("-")
     assert dfa6.match(".123")
     assert dfa6.match("122.")
     assert not dfa6.match("1.1.1")
+
+    for x in dfa6.states:
+        print(x.id, x.transitions)
