@@ -466,6 +466,9 @@ class NfaParser {
                 } break;
                 case OP_RANGE_END:  // 跳过右方括号
                     break;
+                case '\\':  // 支持转义
+                    x = s1[i++];
+                    [[fallthrough]];  // 默认就转义到下一个字符
                 default:
                     // 待计算的符号
                     nfa_stack.push(CreateNfaFromSymbol(x));

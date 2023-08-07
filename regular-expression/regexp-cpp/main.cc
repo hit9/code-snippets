@@ -58,5 +58,15 @@ int main(void) {
     assert(dfa6->Match("aZ"));
     assert(!dfa6->Match("aa"));
     assert(!dfa6->Match("a09a"));
+
+    auto dfa7 =
+        regexp::Compile("((\\+|\\-)[0-9])?[0-9]*(([0-9].)|(.[0-9]))?[0-9]*");
+    assert(dfa7->Match("+31.25"));
+    assert(dfa7->Match("-31.25"));
+    assert(!dfa7->Match("-.25"));
+    assert(!dfa7->Match("-"));
+    assert(dfa7->Match(".123"));
+    assert(dfa7->Match("122."));
+    assert(!dfa7->Match("1.1.1"));
     return 0;
 }
