@@ -642,3 +642,11 @@ if __name__ == "__main__":
     assert dfa5.match("aZ")
     assert not dfa5.match("aa")
     assert not dfa5.match("a09a")
+
+    dfa6 = compile("((+|-)[0-9])?[0-9]*(([0-9].)|(.[0-9]))?[0-9]*")
+    assert dfa6.match("-31.25")
+    assert not dfa6.match("-.25")
+    assert not dfa6.match("-")
+    assert dfa6.match(".123")
+    assert dfa6.match("122.")
+    assert not dfa6.match("1.1.1")
