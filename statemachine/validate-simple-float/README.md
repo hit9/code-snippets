@@ -31,5 +31,6 @@
 '.'
 ```
 
+- [博客 - 自动机校验浮点数字符串 (DFA & NFA)](https://writings.sh/post/statemachine-validate-float)
 - [NFA 状态机实现 - C++](validate-simple-float-nfa-cpp)
 - [DFA 状态机实现 - C++](validate-simple-float-dfa-cpp)

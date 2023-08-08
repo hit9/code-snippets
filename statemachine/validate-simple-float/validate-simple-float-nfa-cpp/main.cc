@@ -4,6 +4,9 @@
 //
 // 对应的正则表达式 (其中点不是任意的意思，是小数点; 问号表示可选)
 // ((+|-)[0-9])?[0-9]*(([0-9].)|(.[0-9]))?[0-9]*
+//
+// 博客 - 自动机校验浮点数字符串 (DFA & NFA)
+// https://writings.sh/post/statemachine-validate-float
 
 #include <cassert>
 #include <string>
