@@ -25,7 +25,7 @@ std::unordered_set<int> Jump(int state, char ch, bool is_end) {
             return Jump(2, ch, is_end);
         case 1:
             if (IsDigit(ch)) return {2};
-            return std::unordered_set<int>{};
+            return {};
         case 2:
             return Jump(3, ch, is_end);
         case 3:
@@ -34,17 +34,17 @@ std::unordered_set<int> Jump(int state, char ch, bool is_end) {
             return Jump(5, ch, is_end);
         case 4:
             if (ch == '.') return {5};
-            return std::unordered_set<int>{};
+            return {};
         case 5:
             return Jump(7, ch, is_end);
         case 6:
             if (IsDigit(ch)) return {5};
-            return std::unordered_set<int>{};
+            return {};
         case 7:
             if (is_end) return {8};
             if (IsDigit(ch)) return {7};
         default:
-            return std::unordered_set<int>{};
+            return {};
     }
 }
 
