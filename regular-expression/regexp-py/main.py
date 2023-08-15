@@ -316,7 +316,7 @@ class NfaParser:
 
 
 class DfaState:
-    def __init__(self, id: str, is_end: bool) -> None:
+    def __init__(self, id: int, is_end: bool) -> None:
         self.id = id
         self.is_end = is_end
         self.transitions: dict[C, "DfaState"] = {}  # 跳转表
@@ -334,7 +334,7 @@ class DfaState:
         return not (self == o)
 
     def __repr__(self) -> str:
-        return self.id
+        return str(self.id)
 
 
 class Dfa:
@@ -363,15 +363,15 @@ class DfaBuilder:
         self.nfa = nfa
         # 记录每个 DfaState 接受的非空符号 到 目标 NfaState 列表的字典
         # DfaState id => { C => NfaState set }
-        self.d: dict[str, dict[C, set[NfaState]]] = {}
+        self.d: dict[int, dict[C, set[NfaState]]] = {}
         # states 缓存已经生成过的 DfaState
-        self.states: dict[str, DfaState] = {}
+        self.states: dict[int, DfaState] = {}
 
-    def make_dfa_state_id(self, N: set[NfaState]) -> str:
+    def make_dfa_state_id(self, N: set[NfaState]) -> int:
         # 从一批 NfaState 构造 DfaState 的标号
-        return ",".join(map(str, sorted(N, key=lambda x: x.id)))
+        return hash(",".join(map(str, sorted(N, key=lambda x: x.id))))
 
-    def make_dfa_state(self, N: set[NfaState], id: str = "") -> DfaState:
+    def make_dfa_state(self, N: set[NfaState], id: int = 0) -> DfaState:
         """从一批 NfaState 创建一个 DfaState."""
         if not id:
             id = self.make_dfa_state_id(N)
@@ -475,7 +475,7 @@ class DfaMinifier:
     def __init__(self, dfa: Dfa):
         self.dfa = dfa
         # d 记录一个 DfaState 在哪个 DfaStateGroup 中
-        self.d: dict[str, DfaStateGroup] = {}
+        self.d: dict[int, DfaStateGroup] = {}
 
     def make_group(
         self, dfa_states: Optional[set[DfaState] | DfaStateGroup] = None
@@ -563,11 +563,11 @@ class DfaMinifier:
 
         # 先创建一轮 state
         g0 = self.group(self.dfa.start)
-        d[g0] = DfaState("0", False)  # 0号状态
+        d[g0] = DfaState(0, False)  # 0号状态
 
         n = 1
         for g in gs - {g0}:
-            d[g] = DfaState(str(n), any(s.is_end for s in g))
+            d[g] = DfaState(n, any(s.is_end for s in g))
             n += 1
 
         # 再维护下跳转关系
