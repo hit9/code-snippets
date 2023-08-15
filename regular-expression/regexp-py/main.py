@@ -65,10 +65,27 @@ def is_able_insert_concat(x: str) -> bool:
     return True  # 左括号, 一般字符可以
 
 
-class NfaState:
+class State:
     def __init__(self, id: int, is_end: bool):
         self.id = id
         self.is_end = is_end
+
+    def __hash__(self) -> int:
+        return hash(self.id)
+
+    def __repr__(self) -> str:
+        return str(self.id)
+
+    def __eq__(self, o: object) -> bool:
+        return isinstance(o, State) and hash(self) == hash(o)
+
+    def __ne__(self, o: object) -> bool:
+        return not (self == o)
+
+
+class NfaState(State):
+    def __init__(self, id: int, is_end: bool):
+        super().__init__(id, is_end)
         # 跳转表, { C => { Target States...}}
         self.transitions: dict[C, set["NfaState"]] = {}
 
@@ -76,12 +93,6 @@ class NfaState:
         self.transitions.setdefault(ch, set()).add(to)
         if self.is_end:
             self.is_end = False
-
-    def __hash__(self) -> int:
-        return hash(self.id)
-
-    def __repr__(self) -> str:
-        return str(self.id)
 
 
 class Nfa:
@@ -315,26 +326,13 @@ class NfaParser:
         return nfa_stack.pop()
 
 
-class DfaState:
+class DfaState(State):
     def __init__(self, id: int, is_end: bool) -> None:
-        self.id = id
-        self.is_end = is_end
+        super().__init__(id, is_end)
         self.transitions: dict[C, "DfaState"] = {}  # 跳转表
 
     def add_transition(self, ch: C, to: "DfaState"):
         self.transitions[ch] = to
-
-    def __hash__(self) -> int:
-        return hash(self.id)
-
-    def __eq__(self, o: object) -> bool:
-        return isinstance(o, DfaState) and hash(self) == hash(o)
-
-    def __ne__(self, o: object) -> bool:
-        return not (self == o)
-
-    def __repr__(self) -> str:
-        return str(self.id)
 
 
 class Dfa:
