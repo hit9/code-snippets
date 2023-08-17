@@ -13,6 +13,8 @@
 //     DfaMinifier().Minify()   压缩 DFA 状态数
 //
 // 编译选项: -std=c++11 以上
+// 博客 - 实现一个简单的正则表达式引擎
+// https://writings.sh/post/regexp
 
 #include <algorithm>
 #include <functional>

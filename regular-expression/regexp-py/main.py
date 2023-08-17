@@ -15,6 +15,9 @@
     DfaMinifier().minify()   压缩 DFA 状态数
 
 需要 Python >= 3.7 (typing hint)
+
+博客 - 实现一个简单的正则表达式引擎
+https://writings.sh/post/regexp
 """
 
 from typing import Optional
