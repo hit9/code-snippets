@@ -87,8 +87,10 @@ class Map {
             if (!node.used || node.k == k) {
                 node.k = k;
                 node.v = v;
-                node.used = true;
-                n++;
+                if (!node.used) {
+                    node.used = true;
+                    n++;
+                }
                 return true;
             }
         }
