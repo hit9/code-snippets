@@ -798,6 +798,7 @@ class DfaMinifier {
     // 清理无法到达的状态 (dfs)
     void RemoveUnreachableStates() {
         auto reachable = new DfaState::Set;
+        reachable->insert(dfa->start);
 
         stack<std::shared_ptr<DfaState>> stack;
         stack.push(dfa->start);
