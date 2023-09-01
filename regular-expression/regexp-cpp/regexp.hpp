@@ -851,7 +851,10 @@ class DfaMinifier {
         }
 
         // 不存在，返回 nullptr
-        if (x->empty()) return nullptr;
+        if (x->empty()) {
+            delete x;
+            return nullptr;
+        }
 
         auto gp = MakeGroup(std::move(*x));
         delete x;
