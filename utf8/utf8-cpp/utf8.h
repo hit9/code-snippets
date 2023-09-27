@@ -1,3 +1,4 @@
+// Copyright 2023 hit9
 #ifndef HIT9_CODE_SNIPPETS_UTF8_H
 #define HIT9_CODE_SNIPPETS_UTF8_H
 
