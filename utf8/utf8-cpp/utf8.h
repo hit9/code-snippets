@@ -9,7 +9,6 @@
 namespace utf8 {
 
 using size_t = std::size_t;
-using uint32_t = std::uint32_t;
 
 // Count codepoints in given utf8 string.
 size_t Count(std::string_view s);

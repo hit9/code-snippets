@@ -29,7 +29,7 @@ static const unsigned char utf8d[] = {
 };
 
 static uint32_t inline
-decode_next(uint32_t* state, uint32_t* codep, unsigned char byte) {
+decode_next(uint32_t* state, char32_t* codep, unsigned char byte) {
   uint32_t type = utf8d[byte];
 
   *codep = (*state != UTF8_ACCEPT) ?
@@ -81,7 +81,7 @@ size_t utf8::Count(std::string_view s) {
 
 size_t utf8::Decode(std::string_view s, std::u32string& p) {
     uint32_t state = 0;
-    uint32_t codep;
+    char32_t codep;
     size_t k = 0;
     for (auto c : s) {
         if (!decode_next(&state, &codep, c)) p[k++] = codep;
