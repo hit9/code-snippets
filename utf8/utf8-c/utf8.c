@@ -1,5 +1,7 @@
 #include "utf8.h"
 
+// https://writings.sh/post/utf8
+
 // Code copy from http://bjoern.hoehrmann.de/utf-8/decoder/dfa.
 // Copyright (c) 2008-2009 Bjoern Hoehrmann <bjoern@hoehrmann.de>
 // See http://bjoern.hoehrmann.de/utf-8/decoder/dfa/ for details.
