@@ -8,3 +8,4 @@
 - [倒酒问题](pour-problem)
 - [除自身以外数组的乘积](product-of-array-except-self)
 - [leetcode-394 字符串解码](leetcode-394-decode-string)
+- [leetcode-33  搜索旋转排序数组](leetcode-33-search-in-rotated-sorted-array)
