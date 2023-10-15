@@ -7,3 +7,4 @@
 - [全排列问题](permutation)
 - [倒酒问题](pour-problem)
 - [除自身以外数组的乘积](product-of-array-except-self)
+- [leetcode-394 字符串解码](leetcode-394-decode-string)
