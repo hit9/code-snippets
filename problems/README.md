@@ -10,3 +10,4 @@
 - [leetcode-394 字符串解码](leetcode-394-decode-string)
 - [leetcode-33  搜索旋转排序数组](leetcode-33-search-in-rotated-sorted-array)
 - [leetcode-74 搜索二维矩阵](leetcode-74-search-a-2d-matrix)
+- [leetcode-138 有效数字](leetcode-138-validate-number)
