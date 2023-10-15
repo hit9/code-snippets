@@ -12,3 +12,4 @@
 - [leetcode-74 搜索二维矩阵](leetcode-74-search-a-2d-matrix)
 - [leetcode-138 有效数字](leetcode-138-validate-number)
 - [leetcode-4 寻找两个正序数组的中位数](leetcode-4-median-of-two-sorted-arrays)
+- [leetcode-295 数据流的中位数](leetcode-295-find-median-from-data-stream)
