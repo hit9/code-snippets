@@ -16,3 +16,4 @@
 - [leetcode-10 正则表达式匹配](leetcode-10-regular-expression-matching)
 - [leetcode-44 通配符匹配](leetcode-44-wildcard-matching)
 - [leetcode-46 全排列](leetcode-46-permutations)
+- [leetcode-41  缺失的第一个正数](leetcode-41-first-missing-positive)
