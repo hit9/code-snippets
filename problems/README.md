@@ -18,3 +18,4 @@
 - [leetcode-46 全排列](leetcode-46-permutations)
 - [leetcode-41 缺失的第一个正数](leetcode-41-first-missing-positive)
 - [leetcode-543 二叉树的直径](leetcode-543-diameter-of-binary-tree)
+- [leetcode-287 寻找重复数](leetcode-287-find-the-duplicate-number)
