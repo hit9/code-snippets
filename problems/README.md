@@ -21,4 +21,4 @@
 - [leetcode-287 寻找重复数](leetcode-287-find-the-duplicate-number)
 - [leetcode-32 最长有效括号](leetcode-32-longest-valid-parentheses)
 - [leetcode-100 滑动窗口最大值](leetcode-100-sliding-window-maximum)
-- [leetcode-128 ](leetcode-128-longest-consecutive-sequence)
+- [leetcode-128 最长连续序列](leetcode-128-longest-consecutive-sequence)
