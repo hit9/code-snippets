@@ -25,3 +25,4 @@
 - [leetcode-84 柱状图中最大的矩形](leetcode-84-largest-rectangle-in-histogram)
 - [leetcode-739 每日温度](leetcode-739-daily-temperatures)
 - [leetcode-2530 执行 K 次操作后的最大分数](leetcode-2530-maximal-score-after-applying-k-operations)
+- [leetcode-42 接雨水](leetcode-42-trapping-rain-water)
