@@ -26,3 +26,4 @@
 - [leetcode-739 每日温度](leetcode-739-daily-temperatures)
 - [leetcode-2530 执行 K 次操作后的最大分数](leetcode-2530-maximal-score-after-applying-k-operations)
 - [leetcode-42 接雨水](leetcode-42-trapping-rain-water)
+- leetcode-169 多数元素](leetcode-169-majority-element)
