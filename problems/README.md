@@ -32,3 +32,4 @@
 - [leetcode-070 有序数组查找不重复的数](leetcode-070-skFtm2)
 - [leetcode-2130 最大链表孪生和](leetcode-2130-maximum-twin-sum-of-a-linked-list)
 - [leetcode-31 下一个排列](leetcode-31-next-permutation)
+- [leetcode-118 杨辉三角](leetcode-118-pascals-triangle)
