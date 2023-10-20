@@ -28,3 +28,4 @@
 - [leetcode-42 接雨水](leetcode-42-trapping-rain-water)
 - [leetcode-169 多数元素](leetcode-169-majority-element)
 - [leetcode-229 多数元素II](leetcode-229-majority-element-ii)
+- [leetcode-22 括号生成](leetcode-22-generate-parentheses )
