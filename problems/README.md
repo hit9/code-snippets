@@ -29,3 +29,5 @@
 - [leetcode-169 多数元素](leetcode-169-majority-element)
 - [leetcode-229 多数元素II](leetcode-229-majority-element-ii)
 - [leetcode-22 括号生成](leetcode-22-generate-parentheses )
+- [leetcode-070 有序数组查找不重复的数](leetcode-070-skFtm2)
+- [leetcode-2130](leetcode-2130-maximum-twin-sum-of-a-linked-list)
