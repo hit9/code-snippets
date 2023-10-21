@@ -37,3 +37,4 @@
 - [leetcode-2316 统计无向图中无法互相到达点对数](leetcode-2316-count-unreachable-pairs-of-nodes-in-an-undirected-graph) ⭐️
 - [leetcode-200 岛屿数量](leetcode-200-number-of-islands) ⭐️⭐️⭐️
 - [leetcode-11 盛水最多的容器](leetcode-11-container-with-most-water) ⭐️⭐️⭐️
+- [leetcode-852 山脉数组的峰顶索引](leetcode-852-peak-index-in-a-mountain-array)
