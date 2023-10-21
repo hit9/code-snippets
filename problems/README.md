@@ -34,4 +34,4 @@
 - [leetcode-31 下一个排列](leetcode-31-next-permutation)
 - [leetcode-118 杨辉三角](leetcode-118-pascals-triangle)
 - [leetcode-2140 解决智力问题](leetcode-2140-solving-questions-with-brainpower) ⭐️⭐️
-- [leetcode-2316 统计无向图中无法互相到达点对数](leetcode-2316-count-unreachable-pairs-of-nodes-in-an-undirected-graph)
+- [leetcode-2316 统计无向图中无法互相到达点对数](leetcode-2316-count-unreachable-pairs-of-nodes-in-an-undirected-graph) ⭐️
