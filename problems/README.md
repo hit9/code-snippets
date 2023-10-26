@@ -48,3 +48,4 @@
 - [leetcode-456  132 模式](leetcode-132-pattern) ⭐️⭐️⭐️⭐️⭐️
 - [leetcode-209 长度最小的子数组](leetcode-209-minimum-size-subarray-sum) ⭐️⭐️
 - [leetcode-402 移掉 K 位数字](leetcode-402-remove-k-digits)
+- [leetcode-1541 平衡括号字符串的最少插入次数](leetcode-1541-minimum-insertions-to-balance-a-parentheses-string)
