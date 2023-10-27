@@ -51,4 +51,4 @@
 - [leetcode-1541 平衡括号字符串的最少插入次数](leetcode-1541-minimum-insertions-to-balance-a-parentheses-string)
 - [leetcode-1004 最大连续1的个数 III](leetcode-1004-max-consecutive-ones-iii)
 - [leetcode-236 二叉树的最近公共祖先](leetcode-236-lowest-common-ancestor-of-a-binary-tree)
-- [leetcode-622 二叉树最大宽度](leetcode-662-maximum-width-of-binary-tree)
+- [leetcode-622 二叉树最大宽度](leetcode-662-maximum-width-of-binary-tree)⭐️
