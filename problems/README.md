@@ -53,3 +53,4 @@
 - [leetcode-236 二叉树的最近公共祖先](leetcode-236-lowest-common-ancestor-of-a-binary-tree)
 - [leetcode-622 二叉树最大宽度](leetcode-662-maximum-width-of-binary-tree)⭐️
 - [leetcode-56 合并区间](leetcode-56-merge-intervals) ⭐️⭐️⭐️
+- [leetcode-55 跳跃游戏](leetcode-55-jump-game) ⭐️
