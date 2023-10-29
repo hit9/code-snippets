@@ -55,3 +55,4 @@
 - [leetcode-56 合并区间](leetcode-56-merge-intervals) ⭐️⭐️⭐️
 - [leetcode-55 跳跃游戏](leetcode-55-jump-game) ⭐️
 - [leetcode-1763 最长的美好子字符串](leetcode-1763-longest-nice-substring) ⭐️⭐️⭐️⭐️⭐️
+- [leetcode-503 下一个更大元素 II](leetcode-503-next-greater-element-ii)
