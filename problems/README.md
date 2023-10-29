@@ -56,3 +56,4 @@
 - [leetcode-55 跳跃游戏](leetcode-55-jump-game) ⭐️
 - [leetcode-1763 最长的美好子字符串](leetcode-1763-longest-nice-substring) ⭐️⭐️⭐️⭐️⭐️
 - [leetcode-503 下一个更大元素 II](leetcode-503-next-greater-element-ii)
+- [leetcode-862 和至少为 K 的最短子数组](leetcode-862-shortest-subarray-with-sum-at-least-k) ⭐️⭐️⭐️⭐️
