@@ -58,3 +58,4 @@
 - [leetcode-503 下一个更大元素 II](leetcode-503-next-greater-element-ii)
 - [leetcode-862 和至少为 K 的最短子数组](leetcode-862-shortest-subarray-with-sum-at-least-k) ⭐️⭐️⭐️⭐️
 - [leetcode-654 最大二叉树](problems/leetcode-654-maximum-binary-tree) ⭐️⭐️⭐️
+- [leetcode-255 验证前序遍历序列二叉搜索树](leetcode-255-verify-preorder-sequence-in-binary-search-tree) ⭐️⭐️
