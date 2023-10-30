@@ -60,3 +60,4 @@
 - [leetcode-654 最大二叉树](problems/leetcode-654-maximum-binary-tree) ⭐️⭐️⭐️          (单调栈)
 - [leetcode-255 验证前序遍历序列二叉搜索树](leetcode-255-verify-preorder-sequence-in-binary-search-tree) ⭐️⭐️     (单调栈)
 - [leetcode-962 最大宽度坡](leetcode-962-maximum-width-ramp) ⭐️⭐️⭐️⭐️⭐️        (单调栈)
+- [leetcode-224 基本计算器](leetcode-224-basic-calculator) ⭐️⭐️     (双栈法)
