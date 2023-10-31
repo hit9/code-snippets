@@ -63,3 +63,4 @@
 - [leetcode-224 基本计算器](leetcode-224-basic-calculator) ⭐️⭐️     (双栈法)
 - [leetcode-23 合并 K 个升序链表](leetcode-23-merge-k-sorted-lists)  ⭐️⭐️⭐️   (分治、k路归并)
 - [leetcode-53 最大子数组和](leetcode-53-maximum-subarray) ⭐️⭐️⭐️  (动态规划)
+- [leetcode-152 乘积最大子数组](leetcode-152-maximum-product-subarray)  ⭐️  (动态规划)
