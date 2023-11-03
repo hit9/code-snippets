@@ -70,3 +70,4 @@
 - [leetcode-622 设计循环队列](leetcode-622-design-circular-queue) ⭐️⭐️  (环形队列)
 - [leetcode-322 零钱兑换](leetcode-322-coin-change) ⭐️⭐️⭐️⭐️ (动态规划、完全背包问题)
 - [leetcode-14 最长公共前缀](leetcode-14-longest-common-prefix) ⭐️ (分治、动态规划)
+- [leetcode-64 最小路径和](leetcode-64-minimum-path-sum) (动态规划)
