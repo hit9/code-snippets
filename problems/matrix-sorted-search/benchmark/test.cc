@@ -41,7 +41,7 @@ class Solution1 {
         if (m == target) return true;
 
         // 检查各个子模块，每次最差排除 1/4 部分
-        // 也就是说，以 3/4 的速度减治
+        // 也就是说，以 3/4 的速度减少
         // 需要先排除 II 和 III
 
         // 检查 II:  b => (ai, mj), f => (mi, zj)
