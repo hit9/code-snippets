@@ -46,6 +46,8 @@
 - [leetcode-53 最大子数组和](leetcode-53-maximum-subarray) ⭐️⭐️⭐️  (动态规划)
 - [leetcode-322 零钱兑换](leetcode-322-coin-change) ⭐️⭐️⭐️⭐️ (动态规划、完全背包问题)
 - [leetcode-1262 可被三整除的最大和](leetcode-1262-greatest-sum-divisible-by-three)        ⭐️⭐️⭐️⭐️  (动态规划)
+- [leetcode-416 分割等和子集](leetcode-416-partition-equal-subset-sum) ⭐️⭐️⭐️⭐️⭐️  (动态规划、01背包问题)
+
 
 贪心:
 
