@@ -26,6 +26,20 @@
 
 using namespace std;
 
+// 思路:
+// 动态规划
+//
+//  nums => [3,6,5,1,8]
+//
+// R               {  0,  0,  0 }
+// nums[i]=3       {  3,  0,  0 }
+// nums[i]=6       {  9,  0,  0 }
+// nums[i]=5       {  9,  0, 14 }
+// nums[i]=1       { 15, 10, 14 }
+// nums[i]=8       { 18, 22, 23 }
+//
+// Answer: R[0] => 18
+//
 class Solution {
    public:
     int maxSumDivThree(vector<int>& nums) {
