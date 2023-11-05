@@ -74,3 +74,4 @@
 - [leetcode-35 搜索插入位置](leetcode-35-search-insert-position)  ⭐️ (二分)
 - [leetcode-1339 分裂二叉树的最大乘积](leetcode-1339-maximum-product-of-splitted-binary-tree)  (二叉树)
 - [leetcode-124 二叉树中的最大路径和](leetcode-124-binary-tree-maximum-path-sum)     (动态规划、树上 DP)
+- [leetcode-1262 可被三整除的最大和](leetcode-1262-greatest-sum-divisible-by-three)        ⭐️⭐️⭐️⭐️  (动态规划)
