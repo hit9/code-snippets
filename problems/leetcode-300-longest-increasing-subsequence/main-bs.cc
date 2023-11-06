@@ -32,24 +32,24 @@ using namespace std;
 
 class Solution {
    public:
-    // 二分查找 seq 数组
+    // 在递增数组 nums 上查找目标 x
+    // right 是最右端元素位置
     // 找到恰好 >= x 的位置
     // ... a b....
     //       ^
     //       x     使得  a < x <= b
     // 等价于找到插入位置的问题
-    int bs(vector<int>& seq, int x) {
+    int bs(const vector<int>& nums, int right, int x) {
         int left = 0;
-        int right = seq.size() - 1;
         while (left <= right) {
             // 终止时，left 越过 right
             // [0..left) 始终保证严格 < x
             // (right..n-1] 始终保证严格 > x
             // 所以 left 位置就是最合适的替换位置
             int mid = left + (right - left) / 2;
-            if (seq[mid] == x)
+            if (nums[mid] == x)
                 return mid;
-            else if (seq[mid] < x)
+            else if (nums[mid] < x)
                 left = mid + 1;
             else
                 right = mid - 1;
@@ -58,22 +58,19 @@ class Solution {
     }
 
     int lengthOfLIS(vector<int>& nums) {
-        vector<int> seq;  // 保存严格上升的序列
-
-        seq.push_back(nums[0]);
+        int right = 0;  // [0..right]  追踪最长递增子序列
 
         for (int i = 1; i < nums.size(); i++) {
-            if (seq[seq.size() - 1] < nums[i]) {
-                seq.push_back(nums[i]);
-            } else {
+            if (nums[i] > nums[right])
+                nums[++right] = nums[i];
+            else {
                 // 找到第一个 <= nums[i] 的位置
-                int j = bs(seq, nums[i]);
+                int j = bs(nums, right, nums[i]);
                 // 替换那个元素为更小的 nums[i]
                 // 让序列上升的更慢
-                seq[j] = nums[i];
+                nums[j] = nums[i];
             }
         }
-
-        return seq.size();
+        return right + 1;
     }
 };
