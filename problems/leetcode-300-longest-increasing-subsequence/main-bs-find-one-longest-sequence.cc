@@ -107,4 +107,10 @@ int main(void) {
     auto ans5 = solution.findOneLIS(nums5);
     for (auto x : ans5) cout << x << " ";
     cout << endl;
+
+    // 测试 6
+    vector<int> nums6{8, 10, 2, 9, 6, 13, 1, 9, 5, 12, 3, 10, 7, 9, 11};
+    auto ans6 = solution.findOneLIS(nums6);
+    for (auto x : ans6) cout << x << " ";
+    cout << endl;
 }
