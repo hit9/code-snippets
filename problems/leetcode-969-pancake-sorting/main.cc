@@ -19,12 +19,33 @@ class Solution {
             std::reverse(arr.begin(), arr.begin() + k);
             ans.push_back(k);
         };
+
+        vector<int> x = arr;  // copy
+        sort(x.begin(), x.end());
+
+        int j = x.size() - 1;
+
         // n > 1 的注释: 只有一个元素的时候，已经没必要再排序了
-        for (int n = arr.size(); n > 1; n--) {
+        int n = arr.size();
+
+        while (n > 1) {
+            // 跳过有序部分
+            if (arr[n - 1] == x[j]) {
+                n--;
+                j--;
+                continue;
+            };
+
             // 找 max 的位置 k
             int k = 0;
-            for (int i = n - 1; i >= 0; i--)
-                if (arr[i] > arr[k]) k = i;
+            int m = x[j--];  // max
+
+            for (int i = n - 1; i >= 0; i--) {
+                if (arr[i] == m) {
+                    k = i;
+                    break;
+                }
+            }
 
             if (k != n - 1) {
                 // 翻到前面作为第0个元素
@@ -32,6 +53,8 @@ class Solution {
                 // 反转整个数组
                 rev(n);
             }
+
+            n--;
         }
         return ans;
     }
