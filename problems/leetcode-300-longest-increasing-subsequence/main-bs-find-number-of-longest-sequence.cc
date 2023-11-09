@@ -7,8 +7,8 @@
 // 12ms 击败 99.24%使用 C++ 的用户
 // https://leetcode.cn/problems/number-of-longest-increasing-subsequence/submissions/480514412/
 
+#include <algorithm>
 #include <iostream>
-#include <numeric>
 #include <vector>
 
 using namespace std;
@@ -17,36 +17,6 @@ using namespace std;
 
 class Solution {
    public:
-    // 升序数组，二分找恰好 < x 的位置
-    int bs1(const vector<int>& nums, int x) {
-        int left = 0;
-        int right = nums.size() - 1;
-        while (left <= right) {
-            int mid = left + (right - left) / 2;
-            if (nums[mid] == x)
-                return mid;
-            else if (nums[mid] < x)
-                left = mid + 1;
-            else
-                right = mid - 1;
-        }
-        return left;
-    }
-
-    // 降序数组，二分查找右侧严格 <x 的起点位置
-    // left 是检索的起点位置
-    int bs2(const vector<int>& nums, int x, int left) {
-        int right = nums.size() - 1;
-        while (left < right) {
-            int mid = left + (right - left) / 2;
-            if (nums[mid] < x)
-                right = mid;
-            else
-                left = mid + 1;
-        }
-        return right;
-    }
-
     int findNumberOfLIS(vector<int>& nums) {
         // 各个列的桶, 每个桶存放元素的值
         vector<vector<int>> buckets;
@@ -76,7 +46,10 @@ class Solution {
                 // 本次 loc 可以作为下次的二分起点
                 // 所谓，维护 loc 数组以递进式二分
                 int k1 = k - 1;
-                int loc = bs2(buckets[k1], num, locs[k1]);
+                auto& b1 = buckets[k1];
+                int loc = upper_bound(b1.begin() + locs[k1], b1.end(), num,
+                                      greater<int>()) -
+                          b1.begin();
                 locs[k1] = loc;  // 更新上一个桶的检索节点
 
                 // 前一个桶的区间 [0..loc] 的 count 总和
@@ -109,7 +82,7 @@ class Solution {
                 push(buckets.size() - 1, nums[i]);
             } else {
                 // 查找合适的桶放入新元素
-                int k = bs1(p, nums[i]);
+                int k = lower_bound(p.begin(), p.end(), nums[i]) - p.begin();
                 push(k, nums[i]);
             }
         }
