@@ -12,7 +12,7 @@
 int partition(std::vector<int>& a, int start, int end) {  // [start, end)
     auto p = a[start];
     int left = start;     // [start, left) 上保持 < p
-    int right = end - 1;  // [right, end) 上保持 > p
+    int right = end - 1;  // (right, end) 上保持 > p
     int i = left;  // i 是迭代变量, [left, i) 上是已知的 == p 的, 可能为空区间
     while (i <= right) {
         if (a[i] < p) {  // 小于 p 的放左边
