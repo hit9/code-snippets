@@ -62,6 +62,11 @@
 - [leetcode-229 多数元素II](leetcode-229-majority-element-ii) ⭐️⭐️⭐️  (摩尔投票)
 
 
+线段树:
+
+- [leetcode-2407 2407. 最长递增子序列 II](longest-increasing-subsequence-ii) ⭐️⭐️⭐️⭐️⭐️  (线段树)
+
+
 -------
 
 其他:
