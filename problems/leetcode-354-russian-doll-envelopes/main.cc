@@ -21,7 +21,8 @@ class Solution {
         // 先优先按 w 排序
         sort(es.begin(), es.end(), [](const auto& a, const auto& b) {
             // 如果 w 相同，h 则逆序
-            // 这里非常巧妙，逆序过来之后，相同的 w 情况下保证 LIS 求解最多取 1 个
+            // 这里非常巧妙，逆序过来之后，相同的 w 情况下保证 LIS 求解最多取 1
+            // 个
             return a[0] < b[0] || (a[0] == b[0] && a[1] > b[1]);
         });
 
