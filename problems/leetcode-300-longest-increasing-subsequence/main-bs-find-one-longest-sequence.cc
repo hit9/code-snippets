@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <iostream>
 #include <vector>
 
@@ -9,21 +10,6 @@ using namespace std;
 
 class Solution {
    public:
-    int bs(const vector<int>& nums, int x) {
-        int left = 0;
-        int right = nums.size() - 1;
-        while (left <= right) {
-            int mid = left + (right - left) / 2;
-            if (nums[mid] == x)
-                return mid;
-            else if (nums[mid] < x)
-                left = mid + 1;
-            else
-                right = mid - 1;
-        }
-        return left;
-    }
-
     vector<int> findOneLIS(vector<int>& nums) {
         using Node = pair<int, int>;  // 槽位, {父节点在桶中的位置、元素值}
         using Bucket = vector<Node>;  // 桶
@@ -54,7 +40,7 @@ class Solution {
                 push(buckets.size() - 1, nums[i]);
             } else {
                 // 查找合适的桶放入新元素
-                int k = bs(p, nums[i]);
+                int k = lower_bound(p.begin(), p.end(), nums[i]) - p.begin();
                 push(k, nums[i]);
             }
         }
