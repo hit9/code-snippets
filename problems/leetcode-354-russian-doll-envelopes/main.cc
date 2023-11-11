@@ -15,21 +15,6 @@
 using namespace std;
 class Solution {
    public:
-    // 升序数组，二分找恰好 < x 的位置
-    int bs1(const vector<int>& nums, int x) {
-        int left = 0;
-        int right = nums.size() - 1;
-        while (left <= right) {
-            int mid = left + (right - left) / 2;
-            if (nums[mid] == x)
-                return mid;
-            else if (nums[mid] < x)
-                left = mid + 1;
-            else
-                right = mid - 1;
-        }
-        return left;
-    }
     int maxEnvelopes(vector<vector<int>>& es) {
         int n = es.size();
 
@@ -49,8 +34,8 @@ class Solution {
             if (num > p.back())
                 p.push_back(num);
             else {
-                int j = bs1(p, num);
-                p[j] = num;
+                auto t = lower_bound(p.begin(), p.end(), num);
+                *t = num;
             }
         }
 
