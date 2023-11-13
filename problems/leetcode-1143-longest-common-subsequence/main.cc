@@ -2,6 +2,7 @@
 // https://leetcode.cn/problems/longest-common-subsequence
 
 #include <string>
+#include <vector>
 using namespace std;
 class Solution {
    public:
