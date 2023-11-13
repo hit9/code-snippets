@@ -9,16 +9,16 @@
 
 - [leetcode-4 寻找两个正序数组的中位数](leetcode-4-median-of-two-sorted-arrays) ⭐️⭐️⭐️  (二分)
 - [二维矩阵搜索](matrix-sorted-search) ⭐️⭐️   (二叉搜索树、分治)
-- [top-k 问题](top-k) ⭐️⭐️⭐️   (快速选择、堆置换)
+- [top-k 问题](top-k) ⭐️⭐️⭐️   (快速选择、堆置换) (经典问题)
 - [leetcode-33  搜索旋转排序数组](leetcode-33-search-in-rotated-sorted-array) ⭐️  (二分)
 - [leetcode-1763 最长的美好子字符串](leetcode-1763-longest-nice-substring) ⭐️⭐️⭐️⭐️⭐️        (分治)
 - [leetcode-23 合并 K 个升序链表](leetcode-23-merge-k-sorted-lists)  ⭐️⭐️⭐️   (分治、k路归并)
-- [leetcode-300 最长递增子序列](leetcode-300-longest-increasing-subsequence)  ⭐️⭐️⭐️   (贪心+二分)
-- [leetcode-354 俄罗斯套娃信封问题](leetcode-354-russian-doll-envelopes)  ⭐️⭐️⭐️  (贪心+二分)
+- [leetcode-300 最长递增子序列](leetcode-300-longest-increasing-subsequence)  ⭐️⭐️⭐️   (贪心+二分, 经典 LIS 问题)
+- [leetcode-354 俄罗斯套娃信封问题](leetcode-354-russian-doll-envelopes)  ⭐️⭐️⭐️  (贪心+二分, LIS 扩展题)
 
 单调栈/队列:
 
-- [leetcode-84 柱状图中最大的矩形](leetcode-84-largest-rectangle-in-histogram) ⭐️⭐️⭐️     (单调栈)
+- [leetcode-84 柱状图中最大的矩形](leetcode-84-largest-rectangle-in-histogram) ⭐️⭐️⭐️     (单调栈, 单调栈经典题)
 - [leetcode-42 接雨水](leetcode-42-trapping-rain-water) ⭐️⭐️⭐️     (单调栈)
 - [leetcode-100 滑动窗口最大值](leetcode-100-sliding-window-maximum) ⭐️⭐️⭐️     (单调队列)
 - [leetcode-456  132 模式](leetcode-132-pattern) ⭐️⭐️⭐️⭐️⭐️          (单调栈)
