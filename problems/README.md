@@ -50,6 +50,7 @@
 - [leetcode-1262 可被三整除的最大和](leetcode-1262-greatest-sum-divisible-by-three)        ⭐️⭐️⭐️⭐️  (动态规划)
 - [leetcode-416 分割等和子集](leetcode-416-partition-equal-subset-sum) ⭐️⭐️⭐️⭐️⭐️  (动态规划、01背包问题)
 - [leetcode-714 买卖股票的最佳时机含手续费](leetcode-714-best-time-to-buy-and-sell-stock-with-transaction-fee) ⭐️⭐️⭐️ (动态规划)
+- [leetcode-1143 最长公共子序列问题](leetcode-1143-longest-common-subsequence) ⭐️⭐️⭐️⭐️  (经典线性dp问题)
 
 
 贪心:
