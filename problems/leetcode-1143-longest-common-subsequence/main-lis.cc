@@ -51,5 +51,6 @@ class Solution {
 int main(void) {
     Solution s;
     cout << s.longestCommonSubsequence("abcba", "abcbcba") << endl;
+    cout << s.longestCommonSubsequence("acadfe", "abccadefe") << endl;
     return 0;
 }
