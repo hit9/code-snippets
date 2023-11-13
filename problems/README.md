@@ -126,3 +126,4 @@
 - [leetcode-122 买卖股票的最佳时机 II](leetcode-122-best-time-to-buy-and-sell-stock-ii)  (双指针)
 - [leetcode-969 煎饼排序](leetcode-969-pancake-sorting)
 - [leetcode-15 三数之和](leetcode-15-3sum)  (排序、二分)
+- [leetcode-307 区域和检索 - 数组可修改] (线段树)
