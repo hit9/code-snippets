@@ -1,3 +1,4 @@
 - [最长递增子序列 - 求长度 nlog(n)](main-bs.cc)
 - [最长递增子序列 - 返回一个最长的递增子序列 nlog(n)](main-bs-find-one-longest-sequence.cc)
 - [最长递增子序列 - 找出最长的递增子序列的个数 nlog(n)](main-bs-find-number-of-longest-sequence.cc)
+- [最长递增子序列 - 求解非严格的最长递增子序列的长度](mian-non-strict.cc)
