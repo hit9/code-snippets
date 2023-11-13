@@ -57,5 +57,8 @@ int main(void) {
 
     vector<int> nums4{7, 7, 7, 7, 7, 7, 7};
     assert(s.looseLIS(nums4) == nums4.size());
+
+    vector<int> nums5{2, 4, 2, 7, 3, 6, 3, 8, 3, 5, 6};
+    assert(s.looseLIS(nums5) == 7);
     return 0;
 }
