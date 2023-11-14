@@ -17,7 +17,7 @@ class Hash {
     int n;
     // h[i+1] 表示前缀 s[0..i]  (前闭后闭) 的哈希值，特殊的：h[0] = 0
     vector<ull> h;
-    vector<ull> p;
+    vector<ull> p;  // p[i] 就是 P^i 次方
 
    public:
     explicit Hash(const string& s)
@@ -32,7 +32,7 @@ class Hash {
     // 计算字符串区间 s[i..j] 的哈希值, 前闭后闭
     // 取前缀 A = h[j+1] 减去前缀 B = h[(i-1)+1]
     // 在 P 进制下，左移 B 和 A 左端对其，然后相减, 定义为 [i..j] 区间的哈希值
-    // 即 A - B * (B << (j-i+1)) (p 进制下的左移，就是乘幂)
+    // 即 A - B * P ^ (j-i+1) (这里 ^ 符号是幂的意思)
     // 要保证传入的 j >= i
     ull sub(int i, int j) { return h[j + 1] - h[i] * p[j - i + 1]; }
 };
