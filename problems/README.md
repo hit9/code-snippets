@@ -4,6 +4,7 @@
 哈希:
 
 - [leetcode-128 最长连续序列](leetcode-128-longest-consecutive-sequence) ⭐️⭐️⭐️⭐️       (哈希表)
+- [leetcode-5 最长回文子串](leetcode-5-longest-palindromic-substring) ⭐️⭐️⭐️⭐️⭐️  (前缀哈希)
 
 分治(减治、归并):
 
