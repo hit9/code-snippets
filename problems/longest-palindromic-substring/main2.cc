@@ -9,23 +9,22 @@
 
 using namespace std;
 
-using ull = unsigned long long;
-const ull P = 131;
-
 class Hash {
+    using ull = unsigned long long;
+    const ull P = 131;  // P 的取值要保证覆盖字符集大小
+
    private:
     int n;
-    // h[i+1] 表示前缀 s[0..i]  (前闭后闭) 的哈希值
-    // h[0] = 0
+    // h[i+1] 表示前缀 s[0..i]  (前闭后闭) 的哈希值，特殊的：h[0] = 0
     vector<ull> h;
     vector<ull> p;
 
    public:
     explicit Hash(const string& s)
         : n(s.size()), h(vector<ull>(n + 1, 0)), p(vector<ull>(n + 1, 0)) {
-        // 计算哈希数组
         p[0] = 1;  // power(P, 0) is 1
         for (int i = 1; i <= s.size(); i++) {
+            // ch-'a'+1 的保证大于 0, 避开特殊的哈希零值
             h[i] = h[i - 1] * P + (s[i - 1] - 'a' + 1);
             p[i] = p[i - 1] * P;
         }
