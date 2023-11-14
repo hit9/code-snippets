@@ -1,10 +1,5 @@
-// https://leetcode.cn/problems/longest-palindromic-substring
-// 5. 最长回文子串
-// 给你一个字符串 s，找到 s 中最长的回文子串。
-// 如果字符串的反序与原始字符串相同，则该字符串称为回文字符串。
-//
-// 输入：s = "babad" 输出："bab" 解释："aba" 同样是符合题意的答案。
-
+// https://writings.sh/post/algorithm-longest-palindromic-substring
+// 从给定的字符串 s 中找到最长的回文子串的长度。
 // 思路: 前缀哈希 + 二分
 // nlog(n)
 
@@ -45,7 +40,7 @@ class Hash {
 
 class Solution {
    public:
-    string longestPalindrome(string s) {
+    int longestPalindrome(string s) {
         string s1("#");
 
         // 插入 '#' 消除奇偶问题
@@ -79,7 +74,6 @@ class Solution {
         // 经过预处理后, 此时的 n 一定是奇数, L 的值不超过 min(n/2, i)
 
         int L = 0;  // 追踪最大的 L
-        int I = 0;  // 追踪最大的 L 的时候的中心位置 i
 
         for (int i = 1; i < n - 1; i++) {
             int j = n - i - 1;
@@ -107,25 +101,18 @@ class Solution {
             // 闭区间内，所以此时 low == high 就是保证哈希值相等的地方
 
             // 更新追踪的结果
-            if (L < low) {
-                L = low;
-                I = i;
-            }
+            if (L < low) L = low;
         }
 
-        // 找到那个最大的回文串
-        // 由于提前做了预处理，那么需要把 '#' 剔除
-        string ans;
-        // 没有找到，那么取第一个 非 '#' 的
-        for (int i = I - L; i <= I + L; i++)
-            if (s1[i] != '#') ans.push_back(s1[i]);
-        return ans;
+        // L 就是原字符串 s 的最长回文长度
+        return L;
     }
 };
 
 int main(void) {
     Solution solution;
     cout << solution.longestPalindrome("babad") << endl;
+    // # c # b # b # d #
     cout << solution.longestPalindrome("cbbd") << endl;
     cout << solution.longestPalindrome("cabcbadf") << endl;
     cout << solution.longestPalindrome("abb") << endl;
