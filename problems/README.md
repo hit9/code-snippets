@@ -15,6 +15,7 @@
 - [leetcode-1763 最长的美好子字符串](leetcode-1763-longest-nice-substring) ⭐️⭐️⭐️⭐️⭐️        (分治)
 - [leetcode-23 合并 K 个升序链表](leetcode-23-merge-k-sorted-lists)  ⭐️⭐️⭐️   (分治、k路归并)
 - [leetcode-300 最长递增子序列](leetcode-300-longest-increasing-subsequence)  ⭐️⭐️⭐️   (贪心+二分, 经典 LIS 问题)
+- [luogu P1439](luogu/P1439) (LIS 模型)
 - [leetcode-354 俄罗斯套娃信封问题](leetcode-354-russian-doll-envelopes)  ⭐️⭐️⭐️  (贪心+二分, LIS 扩展题)
 
 单调栈/队列:
