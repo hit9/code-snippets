@@ -17,6 +17,7 @@
 - [leetcode-300 最长递增子序列](leetcode/leetcode-300-longest-increasing-subsequence)  ⭐️⭐️⭐️   (贪心+二分, 经典 LIS 问题)
 - [luogu P1439](luogu/P1439) (LIS 模型)
 - [leetcode-354 俄罗斯套娃信封问题](leetcode/leetcode-354-russian-doll-envelopes)  ⭐️⭐️⭐️  (贪心+二分, LIS 扩展题)
+- [leetcode-1351 统计有序矩阵中的负数](leetcode/leetcode-1351-count-negative-numbers-in-a-sorted-matrix) ⭐️⭐️⭐️  (二分 or 线性 or 分治)
 
 单调栈/队列:
 
