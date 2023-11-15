@@ -35,6 +35,8 @@ class Solution {
    public:
     bool find(vector<vector<int>>& x, int ai, int aj, int zi, int zj,
               int target) {
+        if (ai > zi || aj > zj) return false;
+
         auto a = x[ai][aj];  // 当前矩阵最小值
         auto z = x[zi][zj];  // 当前矩阵最大值
 
@@ -72,14 +74,17 @@ class Solution {
         // 需要先排除 II 和 III
 
         // 检查 II:  b => (ai, mj), f => (mi, zj)
-        if (find(x, ai, mj, mi, zj, target)) return true;
+        // 不包含 m 所在行和列
+        if (find(x, ai, mj + 1, mi - 1, zj, target)) return true;
 
         // 检查 III: d => (mi, aj), h => (zi, mj)
-        if (find(x, mi, aj, zi, mj, target)) return true;
+        // 不包含 m 所在行和列
+        if (find(x, mi + 1, aj, zi, mj - 1, target)) return true;
 
-        // 检查 I
+        // 检查 I (包括 m 所在行和列)
         if (target < m) return find(x, ai, aj, mi, mj, target);
-        // 检查 IV
+
+        // 检查 IV  (包括 m 所在行和列)
         return find(x, mi, mj, zi, zj, target);
     }
 
