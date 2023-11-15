@@ -130,6 +130,6 @@
 - [leetcode-122 买卖股票的最佳时机 II](leetcode/leetcode-122-best-time-to-buy-and-sell-stock-ii)  (双指针)
 - [leetcode-969 煎饼排序](leetcode/leetcode-969-pancake-sorting)
 - [leetcode-15 三数之和](leetcode/leetcode-15-3sum)  (排序、二分)
-- [leetcode-307 区域和检索 - 数组可修改] (线段树)
+- [leetcode-307 区域和检索 - 数组可修改] (leetcode/leetcode-307-range-sum-query-mutable)  (线段树)
 - [leetcode-159 至多包含两个不同字符的最长子串](leetcode/leetcode-159-longest-substring-with-at-most-two-distinct-characters)
 
