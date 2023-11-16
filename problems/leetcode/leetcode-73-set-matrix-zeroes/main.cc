@@ -20,10 +20,10 @@ class Solution {
         // 标 0
         for (int i = 0; i < m; i++)
             for (int j = 0; j < n; j++)
-                if (zeroRows.find(i) != zeroRows.end()||zeroCols.find(j) != zeroCols.end()) {
+                if (zeroRows.find(i) != zeroRows.end() ||
+                    zeroCols.find(j) != zeroCols.end()) {
                     matrix[i][j] = 0;
                 }
-
     }
 };
 
