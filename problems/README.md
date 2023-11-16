@@ -72,6 +72,10 @@
 
 - [leetcode-2407 2407. 最长递增子序列 II](leetcode/leetcode-2407-longest-increasing-subsequence-ii) ⭐️⭐️⭐️⭐️⭐️  (线段树)
 
+优先级队列/堆
+
+- [中位数](luogu/P1168)  (堆顶堆)
+
 
 -------
 
