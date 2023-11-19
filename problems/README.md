@@ -20,6 +20,7 @@
 - [luogu P1226](luogu/P1226) (快速幂模板题)
 - [leetcode-354 俄罗斯套娃信封问题](leetcode/leetcode-354-russian-doll-envelopes)  ⭐️⭐️⭐️  (贪心+二分, LIS 扩展题)
 - [leetcode-1351 统计有序矩阵中的负数](leetcode/leetcode-1351-count-negative-numbers-in-a-sorted-matrix) ⭐️⭐️⭐️  (二分 or 线性 or 分治)
+- [leetcode-170 逆序对](leetcode-170-shu-zu-zhong-de-ni-xu-dui-lcof)  ⭐️⭐️⭐️  (归并、or 离散化+树状数组)
 
 单调栈/队列:
 
