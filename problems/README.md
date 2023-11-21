@@ -78,6 +78,7 @@
 
 - [中位数](luogu/P1168)  (对顶堆)
 - [序列合并](luogu/P1631) ⭐️⭐️⭐️⭐️ (堆, topk 系列)
+- [类似于序列合并, leetcode-373 查找和最小的 K 对数字](leetcode/leetcode-373-find-k-pairs-with-smallest-sums) ⭐️⭐️⭐️  (堆、topk 系列)
 - [升级版序列合并 - 有序矩阵中的第 k 个最小数组和](leetcode/leetcode-1439-find-the-kth-smallest-sum-of-a-matrix-with-sorted-rows) ⭐️⭐️⭐️⭐️⭐️ (堆, topk 系列, 值域二分)
 
 
