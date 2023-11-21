@@ -13,15 +13,14 @@ class Solution {
     //
     // 思路是: 逐列循环，逐行递归
     // 就是，逐列地稳住当前行的每个元素，拆解到下一行起点的更小的矩阵上去
-    // s 是针对当前矩阵要满足的阈值, 逐行减少
+    // s 是针对当前子矩阵要满足的阈值, 逐行减少
+    // s0 是针对当前子矩阵的数组和的最小值, 也就是子矩阵各行的首元素之和, s
+    // 必须要不小于 s0 才可以
     // k 仅用于提前终止递归, 发现大于等于 k 的时候就及时结束
-    // c 是计数, 递归过程中全局维护
-    // 这里有个优化点（不然超时）:
-    // 把 mat 的每一行的元素都看做减去行首元素 mat[i][0]
-    // 并且传入的阈值 s 也减去行首和 s0
-    // 这样做的好处? 降低 s 以快速结束递归?
-    void dfs(const vector<vector<int>>& mat, int i, int s, int k, int& c) {
-        if (s < 0 || c >= k) return;  // 提前结束
+    // c 是计数, 递归过程中全局维护, 作为一个引用
+    void dfs(const vector<vector<int>>& mat, int i, int s, int s0, int k,
+             int& c) {
+        if (s < s0 || c >= k) return;  // 提前结束
 
         if (i >= mat.size()) {  // 越过最后一行，进行计数
             c++;
@@ -29,20 +28,13 @@ class Solution {
         }
 
         for (int j = 0; j < mat[i].size(); j++) {
-            // 当前元素看做减去行首元素的值
-            int x = mat[i][j] - mat[i][0];
-
-            // 缩小阈值
-            int s1 = s - x;
-
-            // 行是递增的，如果当前不满足，后面的不必再计算
-            if (s1 < 0) return;
+            // 提前剪枝: 因为每行是上升的，当前行不满足后，后续也不必要在看
+            if (s - mat[i][j] < s0 - mat[i][0]) return;
 
             // 选择 mat[i][j]，缩小阈值，向下递归
-            dfs(mat, i + 1, s1, k, c);
+            dfs(mat, i + 1, s - mat[i][j], s0 - mat[i][0], k, c);
 
-            // dfs 执行后 c 可能发生变化
-            // 同理，如果找到 c>=k 的可能，就及时退出
+            // 提前剪枝: c 在 dfs 函数调用后可能会增加，满足 >=k 后提前退出
             if (c >= k) return;
         }
     }
@@ -62,18 +54,13 @@ class Solution {
         }
         int s0 = l;  // 行头和
 
-        sort(mat.begin(), mat.end(), [&](const auto& a, const auto& b) {
-            return a[a.size() - 1] - a[0] > b[b.size() - 1] - b[0];
-        });
-
         // 值域二分, 二分找满足 dfs(s) >= k 的下界
         while (l < r) {
             int s = (l + r) >> 1;
 
             // 计算不超过 s 的数组和的个数
-            // 传入的是 s-s0, 相当于矩阵整体全部减去行首
             int c = 0;
-            dfs(mat, 0, s - s0, k, c);
+            dfs(mat, 0, s, s0, k, c);
 
             if (c >= k)
                 r = s;
