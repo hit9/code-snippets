@@ -38,8 +38,8 @@ class Solution {
     // 找到两个数组中数对和不超过给定值的数对
     // 并按照从小到大的顺序输出
     // 最多 k 个
-    vector<vector<int>> findPairs(const vector<int>& nums1,
-                                  const vector<int>& nums2, ll val, int k) {
+    void findPairs(const vector<int>& nums1, const vector<int>& nums2, ll val,
+                   int k, vector<vector<int>>& ans) {
         // 大顶堆
         auto cmp = [&](const P& a, const P& b) {
             return a.first + a.second < b.first + b.second;
@@ -69,7 +69,6 @@ class Solution {
             }
         }
         // 取出堆中的元素
-        vector<vector<int>> ans;
         while (!q.empty()) {
             auto [a, b] = q.top();
             ans.push_back({a, b});
@@ -77,11 +76,12 @@ class Solution {
         }
         // 反转一下
         reverse(ans.begin(), ans.end());
-        return ans;
     }
 
     vector<vector<int>> kSmallestPairs(vector<int>& nums1, vector<int>& nums2,
                                        int k) {
+        vector<vector<int>> ans;
+
         // 先二分判定找到符合条件的第 k 小的和
         ll l = nums1[0] + nums2[0];
         ll r = nums1[nums1.size() - 1] + nums2[nums2.size() - 1];
@@ -96,7 +96,8 @@ class Solution {
         }
 
         // 然后收集这些数对
-        return findPairs(nums1, nums2, l, k);
+        findPairs(nums1, nums2, l, k, ans);
+        return ans;
     }
 };
 
