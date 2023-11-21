@@ -1,58 +1,86 @@
 #include <iostream>
-#include <queue>
-#include <utility>
 #include <vector>
 using namespace std;
 class Solution {
    public:
-    using P = pair<int, int>;
+    // dfs 函数计算 [i..m] 行的子矩阵中满足 <= s 的数组和的个数
+    //
+    //      +--------+
+    //      |        |
+    //    i +---[x]--+  选择 mat[i][j] = x
+    //      |########|  递归下面的子矩阵
+    //      +--------+
+    //
+    // 思路是: 逐列循环，逐行递归
+    // 就是，逐列地稳住当前行的每个元素，拆解到下一行起点的更小的矩阵上去
+    // s 是针对当前矩阵要满足的阈值, 逐行减少
+    // k 仅用于提前终止递归, 发现大于等于 k 的时候就及时结束
+    // c 是计数, 递归过程中全局维护
+    // 这里有个优化点（不然超时）:
+    // 把 mat 的每一行的元素都看做减去行首元素 mat[i][0]
+    // 并且传入的阈值 s 也减去行首和 s0
+    // 这样做的好处? 降低 s 以快速结束递归?
+    void dfs(const vector<vector<int>>& mat, int i, int s, int k, int& c) {
+        if (s < 0 || c >= k) return;  // 提前结束
 
-    // 计算两个有序数组的前 k 个数对和的数组
-    // 返回的数组的大小是 k
-    // 且要求 k <= size(a) * size(b)
-    vector<int> mergeTwo(const vector<int>& a, const vector<int>& b, int k) {
-        auto cmp = [&](const P& x, const P& y) {
-            return a[x.first] + b[x.second] > a[y.first] + b[y.second];
-        };
-
-        // 小顶堆，维护的是 n 个最小的 a[i] + b[j] 的下标 (i, j)
-        priority_queue<P, vector<P>, decltype(cmp)> q(cmp);
-
-        // a[i], b[0] 入队
-        for (int i = 0; i < a.size(); i++) q.push({i, 0});
-
-        vector<int> ans;
-
-        // 置换 k 次，获取到前 k 个最小的数对的和
-        while (k-- && !q.empty()) {
-            auto [i, j] = q.top();
-            q.pop();
-            ans.push_back(a[i] + b[j]);
-            if (j + 1 < b.size()) q.push({i, j + 1});
+        if (i >= mat.size()) {  // 越过最后一行，进行计数
+            c++;
+            return;
         }
-        return ans;
-    }
-    vector<int> merge(vector<vector<int>>& mat, int k) {
-        int m = mat.size();
-        if (m == 1) return mat[0];
-        if (m == 2) return mergeTwo(mat[0], mat[1], k);
 
-        // 分成上下两半矩阵
-        vector<vector<int>> mat1;
-        int i = 0;
-        for (; i < m / 2; i++) mat1.push_back(mat[i]);
+        for (int j = 0; j < mat[i].size(); j++) {
+            // 当前元素看做减去行首元素的值
+            int x = mat[i][j] - mat[i][0];
 
-        vector<vector<int>> mat2;
-        for (; i < m; i++) mat2.push_back(mat[i]);
+            // 缩小阈值
+            int s1 = s - x;
 
-        // 向上归并
-        return mergeTwo(merge(mat1, k), merge(mat2, k), k);
+            // 行是递增的，如果当前不满足，后面的不必再计算
+            if (s1 < 0) return;
+
+            // 选择 mat[i][j]，缩小阈值，向下递归
+            dfs(mat, i + 1, s1, k, c);
+
+            // dfs 执行后 c 可能发生变化
+            // 同理，如果找到 c>=k 的可能，就及时退出
+            if (c >= k) return;
+        }
     }
 
     int kthSmallest(vector<vector<int>>& mat, int k) {
-        // 采用归并，分治两两合并
-        auto ans = merge(mat, k);
-        return ans.back();
+        int m = mat.size();
+        int n = mat[0].size();
+
+        // 最大的数组和，是最后一列之和
+        // 最小的是第一列之和
+        int l = 0;
+        int r = 0;
+
+        for (int i = 0; i < m; i++) {
+            r += mat[i][n - 1];
+            l += mat[i][0];
+        }
+        int s0 = l;  // 行头和
+
+        sort(mat.begin(), mat.end(), [&](const auto& a, const auto& b) {
+            return a[a.size() - 1] - a[0] > b[b.size() - 1] - b[0];
+        });
+
+        // 值域二分, 二分找满足 dfs(s) >= k 的下界
+        while (l < r) {
+            int s = (l + r) >> 1;
+
+            // 计算不超过 s 的数组和的个数
+            // 传入的是 s-s0, 相当于矩阵整体全部减去行首
+            int c = 0;
+            dfs(mat, 0, s - s0, k, c);
+
+            if (c >= k)
+                r = s;
+            else
+                l = s + 1;
+        }
+        return l;
     }
 };
 

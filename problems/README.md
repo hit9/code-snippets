@@ -76,8 +76,8 @@
 优先级队列/堆
 
 - [中位数](luogu/P1168)  (对顶堆)
-- [序列合并](luogu/P1631) ⭐️⭐️⭐️⭐️ (堆)
-- [升级版序列合并 - 有序矩阵中的第 k 个最小数组和](leetcode/leetcode-1439-find-the-kth-smallest-sum-of-a-matrix-with-sorted-rows) ⭐️⭐️⭐️⭐️⭐️ (堆)
+- [序列合并](luogu/P1631) ⭐️⭐️⭐️⭐️ (堆, topk 系列)
+- [升级版序列合并 - 有序矩阵中的第 k 个最小数组和](leetcode/leetcode-1439-find-the-kth-smallest-sum-of-a-matrix-with-sorted-rows) ⭐️⭐️⭐️⭐️⭐️ (堆, topk 系列, 值域二分)
 
 
 -------
