@@ -23,6 +23,7 @@
 - [leetcode-170 逆序对](leetcode/leetcode-170-shu-zu-zhong-de-ni-xu-dui-lcof)  ⭐️⭐️⭐️  (归并、or 离散化+树状数组)
 - [leetcode-378 有序矩阵中第 K 小的元素](leetcode/leetcode-378-kth-smallest-element-in-a-sorted-matrix)  ⭐️⭐️⭐️  (topk系列、二分判定)
 - [leetcode-719 找出第 K 小的数对距离](leetcode/leetcode-719-find-k-th-smallest-pair-distance)  ⭐️⭐️⭐️  (topk系列、二分判定)
+- [leetcode-410 分割数组的最大值](leetcode/leetcode-410-split-array-largest-sum)  ⭐️⭐️⭐️⭐️    (二分判定模板题)
 
 单调栈/队列:
 
