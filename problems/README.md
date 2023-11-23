@@ -146,3 +146,4 @@
 - [leetcode-307 区域和检索 - 数组可修改](leetcode/leetcode-307-range-sum-query-mutable)  (线段树)
 - [leetcode-159 至多包含两个不同字符的最长子串](leetcode/leetcode-159-longest-substring-with-at-most-two-distinct-characters)
 - [leetcode-2 两数相加](leetcode/leetcode-2-add-two-numbers)  (链表、递归)
+- [leetcode-162 寻找峰值](leetcode/leetcode-162-find-peak-elemen)  (二分)
