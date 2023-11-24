@@ -1,3 +1,5 @@
+// https://writings.sh/post/binary-search#例子寻找两个正序数组的中位数
+
 #include <algorithm>
 #include <iostream>
 #include <vector>
@@ -30,12 +32,9 @@ class Solution {
             L2 = (c2 >= 1 && c2 <= m) ? nums2[c2 - 1] : INT_MIN;
             R2 = (c2 <= m - 1 && c2 >= 0) ? nums2[c2] : INT_MAX;
 
-            if (L1 > R2)
-                r = c1 - 1;
-            else if (L2 > R1)
-                l = c1 + 1;
-            else
-                break;
+            if (L1 > R2) r = c1 - 1;
+            else if (L2 > R1) l = c1 + 1;
+            else break;
         }
 
         // 奇数情况
