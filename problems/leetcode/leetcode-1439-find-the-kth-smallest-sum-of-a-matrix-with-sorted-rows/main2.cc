@@ -39,6 +39,13 @@ class Solution {
         }
     }
 
+    // 计算矩阵中不超过阈值 s 的数组和的个数
+    int count(const vector<vector<int>>& mat, int s, int s0, int k) {
+        int c = 0;
+        dfs(mat, 0, s, s0, k, c);
+        return c;
+    }
+
     int kthSmallest(vector<vector<int>>& mat, int k) {
         int m = mat.size();
         int n = mat[0].size();
@@ -57,12 +64,7 @@ class Solution {
         // 值域二分, 二分找满足 dfs(s) >= k 的下界
         while (l < r) {
             int s = (l + r) >> 1;
-
-            // 计算不超过 s 的数组和的个数
-            int c = 0;
-            dfs(mat, 0, s, s0, k, c);
-
-            if (c >= k)
+            if (count(mat, s, s0, k) >= k)
                 r = s;
             else
                 l = s + 1;
