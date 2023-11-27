@@ -1,3 +1,3 @@
 - [二分判定的思路](main.cc)
 - [行头堆的思路](main1.cc)
-- [归并后驱 topk](main2.cc)
+- [归并后取 topk](main2.cc)
