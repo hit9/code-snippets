@@ -5,7 +5,7 @@ class Solution {
    public:
     // 计算数组 nums 中连续子段和不超过 x 的连续子数组的数目
     // 由于都是正整数，可以通过滑动窗口来实现
-    int countSubArraySumNGT(vector<int>& nums, int x) {
+    int count(vector<int>& nums, int x) {
         int L = 0, R = 0;
         int n = nums.size();
         int sum = 0;
@@ -31,16 +31,16 @@ class Solution {
         // 说明枚举的 X 太小了.
         // 可以用二分的原因在于, 假设正确答案是 Ans, 因为都是正数元素，
         // 对于 >= Ans 的数字 X 而言, 和不超过 X 的子数组数目一定会满足 >=k
-        // 所以，要找到恰好满足 countSubArraySumNGT >=k 的下限的那个 X
-        int L = *min_element(nums.begin(), nums.end());  // 最小的可能的和
-        int R = accumulate(nums.begin(), nums.end(), 0);  // 最大的可能的和
-        while (L < R) {
-            int X = (L + R + 1) >> 1;
-            if (countSubArraySumNGT(nums, X) >= k)
-                R = X;
+        // 所以，要找到恰好满足 count >=k 的左界的那个 X
+        int l = *min_element(nums.begin(), nums.end());  // 最小的可能的和
+        int r = accumulate(nums.begin(), nums.end(), 0);  // 最大的可能的和
+        while (l < r) {
+            int x = (l + r) >> 1;
+            if (count(nums, x) >= k)
+                r = x;
             else
-                L = X + 1;
+                l = x + 1;
         }
-        return L;
+        return l;
     }
 };
