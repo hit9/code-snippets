@@ -61,7 +61,7 @@ class Solution {
         }
         int s0 = l;  // 行头和
 
-        // 值域二分, 二分找满足 dfs(s) >= k 的下界
+        // 值域二分, 二分找满足 count(s) >= k 的下界
         while (l < r) {
             int s = (l + r) >> 1;
             if (count(mat, s, s0, k) >= k)
