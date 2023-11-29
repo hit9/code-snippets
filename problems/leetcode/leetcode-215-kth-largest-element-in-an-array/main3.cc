@@ -17,8 +17,8 @@ class Solution {
         int l = *min_element(nums.begin(), nums.end());
         int r = *max_element(nums.begin(), nums.end());
 
-        // 找 >=x 的元素个数不超过 k 的 x 的最小的 x
-        // 也就是找满足 count(x) >= k 的 x 的左界
+        // 找 >=x 的元素个数不超过 k 的 x 的最大的 x
+        // 也就是找满足 count(x) >= k 的 x 的右界
         while (l < r) {
             int m = (l + r + 1) >> 1;
             if (count(nums, m) < k)
