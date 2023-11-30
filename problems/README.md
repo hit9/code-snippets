@@ -6,7 +6,7 @@
 - [leetcode-128 最长连续序列](leetcode/leetcode-128-longest-consecutive-sequence) ⭐️⭐️⭐️⭐️       (哈希表)
 - [leetcode-5 最长回文子串](leetcode/leetcode-5-longest-palindromic-substring) ⭐️⭐️⭐️⭐️⭐️  (前缀哈希)
 
-分治(减治、归并):
+分治(减治、归并、二分):
 
 - [leetcode-4 寻找两个正序数组的中位数](leetcode/leetcode-4-median-of-two-sorted-arrays) ⭐️⭐️⭐️  (二分)
 - [二维矩阵搜索](matrix-sorted-search) ⭐️⭐️   (二叉搜索树、分治)
@@ -24,6 +24,7 @@
 - [leetcode-378 有序矩阵中第 K 小的元素](leetcode/leetcode-378-kth-smallest-element-in-a-sorted-matrix)  ⭐️⭐️⭐️  (topk系列、二分判定)
 - [leetcode-719 找出第 K 小的数对距离](leetcode/leetcode-719-find-k-th-smallest-pair-distance)  ⭐️⭐️⭐️  (topk系列、二分判定)
 - [leetcode-410 分割数组的最大值](leetcode/leetcode-410-split-array-largest-sum)  ⭐️⭐️⭐️⭐️    (二分判定模板题)
+- [leetcode-2040  两个有序数组的第 K 小乘积](leetcode/leetcode-2040-kth-smallest-product-of-two-sorted-arrays) ⭐️⭐️⭐️⭐️ (二分答案套二分边界、细节卡的很多)
 
 单调栈/队列:
 
