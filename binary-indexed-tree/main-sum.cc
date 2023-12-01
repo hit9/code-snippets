@@ -1,10 +1,10 @@
-// 维护前缀和的树状数组
+// 维护区间和的树状数组
 
 #include <vector>
 
 using namespace std;
 
-// 树状数组，维护区间 [1..n] 的和
+// 树状数组，维护值域 [1..n] 上的区间和
 class BIT {
    private:
     int n;
