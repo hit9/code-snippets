@@ -1,2 +1,3 @@
 - [树状数组-维护区间和](main-sum.cc)
-- [树状数组-维护区间最值](main-max.cc)
+- [树状数组-维护前缀区间最值](main-max.cc)
+- [树状数组-维护区间最值](main-max-interval.cc)

@@ -5,9 +5,11 @@
 using namespace std;
 
 // 树状数组，维护值域 [1..n] 上的区间和
+// 空间大小 n+1
 class BIT {
    private:
     int n;
+    // c[x] 存储 [x-lowbit(x)+1,x] 区间上的和
     vector<int> c;
 
    public:

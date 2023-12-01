@@ -1,13 +1,15 @@
-// 维护区间最大值的树状数组
-//
+// 维护前缀区间最大值的树状数组
+
 #include <vector>
 
 using namespace std;
 
-// 树状数组，维护值域 [1..n] 上的区间最值
+// 树状数组，维护值域 [1..n] 上的最值
+// 空间大小 n+1
 class BIT {
    private:
     int n;
+    // c[x] 存储 [x-lowbit(x)+1,x] 区间上的最值
     vector<int> c;
 
    public:
@@ -17,21 +19,6 @@ class BIT {
     int ask(int x) {
         int ans = 0;
         for (; x; x -= lowbit(x)) ans = std::max(c[x], ans);
-        return ans;
-    }
-    // 查询 [l..r] 区间维护的最大值
-    int ask(int l, int r) {
-        // 注意 c[x] 负责的是 [x-lowbit(x)+1, x] 区间
-        // 从 r 向前枚举, 直到 l
-        int ans = 0;
-        while (r >= l) {
-            ans = std::max(c[r--], ans);
-            // 优化点在于:
-            // 前面还有子节点的情况下，可以直接考虑子节点的值，跳着走
-            // 最后在 l 到 r 没有 r 的子节点的时候, 再退化到依次枚举
-            for (; r - lowbit(r) >= l; r -= lowbit(r))
-                ans = std::max(c[r], ans);
-        }
         return ans;
     }
     // 单点修改
