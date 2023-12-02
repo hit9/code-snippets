@@ -1,6 +1,7 @@
 // https://www.luogu.com.cn/problem/CF10D
 
 #include <iostream>
+#include <utility>
 
 using namespace std;
 
@@ -16,8 +17,8 @@ int m;  // b 的大小
 // dp[i][j] 表示 a[1..i] 和 b[1..j] 上的以 b[j] 结尾的 LCIS 长度
 int dp[N][N] = {0};
 
-// path[i][j] = k 表示 dp[i][j] 的值来自于 dp[i-1][k]
-int path[N][N];
+// path[i][j] 表示 dp[i][j] 的位置
+pair<int, int> path[N][N];
 
 void slove() {
     // 最长 LCIS 长度, 取得答案的方格位置的 i, j 坐标
@@ -35,7 +36,7 @@ void slove() {
             } else {  // a[i] == b[j]
                 dp[i][j] = mx + 1;
                 // 记录由哪个 j 扩充来源
-                path[i][j] = mj;
+                path[i][j] = {i - 1, mj};
             }
 
             // 维护 mx 和 mj
@@ -54,7 +55,8 @@ void slove() {
     while (q > 0) {
         // 只有 j > 0 才是真正的来源
         if (j > 0) c[q--] = b[j];
-        j = path[i][j];
+        auto &tmp = path[i][j];
+        i = tmp.first, j = tmp.second;
     }
     // 反向打印
     for (int k = 1; k <= ans; k++) cout << c[k] << " ";
