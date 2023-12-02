@@ -35,7 +35,7 @@ void slove() {
                 path[i][j] = path[i - 1][j];
             } else {  // a[i] == b[j]
                 dp[i][j] = mx + 1;
-                // 记录由哪个 j 扩充来源
+                // 记录由扩充来源
                 path[i][j] = {i - 1, mj};
             }
 
