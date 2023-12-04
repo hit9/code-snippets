@@ -84,11 +84,18 @@
 - [类似于序列合并, leetcode-373 查找和最小的 K 对数字](leetcode/leetcode-373-find-k-pairs-with-smallest-sums) ⭐️⭐️⭐️  (堆、二分判定、topk 系列)
 - [升级版序列合并 - 有序矩阵中的第 k 个最小数组和](leetcode/leetcode-1439-find-the-kth-smallest-sum-of-a-matrix-with-sorted-rows) ⭐️⭐️⭐️⭐️⭐️ (堆, topk 系列, 值域二分)
 
-树状数组
+树状数组:
 
 - [LIS 问题的树状数组DP优化](leetcode/leetcode-300-longest-increasing-subsequence/main-dp-shift-improve-bit.cc)
 - [LIS 有限上升问题 - 树状数组查询区间最值](leetcode/leetcode-2407-longest-increasing-subsequence-ii/main-bit.cc)
 - [AcWing 244 奶牛身高问题](acwing/244) (树状数组 + 二分答案)
+
+二叉树:
+
+- [leetcode-1038. 从二叉搜索树到更大和树](leetcode/leetcode-1038-binary-search-tree-to-greater-sum-tree)
+- [leetcode-199 二叉树的右视图](leetcode/leetcode-199-binary-tree-right-side-view)      (层序遍历)
+- [leetcode-236 二叉树的最近公共祖先](leetcode/leetcode-236-lowest-common-ancestor-of-a-binary-tree)            (递归)
+- [leetcode-662 二叉树最大宽度](leetcode/leetcode-662-maximum-width-of-binary-tree)⭐️         (层序遍历 + 二叉树索引标号)
 
 -------
 
