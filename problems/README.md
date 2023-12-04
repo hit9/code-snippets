@@ -148,3 +148,4 @@
 - [leetcode-159 至多包含两个不同字符的最长子串](leetcode/leetcode-159-longest-substring-with-at-most-two-distinct-characters)
 - [leetcode-2 两数相加](leetcode/leetcode-2-add-two-numbers)  (链表、递归)
 - [leetcode-162 寻找峰值](leetcode/leetcode-162-find-peak-elemen)  (二分)
+- [leetcode-406 根据身高重建队列](leetcode/leetcode-406-queue-reconstruction-by-height)  (排序、插入排序)
