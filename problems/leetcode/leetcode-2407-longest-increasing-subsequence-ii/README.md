@@ -1,2 +1,3 @@
 - [线段树做法](main.cc)
 - [树状数组做法](main-bit.cc)
+- [CDQ 做法](main-cdq.cc)
