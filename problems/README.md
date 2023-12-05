@@ -161,3 +161,4 @@
 - [leetcode-2 两数相加](leetcode/leetcode-2-add-two-numbers)  (链表、递归)
 - [leetcode-162 寻找峰值](leetcode/leetcode-162-find-peak-elemen)  (二分)
 - [leetcode-406 根据身高重建队列](leetcode/leetcode-406-queue-reconstruction-by-height)  (排序、插入排序)
+- [leetcode-115 不同的子序列](leetcode/leetcode-115-distinct-subsequences)   (dp)
