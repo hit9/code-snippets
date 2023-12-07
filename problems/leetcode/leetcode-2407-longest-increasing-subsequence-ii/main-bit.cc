@@ -22,16 +22,16 @@ class BIT {
     int ask(int l, int r) {
         // 从 r 向前枚举, 直到 l
         int ans = 0;
+
         while (r >= l) {
-            // 当 r 和 l 之间没有 r 的子节点的时候，退化成一个一个枚举
-            // 注意和以前的答案取最值
-            ans = std::max(a[r--], ans);
-            // 注意 c[x] 负责的是 [x-lowbit(x)+1, x] 区间
-            // 当 x-lowbit(x)+1 > l 的时候，可以利用 BIT 树的性质
-            // 直接考虑 [r-lowbit(r)+1, r] 的最值, 而不必一个一个枚举
+            // 注意 c[r] 负责的区间长度是 lowbit(r)
+            // 当 r-lowbit(r)+r > l 的时候，可以跳着走
             for (; r - lowbit(r) + 1 > l; r -= lowbit(r))
                 ans = std::max(c[r], ans);
+            // 当 r 和 l 之间没有 r 的子节点的时候，退化成一个一个枚举
+            ans = std::max(a[r--], ans);
         }
+
         return ans;
     }
     // 单点修改
