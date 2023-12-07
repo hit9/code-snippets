@@ -45,6 +45,13 @@ class Solution {
     int lengthOfLIS(vector<int>& nums, int k) {
         // 树状数组求解 dp
         auto maxn = *max_element(nums.begin(), nums.end());
+        // dp 数组虽然没有写出，但是是理论依据
+        // dp 数组的定义: dp 数组的下标是 nums 的值域 x
+        // dp[x] 的含义是以值 `x` 结尾的能形成的相隔元素差不超过 k 的 LIS 的长度
+        // dp 的递推逻辑是:
+        //     dp[x] = max(dp[x], dp[y] + 1)
+        //     其中 y 在区间 [x-k, x-1] 内，这样才能形成新的符合要求的 LIS
+        //  树状数组 b 维护的是 dp 数组的区间最值
         BIT b(maxn);
         for (int i = 0; i < nums.size(); i++) {
             auto x = nums[i];
