@@ -4,6 +4,7 @@
 
 using namespace std;
 
+namespace bit {
 // 树状数组，维护值域 [1..n] 上的区间和
 // 空间大小 n+1
 class BIT {
@@ -31,3 +32,4 @@ class BIT {
         for (; x <= n; x += lowbit(x)) c[x] += v;
     }
 };
+}  // namespace bit

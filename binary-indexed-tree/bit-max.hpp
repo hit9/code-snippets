@@ -2,20 +2,21 @@
 
 #include <vector>
 
+namespace bit {
 using namespace std;
 
 // 树状数组，维护值域 [1..n] 上的区间最值
 // 空间大小 n+1
-class BIT {
+class BIT1 {
    private:
     int n;
     // c[x] 存储 [x-lowbit(x)+1,x] 区间上的最值
     vector<int> c;
-    // a 可以看做原数组, 也就是值 x 处的答案是 a[x]
+    // a 是原数组, 跟进每个位置的最新值
     vector<int> a;
 
    public:
-    explicit BIT(int n)
+    explicit BIT1(int n)
         : n(n), c(vector<int>(n + 1, 0)), a(vector<int>(n + 1, 0)) {}
 
     int lowbit(int x) { return x & -x; }
@@ -38,7 +39,8 @@ class BIT {
     }
     // 单点修改
     void update(int x, int v) {
-        a[x] = v;  // 并更新答案数组
+        a[x] = v;  // 并更新原数组
         for (; x <= n; x += lowbit(x)) c[x] = max(c[x], v);
     }
 };
+}  // namespace bit
