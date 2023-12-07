@@ -33,7 +33,7 @@ class BIT1 {
             for (; r - lowbit(r) + 1 > l; r -= lowbit(r))
                 ans = std::max(c[r], ans);
             // 当 r 和 l 之间没有 r 的子节点的时候，退化成枚举
-        // 枚举一次，然后继续尝试跳
+            // 枚举一次，然后继续尝试跳
             ans = std::max(a[r--], ans);
         }
 
