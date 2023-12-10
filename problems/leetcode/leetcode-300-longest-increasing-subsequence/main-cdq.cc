@@ -38,7 +38,6 @@ class Solution {
         }
 
         // 恢复秩序
-        sort(a.begin() + start, a.begin() + mid + 1, cmp_index);
         sort(a.begin() + mid + 1, a.begin() + end + 1, cmp_index);
 
         // 分治右边 [mid+1, end]
