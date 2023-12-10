@@ -27,14 +27,14 @@ class Solution {
 
         // 对右边的每个 j, 找到左边值比它小的 i 的最大的 dp 值
         // 因为已经按值有序，所以 i 不必回溯，此部分的总时间复杂度是 n
-        int j = mid + 1;
-        int ma = 0, i = start;
-        while (j <= end) {
-            while (i <= mid && a[i].first < a[j].first) {
-                ma = std::max(ma, dp[a[i++].second]);
+        int i = mid + 1;
+        int ma = 0, j = start;
+        while (i <= end) {
+            while (j <= mid && a[j].first < a[i].first) {
+                ma = std::max(ma, dp[a[j++].second]);
             }
-            dp[a[j].second] = std::max(dp[a[j].second], ma + 1);
-            j++;
+            dp[a[i].second] = std::max(dp[a[i].second], ma + 1);
+            i++;
         }
 
         // 恢复秩序
