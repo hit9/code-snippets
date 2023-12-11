@@ -61,6 +61,7 @@
 - [leetcode-416 分割等和子集](leetcode/leetcode-416-partition-equal-subset-sum) ⭐️⭐️⭐️⭐️⭐️  (动态规划、01背包问题)
 - [leetcode-714 买卖股票的最佳时机含手续费](leetcode/leetcode-714-best-time-to-buy-and-sell-stock-with-transaction-fee) ⭐️⭐️⭐️ (动态规划)
 - [leetcode-1143 最长公共子序列问题](leetcode/leetcode-1143-longest-common-subsequence) ⭐️⭐️⭐️⭐️  (经典线性dp问题)
+- [洛谷 P1775 - 石子合并问题 (基础版)](luogu/P1775) (区间 dp)
 
 
 贪心:
