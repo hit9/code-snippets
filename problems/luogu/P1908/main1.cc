@@ -38,7 +38,7 @@ int discrete(vector<int>& a, int n) {
     return m;
 }
 
-ull slove(vector<int>& a, int n) {
+ull solve(vector<int>& a, int n) {
     // 离散化，最大值目前是 m
     int m = discrete(a, n);
     // 在值域上，假设 b[x] 维护当前值为 x 的元素的数量
@@ -64,6 +64,6 @@ int main(void) {
     for (int i = 1; i <= n; i++) cin >> a[i];
     getchar();
 
-    cout << slove(a, n) << endl;
+    cout << solve(a, n) << endl;
     return 0;
 }

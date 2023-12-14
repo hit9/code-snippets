@@ -6,7 +6,7 @@ using namespace std;
 
 using ull = unsigned long long;
 
-ull slove(const vector<int> &a) {
+ull solve(const vector<int> &a) {
     priority_queue<int> q;
     ull ans = 0;
     for (auto x : a) {
@@ -24,6 +24,6 @@ int main(void) {
     getchar();
     vector<int> a(n);
     for (int i = 0; i < n; i++) cin >> a[i];
-    cout << slove(a) << endl;
+    cout << solve(a) << endl;
     return 0;
 }

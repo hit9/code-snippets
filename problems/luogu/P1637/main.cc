@@ -25,7 +25,7 @@ class BIT {
 const int N = 100009;
 using ull = unsigned long long;
 
-ull slove(vector<int>& a, int n) {
+ull solve(vector<int>& a, int n) {
     // 从左到右记录左侧求 < x 的数量
     BIT p(N);
     vector<int> ap(n + 1);
@@ -60,6 +60,6 @@ int main(void) {
     vector<int> a(n + 1);
     for (int i = 1; i <= n; i++) cin >> a[i];
 
-    cout << slove(a, n) << endl;
+    cout << solve(a, n) << endl;
     return 0;
 }

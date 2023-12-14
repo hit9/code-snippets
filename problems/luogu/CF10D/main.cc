@@ -20,7 +20,7 @@ int dp[N][N] = {0};
 // path[i][j] 表示 dp[i][j] 的位置
 pair<int, int> path[N][N];
 
-void slove() {
+void solve() {
     // 最长 LCIS 长度, 取得答案的方格位置的 i, j 坐标
     int ans = 0, ans_i = 0, ans_j = 0;
 
@@ -76,6 +76,6 @@ int main(void) {
     getchar();
 
     // 输出结果
-    slove();
+    solve();
     return 0;
 }

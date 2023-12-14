@@ -23,7 +23,7 @@ class BIT {
 
 // n 头奶牛, a 是大小为 n+1 的从 2 开始的输入数组
 // ans 是结果数组
-void slove(int n, vector<int>& a, vector<int>& ans) {
+void solve(int n, vector<int>& a, vector<int>& ans) {
     // 一个数组 p = [1,1,1,1,...]
     // b 动态维护其前缀和
     BIT b(n);
@@ -58,7 +58,7 @@ int main(void) {
     for (int i = 2; i <= n; i++) cin >> a[i];
     getchar();
     vector<int> ans(n + 1);
-    slove(n, a, ans);
+    solve(n, a, ans);
     for (int i = 1; i <= n; i++) cout << ans[i] << endl;
     return 0;
 }

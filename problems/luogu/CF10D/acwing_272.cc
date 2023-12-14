@@ -17,7 +17,7 @@ int n;
 // dp[i][j] 表示 a[1..i] 和 b[1..j] 上的以 b[j] 结尾的 LCIS 长度
 int dp[N][N] = {0};
 
-int slove() {
+int solve() {
     int ans = 0;
     for (int i = 1; i <= n; i++) {
         // mx 跟进 dp[i-1][k] (k 属于 0..j) 上的满足 b[k] < a[i]=b[j] 的 dp
@@ -48,7 +48,7 @@ int main(void) {
     getchar();
 
     // 输出结果
-    int q = slove();
+    int q = solve();
     cout << q << endl;
 
     return 0;

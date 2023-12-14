@@ -7,7 +7,7 @@
 
 using namespace std;
 
-int slove(const vector<int> &a, int n) {
+int solve(const vector<int> &a, int n) {
     // 先计算前缀和
     // sum[i] 表示 [1,i] 的前缀和
     vector<int> sum(n + 1, 0);
@@ -42,6 +42,6 @@ int main(void) {
     getchar();
     vector<int> a(n + 1, 0);
     for (int i = 1; i <= n; i++) cin >> a[i];
-    cout << slove(a, n) << endl;
+    cout << solve(a, n) << endl;
     return 0;
 }
