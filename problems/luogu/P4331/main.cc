@@ -21,10 +21,9 @@ void solve(int n) {
     for (int i = 1; i <= n; i++) {
         q.push(A[i]);
         q.push(A[i]);
-        B[i] = q.top();  // 以 opt 结尾的非降数列
+        B[i] = q.top();  // 规模为 i 时的最优结尾
         q.pop();
     }
-    // 向回找出最小的非降 B[i]
     for (int i = n - 1; i; i--) B[i] = min(B[i], B[i + 1]);
     return;
 }
