@@ -17,7 +17,7 @@
 动态规划:
 
 * CF10D LCIS (同 ACWING-272)
-* P2893 分级 (线性 dp、slope trick)
+* P2893 分级 (线性 dp、slope trick), 姊妹题 P4331
 * P1164 背包01
 * P1775 石子合并（弱化版） (区间dp)
 
