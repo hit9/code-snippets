@@ -13,7 +13,7 @@ const int N = 1000000 + 10;
 int a[N];
 // A 是 a[i]-i, 转化为求非降 B
 int A[N];
-// B[i] = opt 的含义是, B 是以 opt 结尾的非降数列
+// B[i] 是构造的非降数组
 int B[N];
 
 void solve(int n) {
@@ -24,6 +24,8 @@ void solve(int n) {
         B[i] = q.top();  // 以 opt 结尾的非降数列
         q.pop();
     }
+    // 向回找出最小的非降 B[i]
+    for (int i = n - 1; i; i--) B[i] = min(B[i], B[i + 1]);
     return;
 }
 
@@ -37,8 +39,6 @@ int main(void) {
 
     solve(n);
 
-    // 向回找出最小的非降 B[i]
-    for (int i = n - 1; i; i--) B[i] = min(B[i], B[i + 1]);
     // 构造回 B[i]+i
     for (int i = 1; i <= n; i++) B[i] += i;
     // 计算答案
