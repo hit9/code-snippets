@@ -25,6 +25,7 @@
 - [leetcode-719 找出第 K 小的数对距离](leetcode/leetcode-719-find-k-th-smallest-pair-distance)  ⭐️⭐️⭐️  (topk系列、二分判定)
 - [leetcode-410 分割数组的最大值](leetcode/leetcode-410-split-array-largest-sum)  ⭐️⭐️⭐️⭐️    (二分判定模板题)
 - [leetcode-2040  两个有序数组的第 K 小乘积](leetcode/leetcode-2040-kth-smallest-product-of-two-sorted-arrays) ⭐️⭐️⭐️⭐️ (二分答案套二分边界、细节卡的很多)
+- [leetcode-1901 寻找峰值 II](leetcode/leetcode-1901-find-a-peak-element-ii)   ⭐️⭐️⭐️  (寻找峰值，有点意思)
 
 单调栈/队列:
 
