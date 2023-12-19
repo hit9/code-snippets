@@ -90,6 +90,7 @@
 - [LIS 问题的树状数组DP优化](leetcode/leetcode-300-longest-increasing-subsequence/main-dp-shift-improve-bit.cc)
 - [LIS 有限上升问题 - 树状数组查询区间最值](leetcode/leetcode-2407-longest-increasing-subsequence-ii/main-bit.cc)
 - [AcWing 244 奶牛身高问题](acwing/244) (树状数组 + 二分答案)
+- [leetcode 315. 计算右侧小于当前元素的个数](leetcode/leetcode-315-count-of-smaller-numbers-after-self) (树状数组、归并排序模板题)
 
 二叉树:
 
