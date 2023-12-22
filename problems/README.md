@@ -5,6 +5,7 @@
 
 - [leetcode-128 最长连续序列](leetcode/leetcode-128-longest-consecutive-sequence) ⭐️⭐️⭐️⭐️       (哈希表)
 - [leetcode-5 最长回文子串](leetcode/leetcode-5-longest-palindromic-substring) ⭐️⭐️⭐️⭐️⭐️  (前缀哈希)
+- [leetcode-560 和为 k 的子数组的个数](leetcode/leetcode-560-subarray-sum-equals-k) ⭐️⭐️⭐️ (哈希表)
 
 分治(减治、归并、二分):
 
