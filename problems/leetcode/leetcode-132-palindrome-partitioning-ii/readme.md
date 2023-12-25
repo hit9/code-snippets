@@ -1,0 +1,2 @@
+- [分割回文串 - O(n^2) dp](main.cc)
+- [分割回文串 - O(nlogn) pam 回文自动机](main1.cc)
