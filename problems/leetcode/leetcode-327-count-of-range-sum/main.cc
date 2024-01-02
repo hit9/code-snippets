@@ -52,19 +52,19 @@ class Solution {
 
         // sum 离散化，用离散化后的数据来代表计数
         // 离散化技巧: 也要把 x+lower 和 x+upper 放进去
-        set<ll> s;
+        set<ll> st;
         for (auto x : sums) {
-            s.insert(x);
-            s.insert(x + lower);
-            s.insert(x + upper);
+            st.insert(x);
+            st.insert(x + lower);
+            st.insert(x + upper);
         }
-        s.insert(0 + lower);
-        s.insert(0 + upper);
+        st.insert(0 + lower);
+        st.insert(0 + upper);
 
         // 离散化前的数据值 => 映射到具体的大小
         // 用树状数组的话，映射到 1 起始的值域
         unordered_map<ll, int> mp;
-        for (auto x : s) mp[x] = mp.size() + 1;
+        for (auto x : st) mp[x] = mp.size() + 1;
 
         BIT b(mp.size() + 1);
 
