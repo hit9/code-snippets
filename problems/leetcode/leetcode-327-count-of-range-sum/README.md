@@ -1,3 +1,4 @@
 - [树状数组做法](main.cc)
 - [CDQ 分治做法](main1.cc)
 - [归并分治做法](main2.cc)
+- [fhq 平衡树做法](main3.cc)
