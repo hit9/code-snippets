@@ -90,8 +90,8 @@ class Solution {
         for (int i = n - 1; i >= 0; i--) {
             tr.insert(sums[i]);
 
-            ll k = (i == 0 ? 0 : sums[i - 1]);
-            ll l = lower + k, r = upper + k;
+            ll x = (i == 0 ? 0 : sums[i - 1]);
+            ll l = lower + x, r = upper + x;
 
             // 求 [l, r] 内的计数
             // 转化为 <=r 的个数 - <=l-1 的个数
