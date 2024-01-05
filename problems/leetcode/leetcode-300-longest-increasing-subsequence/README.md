@@ -1,6 +1,7 @@
 - [最长递增子序列 - 求长度 nlog(n)](main-bs.cc)
 - [最长递增子序列 - 返回一个最长的递增子序列 nlog(n)](main-bs-find-one-longest-sequence.cc)
-- [最长递增子序列 - 找出最长的递增子序列的个数 nlog(n)](main-bs-find-number-of-longest-sequence.cc)
+- [最长递增子序列 - 找出最长的递增子序列的个数 nlog(n) - 分层 DAG 模型](main-bs-find-number-of-longest-sequence.cc)
+- [最长递增子序列 - 找出最长的递增子序列的个数 nlog(n) - 树状数组解法](main-number-of-longest-increasing-subsequence-bit.cc)
 - [最长递增子序列 - 求解非严格的最长递增子序列的长度](main-non-strict.cc)
 - [树状数组优化dp转移](main-dp-shift-improve-bit.cc)
 - [CDQ 分治解法 n(logn)2](main-cdq.cc)
