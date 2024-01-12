@@ -113,11 +113,30 @@ class FHQ {
         return ans;
     }
 
+    // 从子树 p 找第 k 大
     int topk(int p, int k) {
         int lsz = tr[tr[p].l].size;
         if (k == lsz + 1) return tr[p].val;
         if (k <= lsz) return topk(tr[p].l, k);
         return topk(tr[p].r, k - lsz - 1);
+    }
+
+    // 前驱, 严格 <v 的值
+    int get_pre(int v) {
+        int x, y;
+        split(root, v - 1, x, y);
+        int ans = topk(x, tr[x].size);
+        root = merge(x, y);
+        return ans;
+    }
+
+    // 后继, 严格 > v 的值
+    int get_suc(int v) {
+        int x, y;
+        split(root, v, x, y);
+        int ans = topk(y, 1);
+        root = merge(x, y);
+        return ans;
     }
 };
 
