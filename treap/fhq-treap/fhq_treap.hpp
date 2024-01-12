@@ -112,6 +112,13 @@ class FHQ {
         root = merge(x, y);
         return ans;
     }
+
+    int topk(int p, int k) {
+        int lsz = tr[tr[p].l].size;
+        if (k == lsz + 1) return tr[p].val;
+        if (k <= lsz) return topk(tr[p].l, k);
+        return topk(tr[p].r, k - lsz - 1);
+    }
 };
 
 }  // namespace fhq
