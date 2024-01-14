@@ -113,7 +113,7 @@ class FHQ {
         return ans;
     }
 
-    // 从子树 p 找第 k 大
+    // 从子树 p 找第 k 小
     int topk(int p, int k) {
         int lsz = tr[tr[p].l].size;
         if (k == lsz + 1) return tr[p].val;
