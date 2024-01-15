@@ -92,15 +92,6 @@ struct fhq {
         root = merge(merge(x, y), z);
     }
 
-    // 返回 <= v 的节点个数
-    int leqthan(int v) {
-        int x, y;
-        split(root, v, x, y);
-        int ans = tr[x].size;
-        merge(x, y);
-        return ans;
-    }
-
     // 查找排名, 满足 < v 的个数+1
     int rank(int v) {
         int x, y;
