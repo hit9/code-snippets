@@ -127,7 +127,7 @@ void pushdown(int p) {
     if (rs) do_cover(rs);
 }
 
-// 按 size 分割, 使得分裂后 x.size <= k, y.size > k
+// 按位置分裂，左边的树位置 [1,k]
 void split(int p, int k, int &x, int &y) {
     if (!p) {
         x = y = 0;
