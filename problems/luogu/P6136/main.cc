@@ -135,46 +135,47 @@ struct fhq {
 };
 
 int main(void) {
-    int n, m;
-    scanf("%d%d", &n, &m);
-    // 初始化
-    fhq t;
-    int val;
-    for (int i = 0; i < n; i++) {
-        scanf("%d", &val);
-        t.insert(val);
-    }
-    // 操作
-    int last = 0, ans = 0;
-    while (m--) {
-        int opt, x;
-        scanf("%d%d", &opt, &x);
-        x ^= last;
-        switch (opt) {
-            case 1:
-                t.insert(x);
-                break;
-            case 2:
-                t.del(x);
-                break;
-            case 3:
-                last = t.rank(x);
-                ans ^= last;
-                break;
-            case 4:
-                last = t.topk(t.root, x);
-                ans ^= last;
-                break;
-            case 5:
-                last = t.get_pre(x);
-                ans ^= last;
-                break;
-            case 6:
-                last = t.get_suc(x);
-                ans ^= last;
-                break;
-        }
-    }
-    printf("%d\n", ans);
+    printf("%ul\n", sizeof(t.tr));
+//    int n, m;
+//    scanf("%d%d", &n, &m);
+//    // 初始化
+//    fhq t;
+//    int val;
+//    for (int i = 0; i < n; i++) {
+//        scanf("%d", &val);
+//        t.insert(val);
+//    }
+//    // 操作
+//    int last = 0, ans = 0;
+//    while (m--) {
+//        int opt, x;
+//        scanf("%d%d", &opt, &x);
+//        x ^= last;
+//        switch (opt) {
+//            case 1:
+//                t.insert(x);
+//                break;
+//            case 2:
+//                t.del(x);
+//                break;
+//            case 3:
+//                last = t.rank(x);
+//                ans ^= last;
+//                break;
+//            case 4:
+//                last = t.topk(t.root, x);
+//                ans ^= last;
+//                break;
+//            case 5:
+//                last = t.get_pre(x);
+//                ans ^= last;
+//                break;
+//            case 6:
+//                last = t.get_suc(x);
+//                ans ^= last;
+//                break;
+//        }
+//    }
+//    printf("%d\n", ans);
     return 0;
 }
