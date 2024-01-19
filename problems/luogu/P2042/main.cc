@@ -114,7 +114,7 @@ void pushdown(int p) {
 
     // 区间翻转
     do_reverse(p);
-    // 向下标记, 多执行异性
+    // 向下标记, 多执行一层
     if (ls) do_reverse(ls);
     if (rs) do_reverse(rs);
 
@@ -178,6 +178,14 @@ void insert(int k, int tot) {
     split(root, k, x, y);
     int z = build(1, tot);
     root = merge(merge(x, z), y);
+}
+
+// 朴素做法，TEL
+void insert1(int k, int tot) {
+    int x, y;
+    split(root, k, x, y);
+    for (int i = 1; i <= tot; i++) x = merge(x, newnode(to_inserts[i]));
+    root = merge(x, y);
 }
 
 // 从第 k 个开始, 切出子树 x, y, z
