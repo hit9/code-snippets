@@ -37,6 +37,7 @@
 - [leetcode-862 和至少为 K 的最短子数组](leetcode/leetcode-862-shortest-subarray-with-sum-at-least-k) ⭐️⭐️⭐️⭐️      (单调队列)
 - [leetcode-962 最大宽度坡](leetcode/leetcode-962-maximum-width-ramp) ⭐️⭐️⭐️⭐️⭐️        (单调栈)
 - [leetcode-907 子数组的最小值之和](leetcode/leetcode-907-sum-of-subarray-minimums)  ⭐️⭐️⭐️⭐️⭐️  (单调栈)
+- [leetcode-1944 队列中可以看到的人数](leetcode/leetcode-1944-number-of-visible-people-in-a-queue) ⭐️⭐️⭐️ (单调栈)
 
 滑窗:
 
