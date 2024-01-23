@@ -211,7 +211,7 @@ vector<vector<int>> LevelOrder(Node* root) {
             if (node->left != nullptr) q.push(node->left);
             if (node->right != nullptr) q.push(node->right);
         }
-        ans.push_back({});
+        if (!q.empty()) ans.push_back({});
     }
     return ans;
 }
