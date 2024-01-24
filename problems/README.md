@@ -44,11 +44,12 @@
 - [leetcode-209 长度最小的子数组](leetcode/leetcode-209-minimum-size-subarray-sum) ⭐️⭐️      (滑动窗口, 双指针)
 
 
-回溯:
+搜索&回溯:
 
 - [leetcode-46 全排列](leetcode/leetcode-46-permutations) ⭐️⭐️    (回溯)
 - [leetcode-78 子集](leetcode/leetcode-78-subsets)        (回溯)
 - [leetcode-79 单词搜索](leetcode/leetcode-79-word-search)   (回溯)
+- [leetcode-2059 转化数字的最小运算数](leetcode/leetcode-2059-minimum-operations-to-convert-number) (双向 BFS)
 
 并查集:
 
@@ -110,6 +111,8 @@
 中位数：
 
 - [leetcode-462 最小操作次数使数组元素相等 II](leetcode/leetcode-462-minimum-moves-to-equal-array-elements-ii)  (中位数的性质)
+
+
 
 -------
 
