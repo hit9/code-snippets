@@ -19,11 +19,10 @@ class Solution {
 
         int steps = 0;
 
-        while (!q1.empty() || !q2.empty()) {
-            // 确保 q1 是非空 或者 更小的队列
-            if (q1.empty() || (q1.size() > q2.size() && !q2.empty()))
-                swap(q1, q2), swap(st1, st2);
-
+        // 两个队列任一个空时, 就是没找到
+        while (!q1.empty() && !q2.empty()) {
+            // 确保 q1 更小的队列
+            if (q1.size() > q2.size()) swap(q1, q2), swap(st1, st2);
             // 每一次扩展小的队列
             steps++;
             if (extend(q1, nums, st1, st2)) return steps;
@@ -58,7 +57,7 @@ class Solution {
         return false;
     }
 
-    void pushq(queue<int>& q, int z, unordered_set<int>& st) {
+    inline void pushq(queue<int>& q, int z, unordered_set<int>& st) {
         if (st.find(z) != st.end()) return;  // 去重
         st.insert(z);
         q.push(z);
