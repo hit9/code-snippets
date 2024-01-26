@@ -13,12 +13,14 @@
 using namespace std;
 
 // 一个很好的例子是: 11,9,81,84,43,90,3,8
+
+using ll = unsigned long long;
 class Solution {
    public:
     int sumSubarrayMins(vector<int>& arr) {
         int mod = 1000000007;
         int n = arr.size();
-        unsigned long long ans = 0;
+        ll ans = 0;
         stack<int> s;  // 栈中是下标，单调递增栈
 
         auto reduce = [&](int i) {
@@ -31,8 +33,7 @@ class Solution {
             int h = s.empty() ? (j + 1) : (j - s.top());
 
             // 加上这个元素积累的总和
-            ans += static_cast<decltype(ans)>(w * h) *
-                   static_cast<decltype(ans)>(arr[j]);
+            ans += (ll)(w * h) * (ll)arr[j];
         };
 
         for (int i = 0; i < n; i++) {
