@@ -24,7 +24,7 @@ class Solution {
 
         stack<int> s;
         s.push(0);
-        for (int i = 0; i < nums.size(); i++)
+        for (int i = 1; i < nums.size(); i++)
             if (nums[s.top()] > nums[i]) s.push(i);
 
         // 然后就可以从右向左遍历这个数组
