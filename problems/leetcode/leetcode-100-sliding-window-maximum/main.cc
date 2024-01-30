@@ -24,38 +24,19 @@ using namespace std;
 class Solution {
    public:
     vector<int> maxSlidingWindow(vector<int>& nums, int k) {
-        vector<int> results;
+        vector<int> ans;
+        deque<int> q;  // 单调递减队列，存储元素下标
 
-        // q 单调队列：有一个性质:
-        // 队列中前面的比后面的大, 比如 [3, 2, 1] 是合法的, [1,2,3] 就不行要,
-        // 简化为 [3]
-        deque<int> q;
-
-        // 第一个窗口 [0, k-1] 的先入队
-        for (int i = 0; i < k; i++) {
-            while (!q.empty() && nums[i] > q.back()) q.pop_back();
-            q.push_back(nums[i]);
+        for (int i = 0; i < nums.size(); i++) {
+            // 维护队尾
+            while (!q.empty() && nums[q.back()] < nums[i]) q.pop_back();
+            q.push_back(i);
+            // 维护队头
+            while (!q.empty() && q.front() + k <= i) q.pop_front();
+            // 取队头为最大值
+            if (i >= k - 1) ans.push_back(nums[q.front()]);
         }
 
-        // 添加第一个结果
-        results.push_back(q.front());
-
-        // 窗口移动过程中, 右侧不断入队, 左侧如果等于队头，则出队
-        for (int i = 1; i + k <= nums.size(); i++) {
-            // 入队 a, 出队 b
-            int a = nums[i + k - 1];
-            int b = nums[i - 1];
-
-            // 注意一点, 只有队尾严格小于要入队的元素时，才会被弹出
-            // 也就是说，对于重复元素，会在队列中有多份存在
-            // 这样，队头弹出时也可以放心弹出，不会影响弹出后的最大值
-            if (!q.empty() && q.front() == b) q.pop_front();
-            while (!q.empty() && a > q.back()) q.pop_back();
-            q.push_back(a);
-
-            results.push_back(q.front());
-        }
-
-        return results;
+        return ans;
     }
 };
