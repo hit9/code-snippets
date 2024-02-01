@@ -5,11 +5,12 @@ using namespace std;
 // 多重背包
 
 const int N = 10005;
+const int M = 10005;
 
 int v[N], w[N], c[N];  // 物品体积、价值、每种物品的个数
 int n, m;              // 物品种数、背包体积
 
-int f[N];  // 背包放入总体积为 j 的物品的最大价值 f[j]
+int f[M];  // 背包放入总体积为 j 的物品的最大价值 f[j]
 
 int solve() {
     memset(f, 0xcf, sizeof f);
