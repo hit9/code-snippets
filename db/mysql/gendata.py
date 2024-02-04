@@ -20,6 +20,7 @@ logger = logging.getLogger(__name__)
 conn = MySQLdb.connect(
     host="127.0.0.1",
     user="root",
+    port=3306,
     password="test",
     database="testdb",
     charset="utf8mb4",
@@ -86,8 +87,8 @@ def gen_data_table_t2(n: int, step: int = 1000) -> None:
 
 
 def gen() -> None:
-    gen_data_table_t1(3000000, step=10000)
-    gen_data_table_t2(3000000, step=10000)
+    gen_data_table_t1(1000000, step=10000)
+    gen_data_table_t2(1000000, step=10000)
 
 
 def main():

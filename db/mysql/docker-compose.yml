@@ -5,3 +5,9 @@ services:
       - "3306:3306"
     environment:
       MYSQL_ROOT_PASSWORD: "test"
+  mysql57:
+    image: mysql:5.7
+    ports:
+      - "3307:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: "test"
