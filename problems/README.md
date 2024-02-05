@@ -71,6 +71,7 @@
 - [leetcode 132. 分割回文串](leetcode/leetcode-132-palindrome-partitioning-ii) ⭐️⭐️⭐️ (动态规划)
 - [leetcode 1425 带限制的子序列和](leetcode/leetcode-1425-constrained-subsequence-sum) (动态规划、单调队列优化转移)
 - [leetcode 174. 地下城游戏](leetcode/leetcode-174-dungeon-game) ⭐️⭐️⭐️⭐️⭐️ (反向dp)
+- [leetcode 494. 目标和](leetcode/leetcode-494-target-sum) (01 背包)
 
 
 贪心:
