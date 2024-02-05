@@ -38,6 +38,7 @@
 - [leetcode-962 最大宽度坡](leetcode/leetcode-962-maximum-width-ramp) ⭐️⭐️⭐️⭐️⭐️        (单调栈)
 - [leetcode-907 子数组的最小值之和](leetcode/leetcode-907-sum-of-subarray-minimums)  ⭐️⭐️⭐️⭐️⭐️  (单调栈)
 - [leetcode-1944 队列中可以看到的人数](leetcode/leetcode-1944-number-of-visible-people-in-a-queue) ⭐️⭐️⭐️ (单调栈)
+- [leetcode-1696 跳跃游戏 VI](leetcode/leetcode-1696-jump-game-vi)  (单调队列)
 
 滑窗:
 
