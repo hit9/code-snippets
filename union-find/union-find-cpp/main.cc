@@ -37,8 +37,7 @@ class UnionFind {
         // rootb = Find(b)
         // pa[a] = b
         // 但是为了防止合并后的树不平衡，所以优化点: 选择把更小的树放入更大的树
-        a = Find(a);
-        b = Find(b);
+        a = Find(a), b = Find(b);
         // 无需合并，已经在一根树上
         if (a == b) return;
         if (sizes[a] > sizes[b]) {
