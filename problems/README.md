@@ -43,6 +43,7 @@
 滑窗:
 
 - [leetcode-209 长度最小的子数组](leetcode/leetcode-209-minimum-size-subarray-sum) ⭐️⭐️      (滑动窗口, 双指针)
+- [leetcode-1838 最高频元素的频数](leetcode/leetcode-1838-frequency-of-the-most-frequent-element)  ⭐️⭐️⭐️⭐️⭐️ （滑动窗口好题）
 
 
 搜索&回溯:
