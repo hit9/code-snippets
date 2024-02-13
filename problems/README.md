@@ -45,6 +45,7 @@
 - [leetcode-209 长度最小的子数组](leetcode/leetcode-209-minimum-size-subarray-sum) ⭐️⭐️      (滑动窗口, 双指针)
 - [leetcode-1838 最高频元素的频数](leetcode/leetcode-1838-frequency-of-the-most-frequent-element)  ⭐️⭐️⭐️⭐️⭐️ （滑动窗口好题）
 - [leetcode-992 K 个不同整数的子数组](leetcode/leetcode-992-subarrays-with-k-different-integers)    ⭐️⭐️⭐️⭐️⭐️ （双滑动窗口好题）
+- [leetcode-2831 找出最长等值子数组](leetcode/leetcode-2831-find-the-longest-equal-subarray) ⭐️⭐️⭐️⭐️⭐️ （滑动窗口,代码极短,侮辱性极强）
 
 
 搜索&回溯:
