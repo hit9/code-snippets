@@ -9,7 +9,7 @@ class Solution {
    public:
     int longestEqualSubarray(vector<int>& a, int k) {
         unordered_map<int, int> d;
-        int ans = 0;  // ans 是历史最高频元素的频次
+        int ans = 0;  // ans 是历史满足 之间不同元素个数不超过 k 的最高频元素的频次
         for (int L = 0, R = 0; R < a.size(); R++) {
             ans = max(ans, ++d[a[R]]);
             // 窗口的大小至少为 ans+k
