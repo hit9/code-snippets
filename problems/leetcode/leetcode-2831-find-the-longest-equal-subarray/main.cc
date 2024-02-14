@@ -14,7 +14,7 @@ class Solution {
             ans = max(ans, ++d[a[R]]);
             // 窗口的大小至少为 ans+k
             // 后续遇到更高频的, 窗口才会扩张
-            while (ans + k < R - L + 1) {
+            while (L < R && ans + k < R - L + 1) {
                 d[a[L++]]--;
             }
         }
