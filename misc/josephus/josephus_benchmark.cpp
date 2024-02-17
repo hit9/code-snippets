@@ -27,7 +27,7 @@ int josephus3(int n, int k, ll q) {
     return q;
 }
 
-TEST_CASE("Josephus benchmark", "[small k]") {
+TEST_CASE("Josephus benchmark small k", "[small k]") {
     int k = std::rand() % 63;
     int n = std::rand() % 10000 + 1000000;
     BENCHMARK("josephus1") { return josephus1(n, k); };
@@ -35,7 +35,7 @@ TEST_CASE("Josephus benchmark", "[small k]") {
     BENCHMARK("josephus3") { return josephus3(n, k, n - 1); };
 }
 
-TEST_CASE("Josephus benchmark", "[large k]") {
+TEST_CASE("Josephus benchmark large k", "[large k]") {
     int n = std::rand() % 10000 + 1000000;
     int k = (std::rand() % 5 + 1) * n + std::rand() % 100000;
     BENCHMARK("josephus1") { return josephus1(n, k); };
