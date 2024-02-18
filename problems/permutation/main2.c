@@ -20,12 +20,12 @@ void Permute(char s[], int start, int end) {
 
     for (int i = start; i <= end; i++) {
         if (m[s[i]]) continue;
+        m[s[i]] = true;
 
         Swap(s, start, i);
         Permute(s, start + 1, end);
         Swap(s, start, i);
 
-        m[s[i]] = true;
     }
 }
 

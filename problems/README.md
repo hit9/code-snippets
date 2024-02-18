@@ -51,6 +51,7 @@
 搜索&回溯:
 
 - [leetcode-46 全排列](leetcode/leetcode-46-permutations) ⭐️⭐️    (回溯)
+- [leetcode-47 全排列 II (不可重复)](leetcode/leetcode-47-permutations-ii) ⭐️⭐️    (回溯)
 - [leetcode-78 子集](leetcode/leetcode-78-subsets)        (回溯)
 - [leetcode-79 单词搜索](leetcode/leetcode-79-word-search)   (回溯)
 - [leetcode-2059 转化数字的最小运算数](leetcode/leetcode-2059-minimum-operations-to-convert-number) (双向 BFS)
