@@ -1,0 +1,1 @@
+- [933A. A Twisty Movement](https://codeforces.com/contest/933/problem/A)
