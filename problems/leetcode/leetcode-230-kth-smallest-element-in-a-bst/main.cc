@@ -23,6 +23,6 @@ class Solution {
         } else if (leftSize + 1 > k) {
             return kthSmallest(root->left, k);
         }
-        return kthSmallest(root->right, k - leftSize-1);
+        return kthSmallest(root->right, k - leftSize - 1);
     }
 };
