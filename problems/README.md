@@ -188,3 +188,4 @@
 - [leetcode-189 轮转数组](leetcode/leetcode-189-rotate-array) (数组)   ⭐️⭐️
 - [leetcode-48 旋转矩阵](leetcode/leetcode-48-rotate-image) (矩阵转置)   ⭐️⭐️⭐️
 - [leetcode-633 平方数之和](leetcode/leetcode-633-sum-of-square-numbers) （数学） ⭐️
+- [leetcode-204 计数质数](leetcode/leetcode-204-count-primes) （数学、标准的素数筛）
