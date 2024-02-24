@@ -185,3 +185,5 @@
 - [leetcode-162 寻找峰值](leetcode/leetcode-162-find-peak-elemen)  (二分)
 - [leetcode-406 根据身高重建队列](leetcode/leetcode-406-queue-reconstruction-by-height)  (排序、插入排序)
 - [leetcode-115 不同的子序列](leetcode/leetcode-115-distinct-subsequences)   (dp)
+- [leetcode-189 轮转数组](leetcode/leetcode-189-rotate-array) (数组)   ⭐️⭐️
+- [leetcode-48 旋转矩阵](leetcode/leetcode-48-rotate-image) (矩阵转置)   ⭐️⭐️⭐️
