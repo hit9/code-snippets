@@ -22,7 +22,7 @@ class Solution {
         memset(f, 0x3f, sizeof f);
         f[0] = 0;
 
-        for (int i = 1; i <= k; i++) {
+        for (int i = 1; i < k; i++) {
             for (int j = v[i]; j <= m; j++) {
                 f[j] = min(f[j], f[j - v[i]] + 1);
             }
