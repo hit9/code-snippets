@@ -187,3 +187,4 @@
 - [leetcode-115 不同的子序列](leetcode/leetcode-115-distinct-subsequences)   (dp)
 - [leetcode-189 轮转数组](leetcode/leetcode-189-rotate-array) (数组)   ⭐️⭐️
 - [leetcode-48 旋转矩阵](leetcode/leetcode-48-rotate-image) (矩阵转置)   ⭐️⭐️⭐️
+- [leetcode-633 平方数之和](leetcode/leetcode-633-sum-of-square-numbers) （数学） ⭐️
