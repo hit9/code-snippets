@@ -1,12 +1,13 @@
 #include <vector>
 using namespace std;
+// 负数部分原地反转，然后和非负部分归并一下，O(n)
 class Solution {
    public:
     vector<int> sortedSquares(vector<int>& nums) {
         int n = nums.size();
         // 找到第一个非负的下标 k
         int k = 0;
-        while (k  < n && nums[k] < 0 ) k++;
+        while (k < n && nums[k] < 0) k++;
         // 翻转 [0..k]
         reverse(nums.begin(), nums.begin() + k);
         // 归并 nums[0..k) 和 nums[k..n)
