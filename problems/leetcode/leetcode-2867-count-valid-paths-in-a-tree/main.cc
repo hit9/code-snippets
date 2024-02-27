@@ -39,7 +39,7 @@ class Solution {
         up(1);
 
         // 前序计算
-        fill(visit.begin(), visit.end(), false); // 复用下 visit 数组
+        fill(visit.begin(), visit.end(), false);  // 复用下 visit 数组
         function<void(int)> down = [&](int i) {
             visit[i] = true;
             for (auto j : ed[i]) {
