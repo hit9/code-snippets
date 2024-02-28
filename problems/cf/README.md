@@ -1,1 +1,2 @@
 - [933A. A Twisty Movement](https://codeforces.com/contest/933/problem/A)
+- [1324F. F. Maximum White Subtree](https://codeforces.com/problemset/problem/1324/F)
