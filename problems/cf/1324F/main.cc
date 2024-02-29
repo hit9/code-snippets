@@ -8,10 +8,10 @@ using namespace std;
 const int N = 2 * 1e5 + 5;
 
 int f[N];
-int n;
-vector<vector<int>> edges;
-int ver[N];
-bool vis[N];
+int n;                      // 节点数
+vector<vector<int>> edges;  // 边 [x] => [y,z,...]
+int ver[N];                 // 节点权值，1 表示白色，-1 表示黑色
+bool vis[N];                // 访问数组
 
 void solve() {
     memset(f, 0, sizeof f);
