@@ -63,7 +63,7 @@ int solve() {
     }
 
     if (cnt != n) return 1;  // 矛盾
-    if (flag) return 2; // 条件不足
+    if (flag) return 2;      // 条件不足
     return 0;                // 成功
 }
 
