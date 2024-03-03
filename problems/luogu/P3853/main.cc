@@ -27,12 +27,12 @@ int solve() {
 
     // 二分答案, 求满足 count(x) <= k 的左界
     // 转化为 check 不降函数求 check(x) >= L - k 的左界
-    auto check = [&](int x) { return L - count(x); };
+    auto f = [&](int x) { return L - count(x); };
 
     int l = 1, r = L;
     while (l < r) {
         int m = (l + r) >> 1;
-        if (check(m) >= L - k)
+        if (f(m) >= L - k)
             r = m;
         else
             l = m + 1;
