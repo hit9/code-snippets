@@ -32,7 +32,8 @@ class Solution {
             if (vis[x]) continue;
             vis[x] = true;
             for (const auto& p : edges[x]) {
-                ll w = p.first; int y = p.second;
+                ll w = p.first;
+                int y = p.second;
                 // 经过 x 到达 y
                 if (f[y] > f[x] + w) {
                     // 最短路得到更新, 重置为 g[x]
