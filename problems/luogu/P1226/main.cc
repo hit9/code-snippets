@@ -11,7 +11,7 @@ int fastpowermod(int a, int b, int p) {
             remain--;
         } else {
             // 偶数
-            remain = remain / 2;                      // 剩余指数拆半
+            remain >>=1;                      // 剩余指数拆半
             factor = (long long)factor * factor % p;  // 因子自乘翻倍
         }
     }
