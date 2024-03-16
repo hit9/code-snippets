@@ -13,8 +13,6 @@ class Solution {
     int findMaxForm(vector<string>& strs, int m1, int m2) {
         // 预处理体积数组, 分别是 0 和 1 的
         int v1[N], v2[N];
-        memset(v1, 0, sizeof v1);
-        memset(v2, 0, sizeof v2);
 
         for (int i = 0; i < strs.size(); i++) {
             auto& s = strs[i];
