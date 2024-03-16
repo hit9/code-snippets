@@ -1,5 +1,6 @@
-// P2014 拓扑排序逆序 dp 的思路
+// 拓扑序版本
 
+#include <algorithm>
 #include <cstdio>
 #include <cstring>
 #include <queue>
@@ -7,26 +8,26 @@
 
 using namespace std;
 
-const int N = 302;
-const int M = 301;
+const int N = 101;
+const int M = 101;
 
 int n, m;  // 物品数量, 背包体积
+int root;  // 根编号
+
+// f[x][j] 表示只考虑子树 x 的子问题时选取总体积 j 的最大价值
+int f[N][M];
 
 // 父节点到子节点的边 edges[father] = {children..}
 vector<int> edges[N];
 
-// 价值数组, 即学分
-int w[N];
+// 体积, 价值数组
+int v[N], w[N];
 
 // 节点的拓扑序
 int seq[N];
 
 // 节点入度
 int deg[N];
-
-// 拓扑序倒序加入物品
-// f[x][j] 表示放入物品 x 时选取总体积 j 的最大价值
-int f[N][M];
 
 // 计算拓扑序到 seq 数组
 void topo() {
@@ -48,43 +49,36 @@ void topo() {
 
 int solve() {
     topo();
-    // 以物品划分阶段, 先考虑依赖的最底层
-    // 倒序考虑加入每个物品 x
-    // 选择 x 的前提下, 可以进一步选择依赖它的 y, 也可以不选择
-    // 所以 x 要并入 y 的贡献, 所以要倒序
     for (int i = n; i >= 0; i--) {
         int x = seq[i];
-        // 初始化
-        f[x][0] = 0;
-        for (int j = 1; j <= m; j++) f[x][j] = w[x];  // 至少选择 x
+        for (int j = v[x]; j <= m; j++) f[x][j] = w[x];  // 至少选择 x
         // 考虑继续选择一个 y 的新增贡献
         for (auto y : edges[x]) {
             // 考虑每个背包体积, 至少为 v[x]
-            for (int j = m; j >= 1; j--) {
+            for (int j = m; j >= v[x]; j--) {
                 // 枚举分配给 y 的体积 k, 分配给其余的y和x 的即是 j-k
-                for (int k = 0; k <= j - 1; k++) {
+                for (int k = 0; k <= j - v[x]; k++) {
                     f[x][j] = max(f[x][j], f[y][k] + f[x][j - k]);
                 }
             }
         }
     }
 
-    return f[0][m];
+    return f[root][m];
 }
 
 int main(void) {
     scanf("%d%d", &n, &m);
-    // 虚拟0号节点,学分是 0
-    w[0] = 0;
-    // 0 号是必选所以
-    m++;
-    int k = n, y = 1;
+
+    int k = n, i = 1;
     while (k--) {
-        int x;  // x 是 y 的先修
-        scanf("%d%d", &x, &w[y]);
-        // x = 0 时表示没有先修, 也就是 0 号作为先修
-        edges[x].push_back(y);
-        y++;
+        int p;  // 父节点
+        scanf("%d%d%d", &v[i], &w[i], &p);
+        if (p == -1)
+            root = i;  // 根编号
+        else
+            edges[p].push_back(i);
+        i++;
     }
 
     printf("%d\n", solve());
