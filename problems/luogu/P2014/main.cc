@@ -44,7 +44,6 @@ void dfs(int x) {
 
     // 不选择 x 的情况
     f[x][0] = 0;
-
 }
 
 int solve() {
