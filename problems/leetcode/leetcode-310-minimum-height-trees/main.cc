@@ -1,8 +1,13 @@
 #include <algorithm>
 #include <functional>
+#include <iostream>
+#include <thread>
 #include <utility>
 #include <vector>
 using namespace std;
+
+// 双 dp 换根
+
 class Solution {
    public:
     vector<int> findMinHeightTrees(int n, vector<vector<int>>& edges) {
@@ -14,79 +19,82 @@ class Solution {
         }
 
         // f(x) 表示以 0 为根的时候的子树 x 的高
-        vector<int> f(n, 0);
+        // g(x) 表示以 0 为根的时候的子树 x 的次高
+        // 如果有两个最高，次高就是最高
+        vector<int> f(n, 0), g(n, 0);
+
         vector<bool> vis(n, false);
 
-        // 假定一个根，先处理一次, 后序树形 dp
+        // 假定一个根 0 ，计算每个子树的高度
         function<void(int)> up = [&](int x) {
             vis[x] = true;
             for (auto y : ed[x]) {
                 if (vis[y]) continue;
                 up(y);  // 先处理子树 y
-                f[x] = max(f[x], f[y] + 1);
+                if (f[x] <= f[y] + 1) {
+                    // 非第一次取最高，则提前记录次高
+                    if (f[x] != 0) g[x] = f[x];
+                    f[x] = f[y] + 1;
+                }
             }
         };
 
         up(0);
 
-        // 这一次 f[x] 表示以 x 为根的时候的树高
-        // 仍从刚才的根 0 出发，前序修正 f
+        // 这一次
+        // f[x] 表示以 x 为根的时候的树高
+        // g[x] 表示以 x 为根的时候的次高
+        // 仍从刚才的根 0 出发，前序修正 f, 注意情况访问数组
         fill(vis.begin(), vis.end(), false);
 
-        // 计算以 x 为根的情况下的最高子树高度、和 次高子树高度
-        // 包括 深度在内 (也就是 0 号节点方向) 一起考虑
-        // 最高的子树高度
-        function<pair<int, int>(int, int)> calc =
-            [&](int x, int depth) -> pair<int, int> {
-            int f1 = f[x] - 1;
-            // 最高的子树个数
-            int mc = 0;
-            if (depth - 1 == f1) mc++;  // 来自 0 号节点上游
-            for (auto y : ed[x]) {
-                if (vis[y]) continue;  // 确保来自下游没访问过的子节点
-                if (f[y] == f1) mc++;
-            }
-
-            // 次高子树高度，如果有多个最高，次高也是最高,
-            // 如果没有>1个子树，则是 -2
-            int f2 = -2;
-            if (mc > 1)
-                f2 = f1;  // 不止一个最高子树
-            else if (mc == 1) {
-                for (auto y : ed[x]) {
-                    if (vis[y]) continue;
-                    if (f[y] == f1) continue;  // 跳过最高
-                    f2 = max(f2, f[y]);
-                }
-                // 跳过最高
-                if (f1 != depth - 1) f2 = max(f2, depth);
-            }
-            return {f1, f2};
-        };
-
-        function<void(int, int)> down = [&](int x, int depth) {
+        function<void(int)> down = [&](int x) {
             vis[x] = true;
 
-            auto [f1, f2] = calc(x, depth);
+            // 预先计算，以 0 为根的情况下，
+            // x 的下游最高子树有几个？
+            int df = 0;
+            for (auto y : ed[x]) {
+                if (vis[y]) continue;  // 保证只访问下游
+                if (f[y] + 1 == f[x]) df++;
+            }
 
+            // 换根
             for (auto y : ed[x]) {
                 if (vis[y]) continue;
-                // y 不是最高的子树
-                // 也就是说 x 中存在另一个子树 z 比 y 高, 再算上边 (x,y) 肯定比
-                // y 更高
-                if (f[y] < f1)
+                // 注意需要同步维护 g[y] 的含义
+                if (f[y] + 1 < f[x]) {
+                    // y 不是 x 最高的子树, x 再算上 (x,y) 边肯定会更高
+                    // y 的新次高要么是原来的 f[y], 要么是 g[x]+1
+                    // TODO: g[x] 会不会是唯一的 y？
+                    g[y] = max(f[y], g[x] + 1);
                     f[y] = f[x] + 1;
-                else if (f[y] == f1) {
-                    // y 已经是 x 的一个最高的子树
-                    // 进一步看次高的另一个子树 z, 看看是否可以算上 (x,z) 和
-                    // (x,y) 两个边后超过 y 的高度
-                    f[y] = max(f[y], f2 + 2);
+                } else if (f[y] + 1 == f[x]) {
+                    // y 是 x 的一颗最高的子树
+                    // 进一步考虑 x 的次高
+                    if (f[y] < g[x] + 1) {
+                        // x 存在一个次高子树 z，可以联合 (x,y) 成为 y 的最高
+                        // 由于 y 是 x 最高的子树，所以此时 z 一定和 y 同高
+                        // 那么 y 和 z 至少有一个在以 0 为根的情况下处于 x
+                        // 的下游.
+                        // 如果 df == 1, 也就是除了 y 和 z，x 没有更高的子树了
+                        // 那么 y 新的次高只能是原本的 f[y]
+                        if (df == 1) g[y] = f[y];
+                        // 否则 df > 1, 还存在其他最高子树，那么 y
+                        // 新的次高肯定也是新的最高
+                        else
+                            g[y] = g[x] + 1;
+                        f[y] = g[x] + 1;
+                    } else {
+                        // 否则 y 是 x 唯一的最高子树, f[y] 不变
+                        // g[y] 需要和 g[x]+1 取最值
+                        g[y] = max(g[y], g[x] + 1);
+                    }
                 }
-                down(y, depth + 1);
+                down(y);
             }
         };
 
-        down(0, 0);
+        down(0);
 
         // 答案收集
         vector<int> ans;
