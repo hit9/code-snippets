@@ -1,8 +1,5 @@
 #include <algorithm>
 #include <functional>
-#include <iostream>
-#include <thread>
-#include <utility>
 #include <vector>
 using namespace std;
 
@@ -30,7 +27,7 @@ class Solution {
                 if (h[x] < h[y] + 1) {
                     g[x] = h[x];
                     h[x] = h[y] + 1;
-                } else if ( g[x] < h[y]+1 ) {
+                } else if (g[x] < h[y] + 1) { // 这里注意别丢
                     g[x] = h[y] + 1;
                 }
             }
