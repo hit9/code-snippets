@@ -50,7 +50,7 @@ class Solution {
                 if (vis[y]) continue;
                 if (h[x] != g[x] && h[x] == h[y] + 1)
                     // y 是 x 的唯一最高子树
-                    u[y] = 1 + max(u[x], g[x]);
+                    u[y] = max(u[x], g[x]) + 1;
                 else
                     // 否则 y 之外必然有一个最高子树
                     u[y] = max(u[x], h[x]) + 1;
