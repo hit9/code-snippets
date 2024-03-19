@@ -195,3 +195,4 @@
 - [leetcode-633 平方数之和](leetcode/leetcode-633-sum-of-square-numbers) （数学） ⭐️
 - [leetcode-204 计数质数](leetcode/leetcode-204-count-primes) （数学、标准的素数筛）
 - [leetcode-1156  单字符重复子串的最大长度](leetcode/leetcode-1156-swap-for-longest-repeated-character-substring)  (分类讨论)
+- [leetcode-1793 好子数组的最大分数](leetcode/leetcode-1793-maximum-score-of-a-good-subarray)  (单调栈)
