@@ -1,21 +1,25 @@
-using ll =  long long;
+using ll = long long;
 const ll M = 1e9 + 7;
 class Solution {
    public:
     // 计算 (a^b)%mod
-    ll fastpow(ll x, ll n, ll mod) {
-        ll a = x % mod;
-        ll b = 1;
-        while (n) {
-            if (n & 1) {
-                b = b * a % mod;
-                n--;
-            } else {
-                n >>= 1;
-                a = a * a % mod;
-            }
+    ll fastpow(ll a, ll b, ll mod) {
+    ll factor = a % mod;
+    ll result = 1;
+    ll remain = b;
+    while (remain > 0) {
+        if (remain & 1) {
+            // 奇数
+            result = result * factor % mod;
+            remain--;
+        } else {
+            // 偶数
+            remain = remain / 2;  // 剩余指数拆半
+            factor = factor * factor % mod;
+            ;  // 因子自乘翻倍
         }
-        return b % mod;
+    }
+    return result % mod;
     }
     int minNonZeroProduct(int p) {
         if (p == 1) return 1;

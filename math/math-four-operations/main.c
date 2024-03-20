@@ -212,6 +212,26 @@ int PowFast(int a, int b) {
     return result;
 }
 
+// 幂运算 - 二分 循环版本 ( 带 mod )
+// 以下只考虑正数实现，负数可转正数处理
+int PowFastMod(int a, int b, int mod) {
+    int factor = a % mod;
+    int result = 1;
+    int remain = b;
+    while (remain > 0) {
+        if (remain & 1) {
+            // 奇数
+            result = result * factor % mod;
+            remain--;
+        } else {
+            // 偶数
+            remain = remain / 2;  // 剩余指数拆半
+            factor = factor * factor % mod;
+            ;  // 因子自乘翻倍
+        }
+    }
+    return result % mod;
+}
 // 平方根运算 - 二分
 // a 为非负数
 int Sqrt(int a) {
