@@ -77,6 +77,7 @@
 - [leetcode 174. 地下城游戏](leetcode/leetcode-174-dungeon-game) ⭐️⭐️⭐️⭐️⭐️ (反向dp)
 - [leetcode 494. 目标和](leetcode/leetcode-494-target-sum) (01 背包)
 - [leetcode 312. 戳气球](leetcode-312-burst-balloons)  (区间dp)
+- [布尔运算](leetcode/leetcode-0814-boolean-evaluation-lcci)  (区间dp)
 
 
 贪心:
