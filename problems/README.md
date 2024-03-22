@@ -108,6 +108,7 @@
 - [AcWing 244 奶牛身高问题](acwing/244) (树状数组 + 二分答案)
 - [leetcode 315. 计算右侧小于当前元素的个数](leetcode/leetcode-315-count-of-smaller-numbers-after-self) (树状数组、归并排序模板题)
 - [leetcode 327. 区间的个数](leetcode/leetcode-327-count-of-range-sum) (树状数组、线段树、CDQ / 归并、平衡树 都可以做)
+- [leetcode 2617. 网格图中最少访问的格子数](leetcode/leetcode-2617-minimum-number-of-visited-cells-in-a-grid)  (树状数组优化 dp )
 
 二叉树:
 
