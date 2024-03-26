@@ -84,6 +84,7 @@
 贪心:
 
 - [leetcode-55 跳跃游戏](leetcode/leetcode-55-jump-game) ⭐️         (贪婪)
+- [leetcode-334 递增的三元子序列](leetcode/leetcode-334-increasing-triplet-subsequence)  (贪心,有点巧妙)
 
 
 摩尔投票:
