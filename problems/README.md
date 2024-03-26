@@ -127,6 +127,8 @@
 图:
 
 - [leetcode-310 最小高度树](leetcode/leetcode-310-minimum-height-trees)  (拓扑排序, 树根 dp)
+- [leetcode-2642 设计可以求最短路径的图类](leetcode/leetcode-2642-design-graph-with-shortest-path-calculator)  (最短路)
+
 
 -------
 
