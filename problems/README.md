@@ -173,6 +173,7 @@
 - [leetcode-236 二叉树的最近公共祖先](leetcode/leetcode-236-lowest-common-ancestor-of-a-binary-tree)            (递归)
 - [leetcode-662 二叉树最大宽度](leetcode/leetcode-662-maximum-width-of-binary-tree)⭐️         (层序遍历 + 二叉树索引标号)
 - [leetcode-56 合并区间](leetcode/leetcode-56-merge-intervals) ⭐️⭐️⭐️       (排序)
+- [leetcode-2580 统计将重叠区间合并成组的方案数](leetcode/leetcode-2580-count-ways-to-group-overlapping-ranges) ⭐️⭐️⭐️       (排序, 区间合并, 快速幂)
 - [leetcode-503 下一个更大元素 II](leetcode/leetcode-503-next-greater-element-ii)            (单调栈)
 - [leetcode-654 最大二叉树](problems/leetcode-654-maximum-binary-tree) ⭐️⭐️⭐️          (单调栈)
 - [leetcode-255 验证前序遍历序列二叉搜索树](leetcode/leetcode-255-verify-preorder-sequence-in-binary-search-tree) ⭐️⭐️     (单调栈)
