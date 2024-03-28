@@ -79,6 +79,7 @@
 - [leetcode 312. 戳气球](leetcode-312-burst-balloons)  (区间dp)
 - [布尔运算](leetcode/leetcode-0814-boolean-evaluation-lcci)  (区间dp)
 - [1039. 多边形三角剖分的最低得分 ](leetcode/leetcode-1039-minimum-score-triangulation-of-polygon)  (区间dp)
+- [1997. 访问完所有房间的第一天](leetcode/leetcode-1997-first-day-where-you-have-been-in-all-the-rooms) (dp)
 
 
 贪心:
