@@ -16,7 +16,7 @@ using ll = long long;
 
 const int N = 1e5 + 10;
 
-// 4 倍空间
+// 2 倍空间
 struct {
     ll val;  // 权值, 节点 x 代表的区间的和
     ll tag;  // 延迟增加的值, 因为涉及区间更新.
