@@ -1,0 +1,2 @@
+- [经典线段树 - 区间修改 (lazy 标记), 区间求和, 分治建树 - segment-tree.cc](segment-tree.cc)
+- [前序内存线段树 - 2倍空间 - segment-tree-pre-order.cc](segment-tree-pre-order.cc)
