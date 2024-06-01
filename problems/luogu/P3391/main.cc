@@ -21,7 +21,7 @@ struct {
 int root = 0, tt = 0;
 
 inline int _rand() {
-    seed *= 260817;
+    seed *= 111111;
     return (int)seed;
 }
 

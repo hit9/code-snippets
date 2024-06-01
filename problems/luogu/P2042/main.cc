@@ -37,7 +37,7 @@ int gc_stack[N];
 int gc_top = 0;
 
 inline int _rand() {
-    seed *= 260817;
+    seed *= 333333;
     return int(seed);
 }
 

@@ -1,10 +1,13 @@
 #include <cstdio>
 #include <cstring>
+#include <random>
 
 using namespace std;
 const int N = 1e6 + 1e5 + 1;
 
 unsigned long long seed = 1;
+
+std::mt19937 rnd(std::random_device{}());
 
 struct fhq {
     struct {
@@ -15,10 +18,7 @@ struct fhq {
     } tr[N];
     int root = 0, n = 0;  // 根节点, 最新节点的下标
                           //
-    inline int _rand() {
-        seed *= 260817;
-        return int(seed);
-    }
+    inline int _rand() { return rnd(); }
 
     // 创建一个新节点
     int newnode(int v) {
