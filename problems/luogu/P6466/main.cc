@@ -32,7 +32,7 @@ int merge(int *Li, V *M1, V *M2, int start1, int end1, int start2, int end2,
     auto take1 = [&]() {  // 取 Li 的数值
         M2[start].x = Li[start1];
         M2[start].y = start1;
-        M2[start].z = start2;
+        M2[start].z = M1[start2 - 1].x >= Li[start1] ? (start2 - 1) : start2;
         start++;
         start1++;
     };
@@ -118,13 +118,13 @@ int main(void) {
     // 预处理
     preprocess();
 
-    // TODO: debug
-    //    for (int i = 1; i <= k; i++) {
-    //        for (int j = 1; j <= SZ[i]; j++) {
-    //            printf("%d[%d,%d] ", M[i][j].x, M[i][j].y, M[i][j].z);
-    //        }
-    //        printf("\n");
-    //    }
+    // debug
+    // for (int i = 1; i <= k; i++) {
+    //     for (int j = 1; j <= SZ[i]; j++) {
+    //         printf("%d[%d,%d] ", M[i][j].x, M[i][j].y, M[i][j].z);
+    //     }
+    //     printf("\n");
+    // }
 
     int sum = 0;  // 每次询问的异或和
     int x;
