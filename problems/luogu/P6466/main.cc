@@ -7,7 +7,7 @@
 const int N = 10001;
 const int K = 101;
 
-int L[K][N];  // 原始的 k 个有序序列, 从下表 1 开始
+int L[K][N];  // 原始的 k 个有序序列, 从下标 1 开始
 
 struct V {
     int x;      // 元素值
@@ -15,7 +15,7 @@ struct V {
     int z = 0;  // 在 M[i+1] 中出现的位置
 };
 
-V M[K][2 * N];  // 构造的 k 个序列, 从下表 1 开始
+V M[K][2 * N];  // 构造的 k 个序列, 从下标 1 开始
 int SZ[K];      // 记录 M[i] 的长度
 
 int ans[K];  // 记录一次询问在每个序列中的答案
@@ -32,6 +32,8 @@ int merge(int *Li, V *M1, V *M2, int start1, int end1, int start2, int end2,
     auto take1 = [&]() {  // 取 Li 的数值
         M2[start].x = Li[start1];
         M2[start].y = start1;
+        // 注意这里，为了防止 M1 的步长为 2 导致错过真正的后继，需要检验下
+        // start2-1 位置是否是真的后继
         M2[start].z = M1[start2 - 1].x >= Li[start1] ? (start2 - 1) : start2;
         start++;
         start1++;
