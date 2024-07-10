@@ -24,50 +24,38 @@ priority_queue<P, vector<P>, greater<P>> q;  // 小根堆
 bool vis[N];                                 // 访问数组
 int from[N];  // 最短路的上一步来源, 默认 0x3f3f3f3f
 
-// 计算节点 y 到目标 goal 的未来预估代价, 曼哈顿距离
-int future_cost(int y, int goal) {
+// 计算节点 y 到目标 t 的未来预估代价, 曼哈顿距离
+int future_cost(int y, int t) {
     // 目标的坐标, TODO: 优化点可以吧 gi 和 gj 提到 while 外面
-    auto gi = goal / m, gj = goal % m;
+    auto ti = t / m, tj = t % m;
     // y 的坐标
     auto yi = y / m, yj = y % m;
     // 对于 y 的未来代价预估, 曼哈顿距离
-    return abs(gi - yi) + abs(gj - yj);
+    return abs(ti - yi) + abs(tj - yj);
 }
 
-// 结果是 f[goal]
-void astar(int start, int goal) {
+// 结果是 f[t], s 是起点
+void astar(int s, int t) {
     memset(f, 0x3f, sizeof f);
     memset(vis, 0, sizeof vis);
     memset(from, 0x3f, sizeof from);
-
-    f[start] = 0;
-    q.push({f[start], start});
-
+    f[s] = 0;
+    q.push({f[s], s});
     while (!q.empty()) {
         auto [_, x] = q.top();
         q.pop();
-
-        // 到达目标
-        if (x == goal) break;
-
+        if (x == t) break;  // 到达目标
         if (vis[x]) continue;
         vis[x] = true;
-
         // 对于 x 的每个邻居 y 和 边权
         for (const auto& [w, y] : edges[x]) {
-            // 计算 start 到达 y 的实际代价
-            auto g = f[x] + w;
-            // 对于 y 的未来代价预估, 曼哈顿距离
-            auto h = future_cost(y, goal);
-            // 代价作为队列的优先级
-            auto cost = g + h;
-            // 只有下一步比之前计算的更优才加入队列
-            if (f[y] > g) {
-                // 维护 y 的实际代价
-                f[y] = g;
+            auto g = f[x] + w;           // s 到 y 的实际代价
+            auto h = future_cost(y, t);  // y 到目标的未来代价的估计
+            auto cost = g + h;           // 总代价 = 实际 + 未来
+            if (f[y] > g) {  // 如果当前实际代价比之前计算的更优
+                f[y] = g;    // 维护 y 的实际代价
                 q.push({cost, y});
-                // 计算最短路来源
-                from[y] = x;
+                from[y] = x;  // 最短路来源
             }
         }
     }
@@ -97,16 +85,16 @@ int main(void) {
             if (j < m - 1) add_edge(x, i * m + (j + 1));
         }
     }
-    // 设置出发点和目标点
-    int start = (m - 1) * m + 0, goal = 0 * m + (m - 1);
-    astar(start, goal);
-    std::cout << "shortest distance:" << f[goal] << std::endl;
+    // 设置出发点 s 和目标点 t
+    int s = (m - 1) * m + 0, t = 0 * m + (m - 1);
+    astar(s, t);
+    std::cout << "shortest distance:" << f[t] << std::endl;
 
     // 反向找到最短路路径
     vector<int> path;
-    path.push_back(goal);
-    int x = goal;
-    while (x != start) {
+    path.push_back(t);
+    int x = t;
+    while (x != s) {
         x = from[x];
         path.push_back(x);
     }

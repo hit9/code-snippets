@@ -26,8 +26,7 @@ void dijkstra() {
         q.pop();
         if (vis[x]) continue;
         vis[x] = true;
-        for (const auto& p : edges[x]) {
-            auto [w, y] = p;
+        for (const auto& [w, y] : edges[x]) {
             if (f[y] > f[x] + w) {
                 f[y] = f[x] + w;
                 q.push({f[y], y});
