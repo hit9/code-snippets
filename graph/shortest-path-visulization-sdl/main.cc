@@ -1,0 +1,466 @@
+#include <memory>
+#include <queue>
+#include <string>
+#include <unordered_set>
+#include <utility>
+
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_image.h>
+#include <argparse/argparse.hpp>
+#include <spdlog/spdlog.h>
+
+struct Options {
+  // 是否启用每一步的窗口截图, 保存在当前目录下的 screenshot 目录中
+  bool enable_screenshot = false;
+  // 保存窗口截图的目录, 文件的保存格式是 "{step-number}.PNG"
+  // 不带 / 结尾
+  std::string screenshot_directory = "screenshot";
+  // 两帧之间的时间间隔
+  int delay_ms = 100;
+  // 要演示的算法
+  std::string algorithm = "dijstra";
+};
+
+// 一些设置
+const int GRID_SIZE = 40;
+const int M = 15;                        // 方格行数, 迭代变量 i
+const int N = 20;                        // 方格列数, 迭代变量 j
+const int WINDOW_HEIGHT = M * GRID_SIZE; // 窗口高度 600
+const int WINDOW_WIDTH = N * GRID_SIZE;  // 窗口宽度 800
+
+// 网格地图: 0 表示空白方格 (白色), 1 表示有障碍物 (灰色)
+// 要从左上角 (0,0) 出发, 到达右下角 (M-1,N-1)
+const int GRID_MAP[M][N] = {
+    // 15 X 20
+    {0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0},
+    {0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0},
+    {0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+    {0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+    {0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0},
+    {0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0},
+    {0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0},
+    {0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0},
+    {0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0},
+    {0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0},
+    {0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0},
+    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0},
+    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0},
+    {0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0},
+    {0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0},
+};
+
+// 坐标 (i, j)
+using Point = std::pair<int, int>;
+
+// 黑板, 算法要把寻路中的数据写到这里, Visualizer 可视化器会从这个黑板上去读.
+struct Blackboard {
+  // 当前考察的点 x
+  Point x;
+  // 历史考察过的点, 即 访问数组
+  bool vis[M][N];
+  // 当前候选的待扩展的点的代价值
+  // 不在待扩展列表中的, 标记 -1
+  int waits[M][N];
+  // 从出发到目标的一条最短路径 (包含 start 和 target)
+  std::vector<Point> path;
+};
+
+// 算法实现的虚类
+class Algorithm {
+public:
+  virtual ~Algorithm() {} // makes unique_ptr happy
+  // 初始化算法的准备项.
+  // 参数 start 和 target 分别表示起点和终点
+  virtual void Setup(Blackboard &b, const Point &start, const Point &target) = 0;
+  // 每一帧会被调用一次, 算作走一步.
+  // 在这里, Update 要把结果写到黑板上.
+  // 如果已经结束, 则返回 0, 否则返回非 0
+  // 在结束返回 0 的时候必须要做 blackboard 上的最短路结果 path 被设置.
+  virtual int Update(Blackboard &b) = 0;
+};
+
+// 主要的程序 Visualizer
+class Visualizer {
+public:
+  Visualizer(const Options &options, Blackboard &b, Algorithm *algo);
+  // 初始化工作, 包括 SDL 的各种初始化, 需要显式调用
+  // 返回 0 表示成功
+  int Init();
+  // 启动主循环, 直到退出
+  void Start();
+  // 释放 SDL 的资源, 需要显式调用
+  void Destroy();
+
+protected:
+  // 保存一次屏幕截图
+  void saveScreenShot();
+  // 绘制一帧的情况
+  void draw();
+  // 处理输入, 返回 -1 表示要退出
+  int handleInputs();
+
+private:
+  const Options &options;
+  Blackboard &blackboard;
+  Algorithm *algo;
+  // 起始点, 目标点
+  const Point start = {0, 0}, target = {M - 1, N - 1};
+  // SDL
+  SDL_Window *window = nullptr;
+  SDL_Renderer *renderer = nullptr;
+  // 帧号
+  int seq = 0;
+};
+
+// 算法实现 - dijstra
+class AlgorithmImplDijkstra : public Algorithm {
+  // 节点号编码规则: j * N + i
+  // 总的节点数量
+  static const int n = M * N;
+
+  // (距离 OR 边权, 节点号)
+  using P = std::pair<int, int>;
+
+public:
+  void Setup(Blackboard &b, const Point &start, const Point &target) override;
+  int Update(Blackboard &b) override;
+
+private:
+  // 起始点标号 s
+  int s;
+  // 结束点标号 t
+  int t;
+  // edges[x] => {{w, y}}  边权,邻接点
+  std::vector<std::vector<P>> edges;
+  // 小根堆, 实际是按第一项 f[y] 作为比较
+  std::priority_queue<P, std::vector<P>, std::greater<P>> q;
+  // f[x] 保存出发点 s 到 x 的最短路
+  int f[n];
+};
+
+// 算法 Handler 构造器表格
+std::unordered_map<std::string, std::function<std::unique_ptr<Algorithm>()>> AlgorithmMakers = {
+    {"dijstra", []() { return std::make_unique<AlgorithmImplDijkstra>(); }},
+};
+
+// 一个编码规则 i*N+j => 标号, 注意, 因为 N 比 M 大, 所以采用 N
+inline int pack(int i, int j) { return i * N + j; }
+inline int pack(const Point &p) { return p.first * N + p.second; }
+inline int unpack_i(int x) { return x / N; }
+inline int unpack_j(int x) { return x % N; }
+
+int main(int argc, char *argv[]) {
+  // 解析命令行参数到给定的 options 结构.
+  Options options;
+  argparse::ArgumentParser program("shortest-path-visulization-sdl");
+  program.add_argument("-s", "--enable-screenshot")
+      .help("是否启用每一步的窗口截图")
+      .default_value(false)
+      .store_into(options.enable_screenshot);
+  program.add_argument("--screenshot-directory")
+      .help("截图文件的保存目录")
+      .default_value(std::string("screenshot"))
+      .store_into(options.screenshot_directory);
+  program.add_argument("-d", "--delay-ms")
+      .help("帧之间的毫秒间隔")
+      .default_value(100)
+      .store_into(options.delay_ms);
+  program.add_argument("algorithm")
+      .help("algorithm to visualize")
+      .metavar("ALGORITHM")
+      .choices("dijstra", "bfs", "best-first", "astar")
+      .default_value(std::string("dijstra"))
+      .store_into(options.algorithm);
+  try {
+    program.parse_args(argc, argv);
+  } catch (const std::exception &e) {
+    spdlog::error(e.what());
+    std::exit(1);
+  }
+
+  // 选用算法
+  if (AlgorithmMakers.find(options.algorithm) == AlgorithmMakers.end()) {
+    spdlog::error("找不到算法的 handler:  {}", options.algorithm);
+    std::exit(1);
+  }
+  // 构造 algorithm handler
+  auto algo = AlgorithmMakers[options.algorithm]();
+  spdlog::info("选用了算法 {}", options.algorithm);
+  // 构造 Visualizer
+  Blackboard b;
+  Visualizer visualizer(options, b, algo.get());
+  // 启动 Visualizer
+  if (visualizer.Init() != 0)
+    return -1;
+  visualizer.Start();
+  visualizer.Destroy();
+  return 0;
+}
+
+/////////////////////////////////////
+/// 实现 Visualizer
+/////////////////////////////////////
+
+Visualizer::Visualizer(const Options &options, Blackboard &b, Algorithm *algo)
+    : options(options), blackboard(b), algo(algo) {}
+
+int Visualizer::Init() {
+  // 初始化 SDL
+  if (SDL_Init(SDL_INIT_EVERYTHING) != 0) {
+    spdlog::error("SDL 初始化错误 {}", SDL_GetError());
+    return -1;
+  }
+  // 初始化 SDL_image
+  if (!(IMG_Init(IMG_INIT_PNG) & IMG_INIT_PNG)) {
+    spdlog::error("SDL_image 初始化错误: {}", IMG_GetError());
+    SDL_Quit();
+    return -2;
+  }
+  // 创建窗口
+  window = SDL_CreateWindow("shortest-path-visulization-sdl", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
+                            WINDOW_WIDTH, WINDOW_HEIGHT, SDL_WINDOW_SHOWN);
+  if (window == nullptr) {
+    spdlog::error("无法创建窗口: {}", SDL_GetError());
+    IMG_Quit();
+    SDL_Quit();
+    return -3;
+  }
+
+  // 创建渲染器
+  renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_SOFTWARE);
+  if (renderer == nullptr) {
+    spdlog::error("创建渲染器失败: {}", SDL_GetError());
+    SDL_DestroyWindow(window);
+    IMG_Quit();
+    SDL_Quit();
+    return -1;
+  }
+  spdlog::info("初始化 SDL 成功");
+
+  // 初始化算法设置
+  algo->Setup(blackboard, start, target);
+
+  spdlog::info("初始化算法成功");
+  return 0;
+}
+
+void Visualizer::Destroy() {
+  SDL_DestroyRenderer(renderer);
+  SDL_DestroyWindow(window);
+  IMG_Quit();
+  SDL_Quit();
+}
+
+void Visualizer::Start() {
+  while (true) {
+    // 处理输入
+    if (handleInputs() == -1)
+      break;
+    // 更新算法步骤
+    seq++;
+    if (algo->Update(blackboard) == 0) {
+      // 算法结束
+      spdlog::info("算法已结束");
+      break;
+    }
+    // 清理屏幕,并绘制一次
+    // 背景颜色: 白色
+    SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+    SDL_RenderClear(renderer);
+    draw();
+    SDL_RenderPresent(renderer);
+    // 自动截图一次
+    if (options.enable_screenshot)
+      saveScreenShot();
+    // 睡眠 (不严格的 delay)
+    SDL_Delay(options.delay_ms);
+  }
+}
+
+int Visualizer::handleInputs() {
+  SDL_Event e;
+  while (SDL_PollEvent(&e)) {
+    switch (e.type) {
+    case SDL_QUIT:
+      return -1;
+    case SDL_KEYDOWN:
+      // ESC 退出
+      if (e.key.keysym.sym == SDLK_ESCAPE) {
+        spdlog::info("监听到 ESC : 即将退出...");
+        return -1;
+      }
+      // Ctrl-C 退出
+      if (e.key.keysym.sym == SDLK_c && SDL_GetModState() & KMOD_CTRL) {
+        spdlog::info("监听到 Ctrl-C : 即将退出...");
+        return -1;
+      }
+      // Ctrl-S 手动截图一次
+      if (e.key.keysym.sym == SDLK_s && SDL_GetModState() & KMOD_CTRL) {
+        spdlog::info("监听到 Ctrl-S : 即将截图一次...");
+        saveScreenShot();
+      }
+      // 只要有 keydown, 本次 poll 都退出
+      break;
+    }
+  }
+  return 0;
+}
+
+void Visualizer::draw() {
+  // 绘制方格 (x,y) 表示绘制坐标, (i, j) 表示方格坐标
+  for (int i = 0, y = 0; i < M; i++, y += GRID_SIZE) {
+    for (int j = 0, x = 0; j < N; j++, x += GRID_SIZE) {
+      // 正方形 rect, 内侧是 inner (边框宽度 1)
+      SDL_Rect rect = {x, y, GRID_SIZE, GRID_SIZE};
+      SDL_Rect inner = {x + 1, y + 1, GRID_SIZE - 2, GRID_SIZE - 2};
+      // 绘制外层正方形, 边框是黑色
+      SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+      SDL_RenderDrawRect(renderer, &rect);
+      // 选用内层正方形的填充颜色
+      if (GRID_MAP[i][j] == 1)
+        // 障碍物: 灰色
+        SDL_SetRenderDrawColor(renderer, 64, 64, 64, 1);
+      else if (blackboard.vis[i][j])
+        // 访问过的路径点: 蓝色
+        SDL_SetRenderDrawColor(renderer, 0, 0, 255, 1);
+      else if (blackboard.waits[i][j] >= 0)
+        // 将要扩展的点: 浅蓝色
+        SDL_SetRenderDrawColor(renderer, 173, 216, 230, 1);
+      else
+        // 默认是白色
+        SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+      // 绘制内侧正方形
+      SDL_RenderFillRect(renderer, &inner);
+    }
+  }
+}
+
+void Visualizer::saveScreenShot() {
+  SDL_Surface *saveSurface = nullptr;
+  SDL_Surface *infoSurface = SDL_GetWindowSurface(window);
+  if (infoSurface == nullptr) {
+    spdlog::warn("saveScreenShot: 创建 surface 失败 {}", SDL_GetError());
+    return;
+  }
+
+  auto *pixels = new unsigned char[infoSurface->w * infoSurface->h * infoSurface->format->BytesPerPixel];
+  if (pixels == nullptr) {
+    spdlog::warn("saveScreenShot: Unable to allocate memory for screenshot pixel data buffer!");
+    return;
+  }
+
+  if (SDL_RenderReadPixels(renderer, nullptr, infoSurface->format->format, pixels,
+                           infoSurface->w * infoSurface->format->BytesPerPixel) != 0) {
+    spdlog::warn("saveScreenShot: 无法从 renderer 读取像素数据 {}", SDL_GetError());
+    delete[] pixels;
+    return;
+  }
+
+  saveSurface = SDL_CreateRGBSurfaceFrom(
+      pixels, infoSurface->w, infoSurface->h, infoSurface->format->BitsPerPixel,
+      infoSurface->w * infoSurface->format->BytesPerPixel, infoSurface->format->Rmask,
+      infoSurface->format->Gmask, infoSurface->format->Bmask, infoSurface->format->Amask);
+  if (saveSurface == nullptr) {
+    spdlog::warn("saveScreenShot: 无法创建 saveSurface: {}", SDL_GetError());
+    delete[] pixels;
+    return;
+  }
+
+  auto filename = options.screenshot_directory + "/" + std::to_string(seq) + ".PNG";
+
+  if (IMG_SavePNG(saveSurface, filename.c_str()) != 0) {
+    spdlog::warn("saveScreenShot: 保存截图失败 {} => {}", filename, IMG_GetError());
+    SDL_FreeSurface(saveSurface);
+    delete[] pixels;
+    return;
+  }
+
+  SDL_FreeSurface(saveSurface);
+  delete[] pixels;
+  return;
+}
+
+/////////////////////////////////////
+/// 实现 AlgorithmImplDijkstra
+/////////////////////////////////////
+
+void AlgorithmImplDijkstra::Setup(Blackboard &b, const Point &start, const Point &target) {
+  // 清理黑板
+  memset(b.vis, 0, sizeof(b.vis));
+  for (int i = 0; i < M; i++)
+    for (int j = 0; j < N; j++)
+      b.waits[i][j] = -1;
+  b.path.clear();
+
+  // 障碍物的节点标号
+  std::unordered_set<int> obstacles;
+  for (int i = 0; i < M; i++) {
+    for (int j = 0; j < N; j++) {
+      if (GRID_MAP[i][j])
+        obstacles.insert(pack(i, j));
+    }
+  }
+
+  // 添加一条边 (x -> y) 的函数, 边权是 1
+  auto add_edge = [&](int x, int y) {
+    // 不可到达障碍物, 也不可从障碍物出发
+    if (obstacles.find(x) == obstacles.end() && obstacles.find(y) == obstacles.end()) {
+      edges[x].push_back({1, y});
+    }
+  };
+
+  // 构造 edges
+  edges.resize(n);
+  for (int i = 0; i < M; i++) {
+    for (int j = 0; j < N; j++) {
+      // 上下左右都可以走, 除非是有障碍物
+      int x = pack(i, j);
+      if (i > 0) // 上
+        add_edge(x, pack(i - 1, j));
+      if (j > 0) // 左
+        add_edge(x, pack(i, j - 1));
+      if (i < M - 1) // 下
+        add_edge(x, pack(i + 1, j));
+      if (j < N - 1) // 右
+        add_edge(x, pack(i, j + 1));
+    }
+  }
+  // 清理 f, 到无穷大
+  memset(f, 0x3f, sizeof(f));
+  // 设置初始坐标
+  s = pack(start);
+  f[s] = 0;
+  b.waits[unpack_i(s)][unpack_j(s)] = f[s];
+  q.push({f[s], s});
+  // 设置结束
+  t = pack(target);
+}
+
+int AlgorithmImplDijkstra ::Update(Blackboard &b) {
+  while (!q.empty()) {
+    auto [_, x] = q.top();
+    q.pop();
+    // 访问过的要忽略
+    int i = unpack_i(x), j = unpack_j(x);
+    // x 已经不算待扩展了, 恢复到 -1
+    b.waits[i][j] = -1;
+    if (b.vis[i][j])
+      continue;
+    b.vis[i][j] = true;
+    // 到达目标, 及时退出 (将 return 0)
+    if (t == x)
+      break;
+    // 添加邻居节点进入待扩展
+    for (const auto &[w, y] : edges[x]) {
+      if (f[y] > f[x] + w) {
+        f[y] = f[x] + w;
+        q.push({f[y], y});
+        b.waits[unpack_i(y)][unpack_j(y)] = f[y];
+      }
+    }
+    // 每次 Update 只考察一个点, 不算结束
+    return -1;
+  }
+  // TODO: 已经结束,需要计算最短路
+  return 0;
+}
