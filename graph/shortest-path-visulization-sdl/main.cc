@@ -53,6 +53,8 @@ struct Options {
   Point start = {0, 0}, target = {M - 1, N - 1};
   // 是否只采用 4 方向, 默认是 8 方向
   bool use_4directions = false;
+  // astar 的启发式权重, 默认是 1 倍权重, 0 时退化到 dijkstra
+  int astart_heuristic_weight = 1;
 };
 
 // 黑板, 算法要把寻路中的数据写到这里, Visualizer 可视化器会从这个黑板上去读.
@@ -78,8 +80,7 @@ public:
   virtual ~Algorithm() {} // makes unique_ptr happy
   // 初始化算法的准备项.
   // 参数 start 和 target 分别表示起点和终点
-  virtual void Setup(Blackboard &b, const Point &start, const Point &target,
-                     bool use_4directions = false) = 0;
+  virtual void Setup(Blackboard &b, const Options &options) = 0;
   // 每一帧会被调用一次, 算作走一步.
   // 在这里, Update 要把结果写到黑板上.
   // 如果已经结束, 则返回 0, 否则返回非 0
@@ -154,7 +155,7 @@ protected:
 // 算法实现 - dijkstra
 class AlgorithmImplDijkstra : public AlgorithmImplBase {
 public:
-  virtual void Setup(Blackboard &b, const Point &start, const Point &target, bool use_4directions) override;
+  virtual void Setup(Blackboard &b, const Options &options) override;
   virtual int Update(Blackboard &b) override;
 
 protected:
@@ -169,9 +170,11 @@ protected:
 class AlgorithmImplAStar : public AlgorithmImplDijkstra {
 public:
   // Setup 其实可以直接复用 dijkstra 的
+  void Setup(Blackboard &b, const Options &options) override;
   int Update(Blackboard &b) override;
 
 private:
+  int heuristic_weight = 1;
   // 计算节点 y 到目标 t 的未来预估代价, 曼哈顿距离
   int future_cost(int y, int t);
 };
@@ -238,6 +241,10 @@ int main(int argc, char *argv[]) {
       .help("是否只采用4方向,默认是8方向")
       .default_value(false)
       .store_into(options.use_4directions);
+  program.add_argument("-astar-w", "--astart-heuristic-weight")
+      .help("AStar 算法的启发式未来估价的权重倍数, 自然数")
+      .default_value(1)
+      .store_into(options.astart_heuristic_weight);
   program.add_argument("-s", "--start").help("起始点").default_value("0,0");
   program.add_argument("-t", "--target").help("起始点").default_value("11,14");
 
@@ -330,7 +337,7 @@ int Visualizer::Init() {
   spdlog::info("初始化 SDL 成功");
 
   // 初始化算法设置
-  algo->Setup(blackboard, options.start, options.target, options.use_4directions);
+  algo->Setup(blackboard, options);
 
   spdlog::info("初始化算法成功");
   return 0;
@@ -581,21 +588,20 @@ void AlgorithmImplBase::buildShortestPathResult(Blackboard &b) {
 /// 实现 AlgorithmImplDijkstra
 /////////////////////////////////////
 
-void AlgorithmImplDijkstra::Setup(Blackboard &b, const Point &start, const Point &target,
-                                  bool use_4directions) {
+void AlgorithmImplDijkstra::Setup(Blackboard &b, const Options &options) {
   // 清理黑板
   setupBlackboard(b);
   // 建图
-  setupEdges(use_4directions);
+  setupEdges(options.use_4directions);
   // 清理 f, 到无穷大
   memset(f, 0x3f, sizeof(f));
   // 设置初始坐标
-  s = pack(start);
+  s = pack(options.start);
   f[s] = 0;
   from[s] = s;
   q.push({f[s], s});
   // 设置结束
-  t = pack(target);
+  t = pack(options.target);
 }
 
 int AlgorithmImplDijkstra ::Update(Blackboard &b) {
@@ -633,6 +639,12 @@ int AlgorithmImplDijkstra ::Update(Blackboard &b) {
 /// 实现 AlgorithmImplDijkstra
 /////////////////////////////////////
 
+void AlgorithmImplAStar::Setup(Blackboard &b, const Options &options) {
+  heuristic_weight = options.astart_heuristic_weight;
+  // 复用 dijkstra 的 Setup 即可
+  AlgorithmImplDijkstra::Setup(b, options);
+}
+
 int AlgorithmImplAStar ::Update(Blackboard &b) {
   while (!q.empty()) {
     auto [_, x] = q.top();
@@ -649,11 +661,11 @@ int AlgorithmImplAStar ::Update(Blackboard &b) {
       break;
     // 添加邻居节点进入待扩展
     for (const auto &[w, y] : edges[x]) {
-      auto g = f[x] + w;          // s 到 y 的实际代价
-      auto h = future_cost(y, t); // y 到目标的未来代价的估计
-      auto cost = g + h;          // 总代价 = 实际 + 未来
-      if (f[y] > g) {             // 如果当前实际代价比之前计算的更优
-        f[y] = g;                 // 维护 y 的实际代价
+      auto g = f[x] + w;                    // s 到 y 的实际代价
+      auto h = future_cost(y, t);           // y 到目标的未来代价的估计
+      auto cost = g + heuristic_weight * h; // 总代价 = 实际 + 权重*未来
+      if (f[y] > g) {                       // 如果当前实际代价比之前计算的更优
+        f[y] = g;                           // 维护 y 的实际代价
         b.exploring[unpack_i(y)][unpack_j(y)] = f[y];
         q.push({cost, y});
         from[y] = x; // 最短路来源
