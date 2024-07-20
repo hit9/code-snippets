@@ -18,7 +18,7 @@ struct Options {
   // 两帧之间的时间间隔
   int delay_ms = 50;
   // 要演示的算法
-  std::string algorithm = "dijstra";
+  std::string algorithm = "dijkstra";
 };
 
 // 一些设置
@@ -33,18 +33,18 @@ const int WINDOW_WIDTH = N * GRID_SIZE;  // 窗口宽度 800
 // clang-format off
 const int GRID_MAP[M][N] = {
     // 12 X 15
-    {0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0 },
-    {0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0 },
-    {0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0 },
-    {0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0 },
-    {0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0 },
-    {0, 0, 0, 1, 0, 1, 1, 0, 0, 0, 1, 0, 0, 0, 0 },
+    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0 },
+    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0 },
+    {0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 1, 0, 0, 0, 0 },
+    {0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0 },
+    {0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0 },
+    {0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    {0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    {0, 1, 1, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0 },
+    {0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    {0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0 },
     {0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0 },
-    {0, 0, 0, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0 },
-    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0 },
-    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0 },
-    {0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0 },
-    {0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0 },
+    {0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0 },
 };
 // clang-format on
 
@@ -120,37 +120,61 @@ private:
   int shortest_grid_no = 0;
 };
 
-// 算法实现 - dijstra
-class AlgorithmImplDijkstra : public Algorithm {
+class AlgorithmImplBase : public Algorithm {
+protected:
   // 节点号编码规则: j * N + i
   // 总的节点数量
   static const int n = M * N;
-
   // (距离 OR 边权, 节点号)
   using P = std::pair<int, int>;
-
-public:
-  void Setup(Blackboard &b, const Point &start, const Point &target) override;
-  int Update(Blackboard &b) override;
-
-private:
   // 起始点标号 s
   int s;
   // 结束点标号 t
   int t;
   // edges[x] => {{w, y}}  边权,邻接点
   std::vector<std::vector<P>> edges;
+  // from[x] 保存 x 最短路的上一步由哪个节点而来
+  int from[n];
+
+  // 一些 Utils (可重载)
+
+  // 设置黑板 (清理)
+  virtual void setupBlackboard(Blackboard &b);
+  // 初始化建图
+  virtual void setupEdges();
+  // 收集最短路结果
+  virtual void buildShortestPathResult(Blackboard &b);
+};
+
+// 算法实现 - dijkstra
+class AlgorithmImplDijkstra : public AlgorithmImplBase {
+public:
+  virtual void Setup(Blackboard &b, const Point &start, const Point &target) override;
+  virtual int Update(Blackboard &b) override;
+
+protected:
   // 小根堆, 实际是按第一项 f[y] 作为比较
   std::priority_queue<P, std::vector<P>, std::greater<P>> q;
   // f[x] 保存出发点 s 到 x 的最短路
   int f[n];
-  // from[x] 保存 x 最短路的上一步由哪个节点而来
-  int from[n];
+};
+
+// 算法实现 -- A star
+// 事实上, A star 是一种优化的 dijkstra
+class AlgorithmImplAStar : public AlgorithmImplDijkstra {
+public:
+  // Setup 其实可以直接复用 dijkstra 的
+  int Update(Blackboard &b) override;
+
+private:
+  // 计算节点 y 到目标 t 的未来预估代价, 曼哈顿距离
+  int future_cost(int y, int t);
 };
 
 // 算法 Handler 构造器表格
 std::unordered_map<std::string, std::function<std::unique_ptr<Algorithm>()>> AlgorithmMakers = {
-    {"dijstra", []() { return std::make_unique<AlgorithmImplDijkstra>(); }},
+    {"dijkstra", []() { return std::make_unique<AlgorithmImplDijkstra>(); }},
+    {"astar", []() { return std::make_unique<AlgorithmImplAStar>(); }},
 };
 
 // 一个编码规则 i*N+j => 标号, 注意, 因为 N 比 M 大, 所以采用 N
@@ -178,8 +202,8 @@ int main(int argc, char *argv[]) {
   program.add_argument("algorithm")
       .help("algorithm to visualize")
       .metavar("ALGORITHM")
-      .choices("dijstra", "bfs", "best-first", "astar")
-      .default_value(std::string("dijstra"))
+      .choices("dijkstra", "bfs", "best-first", "astar")
+      .default_value(std::string("dijkstra"))
       .store_into(options.algorithm);
   try {
     program.parse_args(argc, argv);
@@ -418,16 +442,20 @@ void Visualizer::saveScreenShot() {
 }
 
 /////////////////////////////////////
-/// 实现 AlgorithmImplDijkstra
+/// 实现 AlgorithmImplBase
 /////////////////////////////////////
 
-void AlgorithmImplDijkstra::Setup(Blackboard &b, const Point &start, const Point &target) {
+void AlgorithmImplBase::setupBlackboard(Blackboard &b) {
   // 清理黑板
   memset(b.vis, 0, sizeof(b.vis));
   for (int i = 0; i < M; i++)
     for (int j = 0; j < N; j++)
       b.waits[i][j] = -1;
   b.path.clear();
+}
+
+void AlgorithmImplBase::setupEdges() {
+  memset(from, 0, sizeof(from));
 
   // 障碍物的节点标号
   std::unordered_set<int> obstacles;
@@ -462,14 +490,39 @@ void AlgorithmImplDijkstra::Setup(Blackboard &b, const Point &start, const Point
         add_edge(x, pack(i, j + 1));
     }
   }
+}
+
+void AlgorithmImplBase::buildShortestPathResult(Blackboard &b) {
+  std::vector<int> path;
+  path.push_back(t);
+  int x = t;
+  while (x != s) {
+    x = from[x];
+    path.push_back(x);
+  }
+  // 反向求最短路
+  for (int i = path.size() - 1; i >= 0; --i) {
+    auto x = path[i];
+    b.path.push_back({unpack_i(x), unpack_j(x)});
+  }
+  b.isStopped = true;
+}
+
+/////////////////////////////////////
+/// 实现 AlgorithmImplDijkstra
+/////////////////////////////////////
+
+void AlgorithmImplDijkstra::Setup(Blackboard &b, const Point &start, const Point &target) {
+  // 清理黑板
+  setupBlackboard(b);
+  // 建图
+  setupEdges();
   // 清理 f, 到无穷大
   memset(f, 0x3f, sizeof(f));
-  memset(from, 0, sizeof(f));
   // 设置初始坐标
   s = pack(start);
   f[s] = 0;
   from[s] = s;
-  b.waits[unpack_i(s)][unpack_j(s)] = f[s];
   q.push({f[s], s});
   // 设置结束
   t = pack(target);
@@ -502,18 +555,52 @@ int AlgorithmImplDijkstra ::Update(Blackboard &b) {
     return -1;
   }
   // 已经结束,需要计算最短路
-  std::vector<int> path;
-  path.push_back(t);
-  int x = t;
-  while (x != s) {
-    x = from[x];
-    path.push_back(x);
-  }
-  // 反向求最短路
-  for (int i = path.size() - 1; i >= 0; --i) {
-    auto x = path[i];
-    b.path.push_back({unpack_i(x), unpack_j(x)});
-  }
-  b.isStopped = true;
+  buildShortestPathResult(b);
   return 0;
+}
+
+/////////////////////////////////////
+/// 实现 AlgorithmImplDijkstra
+/////////////////////////////////////
+
+int AlgorithmImplAStar ::Update(Blackboard &b) {
+  while (!q.empty()) {
+    auto [_, x] = q.top();
+    q.pop();
+    // 访问过的要忽略
+    int i = unpack_i(x), j = unpack_j(x);
+    // x 已经不算待扩展了, 恢复到 -1
+    b.waits[i][j] = -1;
+    if (b.vis[i][j])
+      continue;
+    b.vis[i][j] = true;
+    // 到达目标, 及时退出 (将 return 0)
+    if (t == x)
+      break;
+    // 添加邻居节点进入待扩展
+    for (const auto &[w, y] : edges[x]) {
+      auto g = f[x] + w;          // s 到 y 的实际代价
+      auto h = future_cost(y, t); // y 到目标的未来代价的估计
+      auto cost = g + h;          // 总代价 = 实际 + 未来
+      if (f[y] > g) {             // 如果当前实际代价比之前计算的更优
+        f[y] = g;                 // 维护 y 的实际代价
+        b.waits[unpack_i(y)][unpack_j(y)] = f[y];
+        q.push({cost, y});
+        from[y] = x; // 最短路来源
+      }
+    }
+    // 每次 Update 只考察一个点, 不算结束
+    return -1;
+  }
+  // 已经结束,需要计算最短路
+  buildShortestPathResult(b);
+  return 0;
+}
+
+int AlgorithmImplAStar::future_cost(int y, int t) {
+  auto ti = unpack_i(t), tj = unpack_j(t);
+  // y 的坐标
+  auto yi = unpack_i(y), yj = unpack_j(y);
+  // 对于 y 的未来代价预估, 曼哈顿距离
+  return abs(ti - yi) + abs(tj - yj);
 }
