@@ -9,18 +9,6 @@
 #include <argparse/argparse.hpp>
 #include <spdlog/spdlog.h>
 
-struct Options {
-  // 是否启用每一步的窗口截图, 保存在当前目录下的 screenshot 目录中
-  bool enable_screenshot = false;
-  // 保存窗口截图的目录, 文件的保存格式是 "{step-number}.PNG"
-  // 不带 / 结尾
-  std::string screenshot_directory = "screenshots";
-  // 两帧之间的时间间隔
-  int delay_ms = 50;
-  // 要演示的算法
-  std::string algorithm = "dijkstra";
-};
-
 // 一些设置
 const int GRID_SIZE = 40;
 const int M = 12;                        // 方格行数, 迭代变量 i
@@ -33,23 +21,37 @@ const int WINDOW_WIDTH = N * GRID_SIZE;  // 窗口宽度 800
 // clang-format off
 const int GRID_MAP[M][N] = {
     // 12 X 15
-    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0 },
-    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0 },
-    {0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 1, 0, 0, 0, 0 },
-    {0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0 },
-    {0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0 },
-    {0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    {0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    {0, 1, 1, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0 },
-    {0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    {0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0 },
-    {0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0 },
-    {0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0 },
+    {0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    {0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    {0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    {0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    {0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0 },
+    {0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0 },
+    {0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0 },
+    {0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0 },
+    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0 },
+    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0 },
+    {0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0 },
+    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 };
 // clang-format on
 
 // 坐标 (i, j)
 using Point = std::pair<int, int>;
+
+struct Options {
+  // 是否启用每一步的窗口截图, 保存在当前目录下的 screenshot 目录中
+  bool enable_screenshot = false;
+  // 保存窗口截图的目录, 文件的保存格式是 "{step-number}.PNG"
+  // 不带 / 结尾
+  std::string screenshot_directory = "screenshots";
+  // 两帧之间的时间间隔
+  int delay_ms = 50;
+  // 要演示的算法
+  std::string algorithm = "dijkstra";
+  // 起始点, 终点
+  Point start = {0, 0}, target = {M - 1, N - 1};
+};
 
 // 黑板, 算法要把寻路中的数据写到这里, Visualizer 可视化器会从这个黑板上去读.
 struct Blackboard {
@@ -58,10 +60,12 @@ struct Blackboard {
   // 当前考察的点 x
   Point x;
   // 历史考察过的点, 即 访问数组
-  bool vis[M][N];
+  // 有的也叫做 closed_set
+  bool visited[M][N];
   // 当前候选的待扩展的点的代价值
   // 不在待扩展列表中的, 标记 -1
-  int waits[M][N];
+  // 有的也叫做 open_set
+  int exploring[M][N];
   // 从出发到目标的一条最短路径 (包含 start 和 target)
   std::vector<Point> path;
 };
@@ -106,8 +110,6 @@ private:
   const Options &options;
   Blackboard &blackboard;
   Algorithm *algo;
-  // 起始点, 目标点
-  const Point start = {0, 0}, target = {M - 1, N - 1};
   // SDL
   SDL_Window *window = nullptr;
   SDL_Renderer *renderer = nullptr;
@@ -183,11 +185,35 @@ inline int pack(const Point &p) { return p.first * N + p.second; }
 inline int unpack_i(int x) { return x / N; }
 inline int unpack_j(int x) { return x % N; }
 
+// 一个切割类似 "x,y" 的字符串到 Point 的 util 函数
+Point ParsePointString(const std::string &s);
+
+// 检查选项 start 和 target, 成功返回 0
+int ValidateStartAndTarget(const Options &options) {
+  if (options.start.first < 0 || options.start.second >= M) {
+    spdlog::error("非法的 start");
+    return -1;
+  }
+  if (options.target.first < 0 || options.target.second >= N) {
+    spdlog::error("非法的 target");
+    return -1;
+  }
+  if (GRID_MAP[options.start.first][options.start.second]) {
+    spdlog::error("start 选在了障碍物上");
+    return -1;
+  }
+  if (GRID_MAP[options.target.first][options.target.second]) {
+    spdlog::error("target 选在了障碍物上");
+    return -1;
+  }
+  return 0;
+}
+
 int main(int argc, char *argv[]) {
   // 解析命令行参数到给定的 options 结构.
   Options options;
   argparse::ArgumentParser program("shortest-path-visulization-sdl");
-  program.add_argument("-s", "--enable-screenshot")
+  program.add_argument("--enable-screenshot")
       .help("是否启用每一步的窗口截图")
       .default_value(false)
       .store_into(options.enable_screenshot);
@@ -200,17 +226,26 @@ int main(int argc, char *argv[]) {
       .default_value(50)
       .store_into(options.delay_ms);
   program.add_argument("algorithm")
-      .help("algorithm to visualize")
+      .help("算法名称")
       .metavar("ALGORITHM")
-      .choices("dijkstra", "bfs", "best-first", "astar")
+      .choices("dijkstra", "astar")
       .default_value(std::string("dijkstra"))
       .store_into(options.algorithm);
+  program.add_argument("-s", "--start").help("起始点").default_value("0,0");
+  program.add_argument("-t", "--target").help("起始点").default_value("11,14");
+
   try {
     program.parse_args(argc, argv);
   } catch (const std::exception &e) {
     spdlog::error(e.what());
     std::exit(1);
   }
+
+  // 处理起始点 和 重点
+  options.start = ParsePointString(program.get<std::string>("--start"));
+  options.target = ParsePointString(program.get<std::string>("--target"));
+  if (ValidateStartAndTarget(options) != 0)
+    return -1;
 
   // 选用算法
   if (AlgorithmMakers.find(options.algorithm) == AlgorithmMakers.end()) {
@@ -229,6 +264,20 @@ int main(int argc, char *argv[]) {
   visualizer.Start();
   visualizer.Destroy();
   return 0;
+}
+
+Point ParsePointString(const std::string &s) {
+  std::string sx, sy;
+  int flag = 0; // 0 时输出给 sx, 1 时输出给 sy
+  for (const auto ch : s) {
+    if (ch == ',')
+      flag = 1;
+    else
+      flag == 0 ? sx.push_back(ch) : sy.push_back(ch);
+  }
+  if (!flag)
+    return {-1, -1}; // Invalid
+  return {std::stoi(sx), std::stoi(sy)};
 }
 
 /////////////////////////////////////
@@ -274,7 +323,7 @@ int Visualizer::Init() {
   spdlog::info("初始化 SDL 成功");
 
   // 初始化算法设置
-  algo->Setup(blackboard, start, target);
+  algo->Setup(blackboard, options.start, options.target);
 
   spdlog::info("初始化算法成功");
   return 0;
@@ -359,16 +408,17 @@ void Visualizer::draw() {
       if (GRID_MAP[i][j] == 1)
         // 障碍物: 灰色
         SDL_SetRenderDrawColor(renderer, 64, 64, 64, 255);
-      else if ((i == start.first && j == start.second) || (i == target.first && j == target.second))
+      else if ((i == options.start.first && j == options.start.second) ||
+               (i == options.target.first && j == options.target.second))
         // 起始点: 绿色
         SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
       else if (shortest_grids[i][j])
         // 最短路径点: 绿色
         SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
-      else if (blackboard.vis[i][j])
+      else if (blackboard.visited[i][j])
         // 访问过的路径点: 蓝色
         SDL_SetRenderDrawColor(renderer, 0, 150, 255, 255);
-      else if (blackboard.waits[i][j] >= 0)
+      else if (blackboard.exploring[i][j] >= 0)
         // 将要扩展的点: 浅蓝色
         SDL_SetRenderDrawColor(renderer, 173, 216, 230, 255);
       else
@@ -447,10 +497,10 @@ void Visualizer::saveScreenShot() {
 
 void AlgorithmImplBase::setupBlackboard(Blackboard &b) {
   // 清理黑板
-  memset(b.vis, 0, sizeof(b.vis));
+  memset(b.visited, 0, sizeof(b.visited));
   for (int i = 0; i < M; i++)
     for (int j = 0; j < N; j++)
-      b.waits[i][j] = -1;
+      b.exploring[i][j] = -1;
   b.path.clear();
 }
 
@@ -535,10 +585,10 @@ int AlgorithmImplDijkstra ::Update(Blackboard &b) {
     // 访问过的要忽略
     int i = unpack_i(x), j = unpack_j(x);
     // x 已经不算待扩展了, 恢复到 -1
-    b.waits[i][j] = -1;
-    if (b.vis[i][j])
+    b.exploring[i][j] = -1;
+    if (b.visited[i][j])
       continue;
-    b.vis[i][j] = true;
+    b.visited[i][j] = true;
     // 到达目标, 及时退出 (将 return 0)
     if (t == x)
       break;
@@ -548,7 +598,7 @@ int AlgorithmImplDijkstra ::Update(Blackboard &b) {
         f[y] = f[x] + w;
         from[y] = x;
         q.push({f[y], y});
-        b.waits[unpack_i(y)][unpack_j(y)] = f[y];
+        b.exploring[unpack_i(y)][unpack_j(y)] = f[y];
       }
     }
     // 每次 Update 只考察一个点, 不算结束
@@ -570,10 +620,10 @@ int AlgorithmImplAStar ::Update(Blackboard &b) {
     // 访问过的要忽略
     int i = unpack_i(x), j = unpack_j(x);
     // x 已经不算待扩展了, 恢复到 -1
-    b.waits[i][j] = -1;
-    if (b.vis[i][j])
+    b.exploring[i][j] = -1;
+    if (b.visited[i][j])
       continue;
-    b.vis[i][j] = true;
+    b.visited[i][j] = true;
     // 到达目标, 及时退出 (将 return 0)
     if (t == x)
       break;
@@ -584,7 +634,7 @@ int AlgorithmImplAStar ::Update(Blackboard &b) {
       auto cost = g + h;          // 总代价 = 实际 + 未来
       if (f[y] > g) {             // 如果当前实际代价比之前计算的更优
         f[y] = g;                 // 维护 y 的实际代价
-        b.waits[unpack_i(y)][unpack_j(y)] = f[y];
+        b.exploring[unpack_i(y)][unpack_j(y)] = f[y];
         q.push({cost, y});
         from[y] = x; // 最短路来源
       }
