@@ -51,6 +51,8 @@ struct Options {
   std::string algorithm = "dijkstra";
   // 起始点, 终点
   Point start = {0, 0}, target = {M - 1, N - 1};
+  // 是否只采用 4 方向, 默认是 8 方向
+  bool use_4directions = false;
 };
 
 // 黑板, 算法要把寻路中的数据写到这里, Visualizer 可视化器会从这个黑板上去读.
@@ -76,7 +78,8 @@ public:
   virtual ~Algorithm() {} // makes unique_ptr happy
   // 初始化算法的准备项.
   // 参数 start 和 target 分别表示起点和终点
-  virtual void Setup(Blackboard &b, const Point &start, const Point &target) = 0;
+  virtual void Setup(Blackboard &b, const Point &start, const Point &target,
+                     bool use_4directions = false) = 0;
   // 每一帧会被调用一次, 算作走一步.
   // 在这里, Update 要把结果写到黑板上.
   // 如果已经结束, 则返回 0, 否则返回非 0
@@ -143,7 +146,7 @@ protected:
   // 设置黑板 (清理)
   virtual void setupBlackboard(Blackboard &b);
   // 初始化建图
-  virtual void setupEdges();
+  virtual void setupEdges(bool use_4directions = false);
   // 收集最短路结果
   virtual void buildShortestPathResult(Blackboard &b);
 };
@@ -151,7 +154,7 @@ protected:
 // 算法实现 - dijkstra
 class AlgorithmImplDijkstra : public AlgorithmImplBase {
 public:
-  virtual void Setup(Blackboard &b, const Point &start, const Point &target) override;
+  virtual void Setup(Blackboard &b, const Point &start, const Point &target, bool use_4directions) override;
   virtual int Update(Blackboard &b) override;
 
 protected:
@@ -231,6 +234,10 @@ int main(int argc, char *argv[]) {
       .choices("dijkstra", "astar")
       .default_value(std::string("dijkstra"))
       .store_into(options.algorithm);
+  program.add_argument("-d4", "--use-4-directions")
+      .help("是否只采用4方向,默认是8方向")
+      .default_value(false)
+      .store_into(options.use_4directions);
   program.add_argument("-s", "--start").help("起始点").default_value("0,0");
   program.add_argument("-t", "--target").help("起始点").default_value("11,14");
 
@@ -323,7 +330,7 @@ int Visualizer::Init() {
   spdlog::info("初始化 SDL 成功");
 
   // 初始化算法设置
-  algo->Setup(blackboard, options.start, options.target);
+  algo->Setup(blackboard, options.start, options.target, options.use_4directions);
 
   spdlog::info("初始化算法成功");
   return 0;
@@ -504,7 +511,7 @@ void AlgorithmImplBase::setupBlackboard(Blackboard &b) {
   b.path.clear();
 }
 
-void AlgorithmImplBase::setupEdges() {
+void AlgorithmImplBase::setupEdges(bool use_4directions) {
   memset(from, 0, sizeof(from));
 
   // 障碍物的节点标号
@@ -528,7 +535,8 @@ void AlgorithmImplBase::setupEdges() {
   edges.resize(n);
   for (int i = 0; i < M; i++) {
     for (int j = 0; j < N; j++) {
-      // 上下左右都可以走, 除非是有障碍物
+      // 都可以走, 除非是有障碍物
+      // 上下左右
       int x = pack(i, j);
       if (i > 0) // 上
         add_edge(x, pack(i - 1, j));
@@ -538,6 +546,17 @@ void AlgorithmImplBase::setupEdges() {
         add_edge(x, pack(i + 1, j));
       if (j < N - 1) // 右
         add_edge(x, pack(i, j + 1));
+      if (use_4directions)
+        continue;
+      //  加上斜线方向
+      if (i > 0 && j > 0) // 左上
+        add_edge(x, pack(i - 1, j - 1));
+      if (i > 0 && j < M - 1) // 右上
+        add_edge(x, pack(i - 1, j + 1));
+      if (i < M - 1 && j > 0) // 左下
+        add_edge(x, pack(i + 1, j - 1));
+      if (i < M - 1 && j < N - 1) // 右下
+        add_edge(x, pack(i + 1, j + 1));
     }
   }
 }
@@ -562,11 +581,12 @@ void AlgorithmImplBase::buildShortestPathResult(Blackboard &b) {
 /// 实现 AlgorithmImplDijkstra
 /////////////////////////////////////
 
-void AlgorithmImplDijkstra::Setup(Blackboard &b, const Point &start, const Point &target) {
+void AlgorithmImplDijkstra::Setup(Blackboard &b, const Point &start, const Point &target,
+                                  bool use_4directions) {
   // 清理黑板
   setupBlackboard(b);
   // 建图
-  setupEdges();
+  setupEdges(use_4directions);
   // 清理 f, 到无穷大
   memset(f, 0x3f, sizeof(f));
   // 设置初始坐标
