@@ -14,46 +14,47 @@ struct Options {
   bool enable_screenshot = false;
   // 保存窗口截图的目录, 文件的保存格式是 "{step-number}.PNG"
   // 不带 / 结尾
-  std::string screenshot_directory = "screenshot";
+  std::string screenshot_directory = "screenshots";
   // 两帧之间的时间间隔
-  int delay_ms = 100;
+  int delay_ms = 50;
   // 要演示的算法
   std::string algorithm = "dijstra";
 };
 
 // 一些设置
 const int GRID_SIZE = 40;
-const int M = 15;                        // 方格行数, 迭代变量 i
-const int N = 20;                        // 方格列数, 迭代变量 j
+const int M = 12;                        // 方格行数, 迭代变量 i
+const int N = 15;                        // 方格列数, 迭代变量 j
 const int WINDOW_HEIGHT = M * GRID_SIZE; // 窗口高度 600
 const int WINDOW_WIDTH = N * GRID_SIZE;  // 窗口宽度 800
 
 // 网格地图: 0 表示空白方格 (白色), 1 表示有障碍物 (灰色)
 // 要从左上角 (0,0) 出发, 到达右下角 (M-1,N-1)
+// clang-format off
 const int GRID_MAP[M][N] = {
-    // 15 X 20
-    {0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0},
-    {0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0},
-    {0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-    {0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-    {0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0},
-    {0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0},
-    {0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0},
-    {0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0},
-    {0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0},
-    {0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0},
-    {0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0},
-    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0},
-    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0},
-    {0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0},
-    {0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0},
+    // 12 X 15
+    {0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0 },
+    {0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0 },
+    {0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0 },
+    {0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0 },
+    {0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0 },
+    {0, 0, 0, 1, 0, 1, 1, 0, 0, 0, 1, 0, 0, 0, 0 },
+    {0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0 },
+    {0, 0, 0, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0 },
+    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0 },
+    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0 },
+    {0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0 },
+    {0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0 },
 };
+// clang-format on
 
 // 坐标 (i, j)
 using Point = std::pair<int, int>;
 
 // 黑板, 算法要把寻路中的数据写到这里, Visualizer 可视化器会从这个黑板上去读.
 struct Blackboard {
+  // 是否计算结束?
+  bool isStopped = false;
   // 当前考察的点 x
   Point x;
   // 历史考察过的点, 即 访问数组
@@ -98,6 +99,8 @@ protected:
   void draw();
   // 处理输入, 返回 -1 表示要退出
   int handleInputs();
+  // 处理最短路径结果的播放状态
+  void handleShortestPathPalyStates();
 
 private:
   const Options &options;
@@ -110,6 +113,11 @@ private:
   SDL_Renderer *renderer = nullptr;
   // 帧号
   int seq = 0;
+  // 绘制最短路时的临时状态
+  // shortest_grids[i][j] 是 true 表示 (i,j) 是最短路结果的一员
+  bool shortest_grids[M][N];
+  // 当前播放到第几个最短路点?
+  int shortest_grid_no = 0;
 };
 
 // 算法实现 - dijstra
@@ -136,6 +144,8 @@ private:
   std::priority_queue<P, std::vector<P>, std::greater<P>> q;
   // f[x] 保存出发点 s 到 x 的最短路
   int f[n];
+  // from[x] 保存 x 最短路的上一步由哪个节点而来
+  int from[n];
 };
 
 // 算法 Handler 构造器表格
@@ -159,11 +169,11 @@ int main(int argc, char *argv[]) {
       .store_into(options.enable_screenshot);
   program.add_argument("--screenshot-directory")
       .help("截图文件的保存目录")
-      .default_value(std::string("screenshot"))
+      .default_value(std::string("screenshots"))
       .store_into(options.screenshot_directory);
   program.add_argument("-d", "--delay-ms")
       .help("帧之间的毫秒间隔")
-      .default_value(100)
+      .default_value(50)
       .store_into(options.delay_ms);
   program.add_argument("algorithm")
       .help("algorithm to visualize")
@@ -202,7 +212,9 @@ int main(int argc, char *argv[]) {
 /////////////////////////////////////
 
 Visualizer::Visualizer(const Options &options, Blackboard &b, Algorithm *algo)
-    : options(options), blackboard(b), algo(algo) {}
+    : options(options), blackboard(b), algo(algo) {
+  memset(shortest_grids, 0, sizeof(shortest_grids));
+}
 
 int Visualizer::Init() {
   // 初始化 SDL
@@ -258,10 +270,13 @@ void Visualizer::Start() {
       break;
     // 更新算法步骤
     seq++;
-    if (algo->Update(blackboard) == 0) {
-      // 算法结束
-      spdlog::info("算法已结束");
-      break;
+    if (!blackboard.isStopped) { // 只有没有结束时才执行一次 Update
+      if (algo->Update(blackboard) == 0) {
+        spdlog::info("算法已结束, Ctrl-C 即可退出");
+      }
+    } else {
+      // 否则, 需要设定当前需要绘制的最短路径点
+      handleShortestPathPalyStates();
     }
     // 清理屏幕,并绘制一次
     // 背景颜色: 白色
@@ -319,13 +334,19 @@ void Visualizer::draw() {
       // 选用内层正方形的填充颜色
       if (GRID_MAP[i][j] == 1)
         // 障碍物: 灰色
-        SDL_SetRenderDrawColor(renderer, 64, 64, 64, 1);
+        SDL_SetRenderDrawColor(renderer, 64, 64, 64, 255);
+      else if ((i == start.first && j == start.second) || (i == target.first && j == target.second))
+        // 起始点: 绿色
+        SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
+      else if (shortest_grids[i][j])
+        // 最短路径点: 绿色
+        SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
       else if (blackboard.vis[i][j])
         // 访问过的路径点: 蓝色
-        SDL_SetRenderDrawColor(renderer, 0, 0, 255, 1);
+        SDL_SetRenderDrawColor(renderer, 0, 150, 255, 255);
       else if (blackboard.waits[i][j] >= 0)
         // 将要扩展的点: 浅蓝色
-        SDL_SetRenderDrawColor(renderer, 173, 216, 230, 1);
+        SDL_SetRenderDrawColor(renderer, 173, 216, 230, 255);
       else
         // 默认是白色
         SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
@@ -333,6 +354,20 @@ void Visualizer::draw() {
       SDL_RenderFillRect(renderer, &inner);
     }
   }
+}
+
+void Visualizer::handleShortestPathPalyStates() {
+  if (blackboard.path.empty())
+    return;
+  // 播放到下一个路径点, 到尾部则循环
+  if (shortest_grid_no == blackboard.path.size() - 1) {
+    shortest_grid_no = 0;
+    memset(shortest_grids, 0, sizeof shortest_grids);
+  } else {
+    shortest_grid_no++;
+  }
+  auto &p = blackboard.path[shortest_grid_no];
+  shortest_grids[p.first][p.second] = true;
 }
 
 void Visualizer::saveScreenShot() {
@@ -374,6 +409,8 @@ void Visualizer::saveScreenShot() {
     delete[] pixels;
     return;
   }
+
+  spdlog::info("saveScreenShot: 保存截图成功 => {}", filename);
 
   SDL_FreeSurface(saveSurface);
   delete[] pixels;
@@ -427,9 +464,11 @@ void AlgorithmImplDijkstra::Setup(Blackboard &b, const Point &start, const Point
   }
   // 清理 f, 到无穷大
   memset(f, 0x3f, sizeof(f));
+  memset(from, 0, sizeof(f));
   // 设置初始坐标
   s = pack(start);
   f[s] = 0;
+  from[s] = s;
   b.waits[unpack_i(s)][unpack_j(s)] = f[s];
   q.push({f[s], s});
   // 设置结束
@@ -454,6 +493,7 @@ int AlgorithmImplDijkstra ::Update(Blackboard &b) {
     for (const auto &[w, y] : edges[x]) {
       if (f[y] > f[x] + w) {
         f[y] = f[x] + w;
+        from[y] = x;
         q.push({f[y], y});
         b.waits[unpack_i(y)][unpack_j(y)] = f[y];
       }
@@ -461,6 +501,19 @@ int AlgorithmImplDijkstra ::Update(Blackboard &b) {
     // 每次 Update 只考察一个点, 不算结束
     return -1;
   }
-  // TODO: 已经结束,需要计算最短路
+  // 已经结束,需要计算最短路
+  std::vector<int> path;
+  path.push_back(t);
+  int x = t;
+  while (x != s) {
+    x = from[x];
+    path.push_back(x);
+  }
+  // 反向求最短路
+  for (int i = path.size() - 1; i >= 0; --i) {
+    auto x = path[i];
+    b.path.push_back({unpack_i(x), unpack_j(x)});
+  }
+  b.isStopped = true;
   return 0;
 }
