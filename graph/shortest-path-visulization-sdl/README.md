@@ -41,7 +41,7 @@ make build
 
 可以按下 `Ctrl-S` 来截图, 会保存在 `screenshots` 目录.
 
-也可以用 `--enable-screenshot` 来对每一帧截图 (注意及时退出, 免得截图太多).
+也可以用 `--enable-screenshot` 来对每一帧截图 (会自动在找到最短路后及时退出自动截图, 免得截图太多).
 
 #### 地图
 
