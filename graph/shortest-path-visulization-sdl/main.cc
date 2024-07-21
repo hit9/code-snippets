@@ -1,5 +1,6 @@
 #include <cmath>
 #include <cstring>
+#include <fstream>
 #include <memory>
 #include <queue>
 #include <string>
@@ -20,23 +21,8 @@ const int WINDOW_WIDTH = N * GRID_SIZE;  // 窗口宽度 800
 
 // 网格地图: 0 表示空白方格 (白色), 1 表示有障碍物 (灰色)
 // 要从左上角 (0,0) 出发, 到达右下角 (M-1,N-1)
-// clang-format off
-const int GRID_MAP[M][N] = {
-    // 12 X 15
-    {0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    {0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    {0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    {0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    {0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0 },
-    {0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0 },
-    {0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0 },
-    {0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 0, 0, 0 },
-    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0 },
-    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0 },
-    {0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0 },
-    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-};
-// clang-format on
+// 12 X 15
+int GRID_MAP[M][N];
 
 // 坐标 (i, j)
 using Point = std::pair<int, int>;
@@ -56,6 +42,8 @@ const std::pair<int, int> DIRECTIONS[8] = {
 };
 
 struct Options {
+  // 地图文件地址
+  std::string map_file_path = "map.txt";
   // 是否启用每一步的窗口截图, 保存在当前目录下的 screenshot 目录中
   bool enable_screenshot = false;
   // 保存窗口截图的目录, 文件的保存格式是 "{step-number}.PNG"
@@ -244,10 +232,17 @@ int ValidateStartAndTarget(const Options &options) {
   return 0;
 }
 
+// 加载地图, 成功则返回 0
+int LoadMap(const std::string &filepath);
+
 int main(int argc, char *argv[]) {
   // 解析命令行参数到给定的 options 结构.
   Options options;
   argparse::ArgumentParser program("shortest-path-visulization-sdl");
+  program.add_argument("-m", "--map")
+      .help("地图文件")
+      .default_value(std::string("map.txt"))
+      .store_into(options.map_file_path);
   program.add_argument("--enable-screenshot")
       .help("是否启用每一步的窗口截图")
       .default_value(false)
@@ -288,6 +283,11 @@ int main(int argc, char *argv[]) {
     std::exit(1);
   }
 
+  // 加载地图
+  if (LoadMap(options.map_file_path) != 0)
+    return -1;
+  spdlog::info("地图加载成功 ({})", options.map_file_path);
+
   // 处理起始点 和 重点
   options.start = ParsePointString(program.get<std::string>("--start"));
   options.target = ParsePointString(program.get<std::string>("--target"));
@@ -327,6 +327,44 @@ Point ParsePointString(const std::string &s) {
   if (!flag)
     return {-1, -1}; // Invalid
   return {std::stoi(sx), std::stoi(sy)};
+}
+
+int LoadMap(const std::string &filepath) {
+  std::fstream f;
+  f.open(filepath);
+  std::string line;
+  int x = 0;
+  while (std::getline(f, line)) {
+    // 检查行数
+    if (x >= M) {
+      spdlog::error("地图: 必须恰好 {} 行", M);
+      f.close();
+      return -1;
+    }
+    // 检查每行字符个数
+    if (line.size() != N + N - 1) { // 算进去空格
+      spdlog::error("地图: 每行必须是 {} 个 0 或者 1, 目前第 {} 行是 {} 个字符 (包含空格计算在内)", N, x,
+                    line.size());
+      f.close();
+      return -1;
+    }
+    // 读取每个字符
+    int y = 0;
+    for (auto ch : line) {
+      if (ch == ' ')
+        continue;
+      int value = static_cast<int>(ch - '0');
+      if (value != 0 && value != 1) {
+        spdlog::error("地图: 每个字符要么是0要么是1, 发现了一个 '{}'", ch);
+        f.close();
+        return -2;
+      }
+      GRID_MAP[x][y++] = value;
+    }
+    x++;
+  }
+  f.close();
+  return 0;
 }
 
 /////////////////////////////////////
