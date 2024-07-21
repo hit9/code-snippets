@@ -12,18 +12,17 @@
 #include <spdlog/spdlog.h>
 
 // 一些设置
-const int COST_UNIT = 10;     // 默认边长 10, 即代价单位
-const int DIAGONAL_COST = 14; //  对角成本是 14 (根号2 x 10)
-const int GRID_SIZE = 40;
+const int GRID_SIZE = 40;                // 绘制每个网格 Pixel 的个数
 const int M = 12;                        // 方格行数, 迭代变量 i
 const int N = 15;                        // 方格列数, 迭代变量 j
 const int WINDOW_HEIGHT = M * GRID_SIZE; // 窗口高度 600
 const int WINDOW_WIDTH = N * GRID_SIZE;  // 窗口宽度 800
+const int COST_UNIT = 10;                // 默认边长 10, 即代价单位, 水平和垂直方向代价
+const int DIAGONAL_COST = 14;            // 对角成本是 14 (根号2 x 10)
+const int inf = 0x3f3f3f3f;
 
 // 网格地图: 0 表示空白方格 (白色), 1 表示有障碍物 (灰色)
-// 要从左上角 (0,0) 出发, 到达右下角 (M-1,N-1)
-// 12 X 15
-int GRID_MAP[M][N];
+int GRID_MAP[M][N]; // 12 x 15
 
 // 坐标 (i, j)
 using Point = std::pair<int, int>;
@@ -42,6 +41,7 @@ const std::pair<int, std::pair<int, int>> DIRECTIONS[8] = {
     {DIAGONAL_COST, {1, 1}},
 };
 
+// 命令行选项
 struct Options {
   // 地图文件地址
   std::string map_file_path = "map.txt";
@@ -144,14 +144,12 @@ protected:
   static const int n = M * N;
   // (距离 OR 边权, 节点号)
   using P = std::pair<int, int>;
-  // 起始点标号 s
-  int s;
-  // 结束点标号 t
-  int t;
+  // 起始点标号 s, 结束点标号 t
+  int s, t;
   // edges[x] => {{w, y}}  边权,邻接点
   std::vector<std::vector<P>> edges;
   // from[x] 保存 x 最短路的上一步由哪个节点而来
-  // 默认是 0x3f3f3f3f
+  // 默认是 inf, 如果最终算法结束仍然是 inf, 则表示算法失败
   int from[n];
 
   // 一些 Utils (可重载)
@@ -192,7 +190,7 @@ private:
   int future_cost(int y, int t);
 };
 
-// 算法 Handler 构造器表格
+// 算法 Handler 构造器表格, 每新增一个算法, 需要到这里注册一下
 std::unordered_map<std::string, std::function<std::unique_ptr<Algorithm>()>> AlgorithmMakers = {
     {"dijkstra", []() { return std::make_unique<AlgorithmImplDijkstra>(); }},
     {"astar", []() { return std::make_unique<AlgorithmImplAStar>(); }},
@@ -322,7 +320,7 @@ Point ParsePointString(const std::string &s) {
   int flag = 0; // 0 时输出给 sx, 1 时输出给 sy
   for (const auto ch : s) {
     if (ch == ',')
-      flag = 1;
+      flag = 1; // 切换到输入给 sy
     else
       flag == 0 ? sx.push_back(ch) : sy.push_back(ch);
   }
@@ -689,7 +687,7 @@ int AlgorithmImplDijkstra ::Update(Blackboard &b) {
     return -1;
   }
   // 已经结束,需要计算最短路
-  if (from[t] == 0x3f3f3f3f)
+  if (from[t] == inf)
     return -2; // 失败
   buildShortestPathResult(b);
   return 0;
@@ -740,7 +738,7 @@ int AlgorithmImplAStar ::Update(Blackboard &b) {
     return -1;
   }
   // 每次 Update 只考察一个点, 不算结束
-  if (from[t] == 0x3f3f3f3f)
+  if (from[t] == inf)
     return -2; // 失败
   // 已经结束,需要计算最短路
   buildShortestPathResult(b);
