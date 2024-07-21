@@ -27,10 +27,10 @@ const int GRID_MAP[M][N] = {
     {0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
     {0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
     {0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    {0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0 },
     {0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0 },
     {0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0 },
-    {0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0 },
-    {0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0 },
+    {0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 0, 0, 0 },
     {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0 },
     {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0 },
     {0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0 },
@@ -40,6 +40,20 @@ const int GRID_MAP[M][N] = {
 
 // 坐标 (i, j)
 using Point = std::pair<int, int>;
+
+// 方向
+const std::pair<int, int> DIRECTIONS[8] = {
+    // 前 4 个是水平和竖直
+    {-1, 0},
+    {0, -1},
+    {1, 0},
+    {0, 1},
+    // 后 4 个是斜向
+    {-1, -1},
+    {-1, 1},
+    {1, -1},
+    {1, 1},
+};
 
 struct Options {
   // 是否启用每一步的窗口截图, 保存在当前目录下的 screenshot 目录中
@@ -199,17 +213,19 @@ inline int unpack_j(int x) { return x % N; }
 // 一个切割类似 "x,y" 的字符串到 Point 的 util 函数
 Point ParsePointString(const std::string &s);
 
-inline bool validatePoint(const Point &p) {
+// 检查点是否在地图中
+inline bool ValidatePoint(const Point &p) {
   return p.first >= 0 && p.first < M && p.second >= 0 && p.second < N;
 }
+inline bool ValidatePoint(int x, int y) { return x >= 0 && x < M && y >= 0 && y < N; }
 
 // 检查选项 start 和 target, 成功返回 0
 int ValidateStartAndTarget(const Options &options) {
-  if (!validatePoint(options.start)) {
+  if (!ValidatePoint(options.start)) {
     spdlog::error("非法的 start {},{}", options.start.first, options.start.second);
     return -1;
   }
-  if (!validatePoint(options.target)) {
+  if (!ValidatePoint(options.target)) {
     spdlog::error("非法的 target {},{}", options.target.first, options.target.second);
     return -1;
   }
@@ -273,6 +289,8 @@ int main(int argc, char *argv[]) {
   options.target = ParsePointString(program.get<std::string>("--target"));
   if (ValidateStartAndTarget(options) != 0)
     return -1;
+
+  spdlog::info("支持的方向数量 => {}", options.use_4directions ? 4 : 8);
 
   // 选用算法
   if (AlgorithmMakers.find(options.algorithm) == AlgorithmMakers.end()) {
@@ -553,30 +571,21 @@ void AlgorithmImplBase::setupEdges(bool use_4directions) {
 
   // 构造 edges
   edges.resize(n);
+  // 4 方向是取前 4 个.
+  int K = use_4directions ? 4 : 8;
   for (int i = 0; i < M; i++) {
     for (int j = 0; j < N; j++) {
-      // 都可以走, 除非是有障碍物
-      // 上下左右
-      int x = pack(i, j);
-      if (i > 0) // 上
-        add_edge(x, pack(i - 1, j));
-      if (j > 0) // 左
-        add_edge(x, pack(i, j - 1));
-      if (i < M - 1) // 下
-        add_edge(x, pack(i + 1, j));
-      if (j < N - 1) // 右
-        add_edge(x, pack(i, j + 1));
-      if (use_4directions)
+      if (GRID_MAP[i][j]) // 不可从障碍物出发
         continue;
-      //  加上斜线方向
-      if (i > 0 && j > 0) // 左上
-        add_edge(x, pack(i - 1, j - 1));
-      if (i > 0 && j < M - 1) // 右上
-        add_edge(x, pack(i - 1, j + 1));
-      if (i < M - 1 && j > 0) // 左下
-        add_edge(x, pack(i + 1, j - 1));
-      if (i < M - 1 && j < N - 1) // 右下
-        add_edge(x, pack(i + 1, j + 1));
+      int x = pack(i, j);
+      // 都可以走, 除非是有障碍物
+      for (int k = 0; k < K; k++) {
+        const auto &d = DIRECTIONS[k];
+        auto i1 = i + d.first, j1 = j + d.second;
+        // 不可到达障碍物, 不可越过边界
+        if (ValidatePoint(i1, j1) && !GRID_MAP[i1][j1])
+          edges[x].push_back({1, pack(i1, j1)});
+      }
     }
   }
 }
