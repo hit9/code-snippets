@@ -89,7 +89,7 @@ public:
   virtual void Setup(Blackboard &b, const Options &options) = 0;
   // 每一帧会被调用一次, 算作走一步.
   // 在这里, Update 要把结果写到黑板上.
-  // 如果已经结束, 则返回 0, 否则返回非 0
+  // 如果已经结束, 则返回 0, 没结束返回 -1, 失败返回 -2
   // 在结束返回 0 的时候必须要做 blackboard 上的最短路结果 path 被设置.
   virtual int Update(Blackboard &b) = 0;
 };
@@ -150,6 +150,7 @@ protected:
   // edges[x] => {{w, y}}  边权,邻接点
   std::vector<std::vector<P>> edges;
   // from[x] 保存 x 最短路的上一步由哪个节点而来
+  // 默认是 0x3f3f3f3f
   int from[n];
 
   // 一些 Utils (可重载)
@@ -430,9 +431,13 @@ void Visualizer::Start() {
       break;
     // 更新算法步骤
     seq++;
+    int code = -1;
     if (!blackboard.isStopped) { // 只有没有结束时才执行一次 Update
-      if (algo->Update(blackboard) == 0) {
+      code = algo->Update(blackboard);
+      if (code == 0) {
         spdlog::info("算法已结束, Ctrl-C 即可退出");
+      } else if (code == -2) {
+        spdlog::info("算法已失败, Ctrl-C 即可退出");
       }
     } else {
       // 否则, 需要设定当前需要绘制的最短路径点
@@ -444,7 +449,7 @@ void Visualizer::Start() {
     SDL_RenderClear(renderer);
     draw();
     SDL_RenderPresent(renderer);
-    if (is_shortest_path_ever_rendered && enable_screenshot) {
+    if ((code == -2 || is_shortest_path_ever_rendered) && enable_screenshot) {
       enable_screenshot = false;
       spdlog::info("算法已结束, 已关闭自动截图");
     }
@@ -598,7 +603,7 @@ void AlgorithmImplBase::setupBlackboard(Blackboard &b) {
 }
 
 void AlgorithmImplBase::setupEdges(bool use_4directions) {
-  memset(from, 0, sizeof(from));
+  memset(from, 0x3f, sizeof(from));
 
   // 障碍物的节点标号
   std::unordered_set<int> obstacles;
@@ -701,6 +706,8 @@ int AlgorithmImplDijkstra ::Update(Blackboard &b) {
     return -1;
   }
   // 已经结束,需要计算最短路
+  if (from[t] == 0x3f3f3f3f)
+    return -2; // 失败
   buildShortestPathResult(b);
   return 0;
 }
@@ -747,9 +754,11 @@ int AlgorithmImplAStar ::Update(Blackboard &b) {
         from[y] = x; // 最短路来源
       }
     }
-    // 每次 Update 只考察一个点, 不算结束
     return -1;
   }
+  // 每次 Update 只考察一个点, 不算结束
+  if (from[t] == 0x3f3f3f3f)
+    return -2; // 失败
   // 已经结束,需要计算最短路
   buildShortestPathResult(b);
   return 0;
