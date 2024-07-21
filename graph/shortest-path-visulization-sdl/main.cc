@@ -194,14 +194,18 @@ inline int unpack_j(int x) { return x % N; }
 // 一个切割类似 "x,y" 的字符串到 Point 的 util 函数
 Point ParsePointString(const std::string &s);
 
+inline bool validatePoint(const Point &p) {
+  return p.first >= 0 && p.first < M && p.second >= 0 && p.second < N;
+}
+
 // 检查选项 start 和 target, 成功返回 0
 int ValidateStartAndTarget(const Options &options) {
-  if (options.start.first < 0 || options.start.second >= M) {
-    spdlog::error("非法的 start");
+  if (!validatePoint(options.start)) {
+    spdlog::error("非法的 start {},{}", options.start.first, options.start.second);
     return -1;
   }
-  if (options.target.first < 0 || options.target.second >= N) {
-    spdlog::error("非法的 target");
+  if (!validatePoint(options.target)) {
+    spdlog::error("非法的 target {},{}", options.target.first, options.target.second);
     return -1;
   }
   if (GRID_MAP[options.start.first][options.start.second]) {
