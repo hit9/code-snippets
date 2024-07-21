@@ -1,6 +1,6 @@
 一个用来可视化最短路算法的小工具.
 
-![](misc/astar-demo.png)
+![](misc/astar.gif)
 
 ### 安装依赖和构建
 
