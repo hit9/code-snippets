@@ -132,6 +132,8 @@ private:
   const Options &options;
   Blackboard &blackboard;
   Algorithm *algo;
+  // 拷贝一份 enable_screenshot (因为要修改)
+  bool enable_screenshot = false;
   // SDL
   SDL_Window *window = nullptr;
   SDL_Renderer *renderer = nullptr;
@@ -142,6 +144,8 @@ private:
   bool shortest_grids[M][N];
   // 当前播放到第几个最短路点?
   int shortest_grid_no = 0;
+  // 第一次绘制完毕最短路后变为 true
+  bool is_shortest_path_ever_rendered = false;
 };
 
 class AlgorithmImplBase : public Algorithm {
@@ -330,7 +334,7 @@ Point ParsePointString(const std::string &s) {
 /////////////////////////////////////
 
 Visualizer::Visualizer(const Options &options, Blackboard &b, Algorithm *algo)
-    : options(options), blackboard(b), algo(algo) {
+    : options(options), blackboard(b), algo(algo), enable_screenshot(options.enable_screenshot) {
   memset(shortest_grids, 0, sizeof(shortest_grids));
 }
 
@@ -402,9 +406,14 @@ void Visualizer::Start() {
     SDL_RenderClear(renderer);
     draw();
     SDL_RenderPresent(renderer);
+    if (is_shortest_path_ever_rendered && enable_screenshot) {
+      enable_screenshot = false;
+      spdlog::info("算法已结束, 已关闭自动截图");
+    }
     // 自动截图一次
-    if (options.enable_screenshot)
+    if (enable_screenshot) {
       saveScreenShot();
+    }
     // 睡眠 (不严格的 delay)
     SDL_Delay(options.delay_ms);
   }
@@ -482,6 +491,7 @@ void Visualizer::handleShortestPathPalyStates() {
   if (shortest_grid_no == blackboard.path.size() - 1) {
     shortest_grid_no = 0;
     memset(shortest_grids, 0, sizeof shortest_grids);
+    is_shortest_path_ever_rendered = true;
   } else {
     shortest_grid_no++;
   }
