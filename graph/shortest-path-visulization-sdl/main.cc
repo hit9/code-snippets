@@ -57,8 +57,8 @@ struct Options {
   bool use_4directions = false;
   // astar 的启发式权重, 默认是 1 倍权重, 0 时退化到 dijkstra
   int astar_heuristic_weight = 1;
-  // astar 的启发式方法, 可选两种: 曼哈顿距离 'manhattan' 和 欧式距离 'euclidean', 默认是欧式
-  std::string astar_heuristic_method = "euclidean";
+  // astar 的启发式方法, 可选两种: 曼哈顿距离 'manhattan' 和 欧式距离 'euclidean', 默认是曼哈顿
+  std::string astar_heuristic_method = "manhattan";
 };
 
 // 黑板, 算法要把寻路中的数据写到这里, Visualizer 可视化器会从这个黑板上去读.
@@ -179,7 +179,7 @@ public:
 
 private:
   int heuristic_weight = 1;
-  int heuristic_method = 1; // 1 欧式, 2 曼哈顿
+  int heuristic_method = 1; // 1 曼哈顿, 2 曼哈顿
   // 计算节点 y 到目标 t 的未来预估代价, 曼哈顿距离
   int future_cost(int y, int t);
 };
@@ -256,7 +256,7 @@ int main(int argc, char *argv[]) {
       .store_into(options.astar_heuristic_weight);
   program.add_argument("-astar-m", "--astar-heuristic-method")
       .help("AStar 算法的启发式方法, 曼哈顿 manhattan 或者 欧式距离 euclidean")
-      .default_value(std::string("euclidean"))
+      .default_value(std::string("manhattan"))
       .store_into(options.astar_heuristic_method);
   program.add_argument("-s", "--start").help("起始点").default_value("0,0");
   program.add_argument("-t", "--target").help("起始点").default_value("11,14");
@@ -654,11 +654,11 @@ int AlgorithmImplDijkstra ::Update(Blackboard &b) {
 
 void AlgorithmImplAStar::Setup(Blackboard &b, const Options &options) {
   heuristic_weight = options.astar_heuristic_weight;
-  if (options.astar_heuristic_method == "manhattan") {
+  if (options.astar_heuristic_method == "euclidean") {
     heuristic_method = 2;
-    spdlog::info("astar 选用曼哈顿距离");
-  } else {
     spdlog::info("astar 选用欧式距离");
+  } else {
+    spdlog::info("astar 选用曼哈顿距离");
   }
   // 复用 dijkstra 的 Setup 即可
   AlgorithmImplDijkstra::Setup(b, options);
@@ -703,7 +703,8 @@ int AlgorithmImplAStar::future_cost(int y, int t) {
   // y 的坐标
   auto yi = unpack_i(y), yj = unpack_j(y);
   // 对于 y 的未来代价预估, 曼哈顿距离
-  if (heuristic_method == 2)
+  if (heuristic_method == 1)
     return abs(ti - yi) + abs(tj - yj);
-  return std::round(std::sqrt((ti - yi) * (ti - yi) + (tj - yj) * (tj - yj)));
+  // 欧式距离
+  return std::floor(std::hypot(abs(ti - yi), abs(tj - yj)));
 }
