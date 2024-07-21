@@ -4,7 +4,6 @@
 #include <memory>
 #include <queue>
 #include <string>
-#include <unordered_set>
 #include <utility>
 
 #include <SDL2/SDL.h>
@@ -13,6 +12,8 @@
 #include <spdlog/spdlog.h>
 
 // 一些设置
+const int COST_UNIT = 10;     // 默认边长 10, 即代价单位
+const int DIAGONAL_COST = 14; //  对角成本是 14 (根号2 x 10)
 const int GRID_SIZE = 40;
 const int M = 12;                        // 方格行数, 迭代变量 i
 const int N = 15;                        // 方格列数, 迭代变量 j
@@ -27,18 +28,18 @@ int GRID_MAP[M][N];
 // 坐标 (i, j)
 using Point = std::pair<int, int>;
 
-// 方向
-const std::pair<int, int> DIRECTIONS[8] = {
+// 方向 和 成本
+const std::pair<int, std::pair<int, int>> DIRECTIONS[8] = {
     // 前 4 个是水平和竖直
-    {-1, 0},
-    {0, -1},
-    {1, 0},
-    {0, 1},
+    {COST_UNIT, {-1, 0}},
+    {COST_UNIT, {0, -1}},
+    {COST_UNIT, {1, 0}},
+    {COST_UNIT, {0, 1}},
     // 后 4 个是斜向
-    {-1, -1},
-    {-1, 1},
-    {1, -1},
-    {1, 1},
+    {DIAGONAL_COST, {-1, -1}},
+    {DIAGONAL_COST, {-1, 1}},
+    {DIAGONAL_COST, {1, -1}},
+    {DIAGONAL_COST, {1, 1}},
 };
 
 struct Options {
@@ -186,7 +187,7 @@ public:
 
 private:
   int heuristic_weight = 1;
-  int heuristic_method = 1; // 1 曼哈顿, 2 曼哈顿
+  int heuristic_method = 1; // 1 曼哈顿, 2 欧式
   // 计算节点 y 到目标 t 的未来预估代价, 曼哈顿距离
   int future_cost(int y, int t);
 };
@@ -604,24 +605,6 @@ void AlgorithmImplBase::setupBlackboard(Blackboard &b) {
 
 void AlgorithmImplBase::setupEdges(bool use_4directions) {
   memset(from, 0x3f, sizeof(from));
-
-  // 障碍物的节点标号
-  std::unordered_set<int> obstacles;
-  for (int i = 0; i < M; i++) {
-    for (int j = 0; j < N; j++) {
-      if (GRID_MAP[i][j])
-        obstacles.insert(pack(i, j));
-    }
-  }
-
-  // 添加一条边 (x -> y) 的函数, 边权是 1
-  auto add_edge = [&](int x, int y) {
-    // 不可到达障碍物, 也不可从障碍物出发
-    if (obstacles.find(x) == obstacles.end() && obstacles.find(y) == obstacles.end()) {
-      edges[x].push_back({1, y});
-    }
-  };
-
   // 构造 edges
   edges.resize(n);
   // 4 方向是取前 4 个.
@@ -633,11 +616,11 @@ void AlgorithmImplBase::setupEdges(bool use_4directions) {
       int x = pack(i, j);
       // 都可以走, 除非是有障碍物
       for (int k = 0; k < K; k++) {
-        const auto &d = DIRECTIONS[k];
+        const auto &[w, d] = DIRECTIONS[k];
         auto i1 = i + d.first, j1 = j + d.second;
         // 不可到达障碍物, 不可越过边界
         if (ValidatePoint(i1, j1) && !GRID_MAP[i1][j1])
-          edges[x].push_back({1, pack(i1, j1)});
+          edges[x].push_back({w, pack(i1, j1)});
       }
     }
   }
@@ -768,9 +751,10 @@ int AlgorithmImplAStar::future_cost(int y, int t) {
   auto ti = unpack_i(t), tj = unpack_j(t);
   // y 的坐标
   auto yi = unpack_i(y), yj = unpack_j(y);
+  // 注意乘以 10
   // 对于 y 的未来代价预估, 曼哈顿距离
   if (heuristic_method == 1)
-    return abs(ti - yi) + abs(tj - yj);
+    return (abs(ti - yi) + abs(tj - yj)) * COST_UNIT;
   // 欧式距离
-  return std::floor(std::hypot(abs(ti - yi), abs(tj - yj)));
+  return std::floor(std::hypot(abs(ti - yi), abs(tj - yj))) * COST_UNIT;
 }
