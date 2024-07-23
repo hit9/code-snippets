@@ -68,8 +68,6 @@ struct Options {
 struct Blackboard {
   // 是否计算结束?
   bool isStopped = false;
-  // 当前考察的点 x
-  Point x;
   // 历史考察过的点, 即 访问数组
   // 有的也叫做 closed_set
   bool visited[M][N];
@@ -87,12 +85,17 @@ public:
   virtual ~Algorithm() {} // makes unique_ptr happy
   // 初始化算法的准备项.
   // 参数 start 和 target 分别表示起点和终点
+  // 最好支持重复执行(幂等)
   virtual void Setup(Blackboard &b, const Options &options) = 0;
   // 每一帧会被调用一次, 算作走一步.
   // 在这里, Update 要把结果写到黑板上.
   // 如果已经结束, 则返回 0, 没结束返回 -1, 失败返回 -2
   // 在结束返回 0 的时候必须要做 blackboard 上的最短路结果 path 被设置.
   virtual int Update(Blackboard &b) = 0;
+  // 处理地图变化 (目前就是新增和删除障碍物点)
+  // 如果算法支持增量计算, 就直接增量重新规划路径
+  // 否则就需要完全重新计算, 相当于 Setup 要重新执行一次
+  virtual void HandleMapChanges(Blackboard &b, const Options &options, const std::vector<Point> &points) = 0;
 };
 
 // 主要的程序 Visualizer
@@ -116,6 +119,8 @@ protected:
   int handleInputs();
   // 处理最短路径结果的播放状态
   void handleShortestPathPalyStates();
+  // 处理地图变化
+  void handleMapChanges();
 
 private:
   const Options &options;
@@ -135,6 +140,8 @@ private:
   int shortest_grid_no = 0;
   // 第一次绘制完毕最短路后变为 true
   bool is_shortest_path_ever_rendered = false;
+  // 需要新增/删除的障碍物的坐标点
+  std::vector<Point> to_invert_obstacles;
 };
 
 class AlgorithmImplBase : public Algorithm {
@@ -154,9 +161,9 @@ protected:
 
   // 一些 Utils (可重载)
 
-  // 设置黑板 (清理)
+  // 设置黑板 (清理) (允许重复执行)
   virtual void setupBlackboard(Blackboard &b);
-  // 初始化建图
+  // 初始化建图 (允许重复执行)
   virtual void setupEdges(bool use_4directions = false);
   // 收集最短路结果
   virtual void buildShortestPathResult(Blackboard &b);
@@ -167,6 +174,8 @@ class AlgorithmImplDijkstra : public AlgorithmImplBase {
 public:
   virtual void Setup(Blackboard &b, const Options &options) override;
   virtual int Update(Blackboard &b) override;
+  virtual void HandleMapChanges(Blackboard &b, const Options &options,
+                                const std::vector<Point> &points) override;
 
 protected:
   // 小根堆, 实际是按第一项 f[y] 作为比较
@@ -182,6 +191,7 @@ public:
   // Setup 其实可以直接复用 dijkstra 的
   void Setup(Blackboard &b, const Options &options) override;
   int Update(Blackboard &b) override;
+  void HandleMapChanges(Blackboard &b, const Options &options, const std::vector<Point> &points) override;
 
 private:
   int heuristic_weight = 1;
@@ -428,8 +438,14 @@ void Visualizer::Start() {
     // 处理输入
     if (handleInputs() == -1)
       break;
+
     // 更新算法步骤
     seq++;
+
+    // 地图是否有变化?
+    handleMapChanges();
+
+    // 继续进行一步 Update
     int code = -1;
     if (!blackboard.isStopped) { // 只有没有结束时才执行一次 Update
       code = algo->Update(blackboard);
@@ -461,6 +477,21 @@ void Visualizer::Start() {
   }
 }
 
+void Visualizer::handleMapChanges() {
+  std::vector<Point> changes;
+  for (const auto &p : to_invert_obstacles) {
+    GRID_MAP[p.first][p.second] ^= 1;
+    changes.push_back(p);
+  }
+  to_invert_obstacles.clear();
+  if (changes.size()) {
+    algo->HandleMapChanges(blackboard, options, changes);
+    memset(shortest_grids, 0, sizeof shortest_grids);
+    shortest_grid_no = 0;
+    is_shortest_path_ever_rendered = false;
+  }
+}
+
 int Visualizer::handleInputs() {
   SDL_Event e;
   while (SDL_PollEvent(&e)) {
@@ -483,7 +514,15 @@ int Visualizer::handleInputs() {
         spdlog::info("监听到 Ctrl-S : 即将截图一次...");
         saveScreenShot();
       }
-      // 只要有 keydown, 本次 poll 都退出
+      break;
+    case SDL_MOUSEBUTTONDOWN:
+      // 单击翻转地图元素, 新增或者删除一个障碍物, 更新地图
+      if (e.button.button == SDL_BUTTON_LEFT) {
+        Point p{e.button.y / GRID_SIZE, e.button.x / GRID_SIZE};
+        spdlog::info("监听到鼠标左键点击 {},{}, {}一个障碍物", p.first, p.second,
+                     GRID_MAP[p.first][p.second] ? "删除" : "新增");
+        to_invert_obstacles.push_back(p);
+      }
       break;
     }
   }
@@ -594,6 +633,7 @@ void Visualizer::saveScreenShot() {
 
 void AlgorithmImplBase::setupBlackboard(Blackboard &b) {
   // 清理黑板
+  b.isStopped = false;
   memset(b.visited, 0, sizeof(b.visited));
   for (int i = 0; i < M; i++)
     for (int j = 0; j < N; j++)
@@ -604,6 +644,7 @@ void AlgorithmImplBase::setupBlackboard(Blackboard &b) {
 void AlgorithmImplBase::setupEdges(bool use_4directions) {
   memset(from, 0x3f, sizeof(from));
   // 构造 edges
+  edges.clear();
   edges.resize(n);
   // 4 方向是取前 4 个.
   int K = use_4directions ? 4 : 8;
@@ -651,6 +692,9 @@ void AlgorithmImplDijkstra::Setup(Blackboard &b, const Options &options) {
   setupEdges(options.use_4directions);
   // 清理 f, 到无穷大
   memset(f, 0x3f, sizeof(f));
+  // 清理 queue
+  while (q.size())
+    q.pop();
   // 设置初始坐标
   s = pack(options.start);
   f[s] = 0;
@@ -691,6 +735,15 @@ int AlgorithmImplDijkstra ::Update(Blackboard &b) {
     return -2; // 失败
   buildShortestPathResult(b);
   return 0;
+}
+
+void AlgorithmImplDijkstra::HandleMapChanges(Blackboard &b, const Options &options,
+                                             const std::vector<Point> &points) {
+  if (points.empty())
+    return;
+  // dijkstra 不支持增量计算, 只可以重新计算
+  spdlog::info("dijkstra 算法不支持增量计算, 将重新计算");
+  Setup(b, options);
 }
 
 /////////////////////////////////////
@@ -755,4 +808,13 @@ int AlgorithmImplAStar::future_cost(int y, int t) {
     return (abs(ti - yi) + abs(tj - yj)) * COST_UNIT;
   // 欧式距离
   return std::floor(std::hypot(abs(ti - yi), abs(tj - yj))) * COST_UNIT;
+}
+
+void AlgorithmImplAStar::HandleMapChanges(Blackboard &b, const Options &options,
+                                          const std::vector<Point> &points) {
+  if (points.empty())
+    return;
+  // astar 不支持增量计算, 只可以重新计算
+  spdlog::info("astar 算法不支持增量计算, 将重新计算");
+  Setup(b, options);
 }

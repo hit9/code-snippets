@@ -37,11 +37,12 @@ make build
  ./build/shortest-path-visulization-sdl --start 6,1 --target 6,14 astar
 ```
 
-可以按下 `ESC` 来退出.
+#### 操作说明:
 
-可以按下 `Ctrl-S` 来截图, 会保存在 `screenshots` 目录.
-
-也可以用 `--enable-screenshot` 来对每一帧截图 (会自动在找到最短路后及时退出自动截图, 免得截图太多).
+1. 可以按下 `ESC` 或者 `Ctrl-C` 来退出.
+2. 可以按下 `Ctrl-S` 来截图, 会保存在 `screenshots` 目录.
+3. 也可以用 `--enable-screenshot` 来对每一帧截图 (会自动在找到最短路后及时退出自动截图, 免得截图太多).
+4. 单击鼠标左键, 来翻转一个地图方格(成为障碍物或者消去障碍物), 引起重新计算
 
 #### 地图
 
