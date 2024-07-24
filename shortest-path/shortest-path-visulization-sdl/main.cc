@@ -888,7 +888,8 @@ void AlgorithmImplAStar::HandleMapChanges(Blackboard &b, const Options &options,
 /////////////////////////////////////
 
 // 采用欧式距离
-// TODO: 不知为何, 曼哈顿距离对于 LPAstar 在支持斜角方向时会出现问题.
+// 允许斜角的时候, 曼哈顿启发函数会高估代价, 有可能会导致提前增量搜索提前终止,
+// 从而无法重新刷新 g 数组, 导致死循环
 int AlgorithmImplLPAStar::h(int x) {
   // 方格内的坐标
   auto ti = unpack_i(t), tj = unpack_j(t);
@@ -1062,10 +1063,6 @@ void AlgorithmImplLPAStar::Setup(Blackboard &b, const Options &options) {
 int AlgorithmImplLPAStar::Update(Blackboard &b) {
   while (q.size()) {
     auto it = q.begin();
-    // TODO: 这里有问题!!
-    spdlog::info("debug {},{},{} {},{},{} {} {} {} {}", std::get<0>(it->first), std::get<1>(it->first),
-                 std::get<2>(it->first), std::get<0>(k(t)), std::get<1>(k(t)), std::get<2>(k(t)), rhs[t],
-                 g[t], unpack_i(it->second), unpack_j(it->second));
     if (it->first >= k(t) && rhs[t] == g[t])
       break;
 
