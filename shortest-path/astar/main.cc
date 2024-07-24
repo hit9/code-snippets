@@ -61,28 +61,27 @@ void astar(int s, int t) {
     }
 }
 
+const int map[m][m] = {
+    // 8x8
+    {0, 0, 0, 0, 0, 0, 0, 0}, {1, 1, 1, 1, 1, 0, 0, 0},
+    {0, 0, 0, 0, 1, 0, 0, 0}, {0, 0, 0, 0, 1, 0, 0, 0},
+    {0, 0, 0, 0, 1, 0, 0, 0}, {0, 0, 0, 0, 0, 0, 0, 0},
+    {0, 0, 0, 0, 0, 0, 0, 0}, {0, 0, 0, 0, 0, 0, 0, 0},
+};
 int main(void) {
     edges.resize(n);
 
-    // 设置障碍物 (1,0),(1,1),(1,2),(1,3),(1,4),(2,4),(3,4),(4,4)
-    unordered_set<int> obstacles = {1 * m + 0, 1 * m + 1, 1 * m + 2, 1 * m + 3,
-                                    1 * m + 4, 2 * m + 4, 3 * m + 4, 4 * m + 4};
-    // 添加边，x => y
-    auto add_edge = [&](int x, int y) {
-        // 不可到达障碍物, 也不可从障碍物出发
-        if (obstacles.find(x) == obstacles.end() &&
-            obstacles.find(y) == obstacles.end())
-            edges[x].push_back({1, y});
-    };
     // 初始化边权数组
+    P directions[4] = {{0, 1}, {1, 0}, {0, -1}, {-1, 0}};
     for (int i = 0; i < m; i++) {
         for (int j = 0; j < m; j++) {
             int x = i * m + j;
-            // 上下左右
-            if (i > 0) add_edge(x, (i - 1) * m + j);
-            if (j > 0) add_edge(x, i * m + (j - 1));
-            if (i < m - 1) add_edge(x, (i + 1) * m + j);
-            if (j < m - 1) add_edge(x, i * m + (j + 1));
+            for (int di = 0; di < 4; di++) {
+                const auto& d = directions[di];
+                auto i1 = i + d.first, j1 = j + d.second;
+                if (i1 >= 0 && j1 >= 0 && i1 < m && j1 < m && !map[i1][j1])
+                    edges[x].push_back({1, i1 * m + j1});
+            }
         }
     }
     // 设置出发点 s 和目标点 t
