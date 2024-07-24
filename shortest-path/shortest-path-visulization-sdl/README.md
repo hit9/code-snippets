@@ -37,6 +37,13 @@ make build
  ./build/shortest-path-visulization-sdl --start 6,1 --target 6,14 astar
 ```
 
+可视化 `LPA*` 算法 (增量计算的 A*):
+
+```bash
+ ./build/shortest-path-visulization-sdl --start 6,1 --target 6,14 lpastar
+```
+
+
 #### 操作说明:
 
 1. 可以按下 `ESC` 或者 `Ctrl-C` 来退出.
