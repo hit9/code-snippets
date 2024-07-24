@@ -1,3 +1,4 @@
+#include <bitset>
 #include <cmath>
 #include <cstring>
 #include <fstream>
@@ -60,10 +61,11 @@ struct Options {
   Point start = {0, 0}, target = {M - 1, N - 1};
   // 是否只采用 4 方向, 默认是 8 方向
   bool use_4directions = false;
-  // astar 的启发式权重, 默认是 1 倍权重, 0 时退化到 dijkstra
+  // astar/lpastar 的启发式权重, 默认是 1 倍权重, 0 时退化到 dijkstra
   int astar_heuristic_weight = 1;
-  // astar 的启发式方法, 可选两种: 曼哈顿距离 'manhattan' 和 欧式距离 'euclidean', 默认是曼哈顿
-  std::string astar_heuristic_method = "manhattan";
+  // astar 的启发式方法, 可选两种: 曼哈顿距离 'manhattan' 和 欧式距离 'euclidean'
+  // 对于 4 方向, 默认是曼哈顿; 对于 8 方向默认是欧式
+  std::string astar_heuristic_method = "";
 };
 
 // 黑板, 算法要把寻路中的数据写到这里, Visualizer 可视化器会从这个黑板上去读.
@@ -227,6 +229,12 @@ public:
 
 private:
   int heuristic_weight = 1;
+  int heuristic_method = 1; // 1 曼哈顿, 2 欧式
+  // 默认情况下, 传播是按照估价终止的
+  // 如果这个 force_stop_until_target 设置到 true
+  // 那么会强制传播到目标才终止(或者q空的时候).
+  // 这个用来预防不良的, 高估的估价函数 (比如8方向的情况下的曼哈顿函数)
+  bool force_stop_until_target = false;
   // { 标号, 边权 }
   using P = std::pair<int, int>;
   // { 键值k1, 键值k2, 标号 }
@@ -251,7 +259,8 @@ private:
   // 更新节点
   void update(int x);
   // 收集最短路, 结果存储在入参 path (必须是空的)
-  void collect(std::vector<int> &path);
+  // 收集失败, 返回 -1, 否则返回 0
+  int collect(std::vector<int> &path);
   // 新增障碍物
   void add_obstacle(int i, int j);
   // 清理障碍物
@@ -333,8 +342,10 @@ int main(int argc, char *argv[]) {
       .default_value(1)
       .store_into(options.astar_heuristic_weight);
   program.add_argument("-astar-m", "--astar-heuristic-method")
-      .help("AStar 算法的启发式方法, 曼哈顿 manhattan 或者 欧式距离 euclidean")
-      .default_value(std::string("manhattan"))
+      .help(
+          "AStar/LPAStar 算法的启发式方法, 曼哈顿 manhattan 或者 欧式距离 euclidean; 对于4方向默认是曼哈顿, "
+          "8方向时默认是欧式")
+      .default_value(std::string(""))
       .store_into(options.astar_heuristic_method);
   program.add_argument("-s", "--start").help("起始点").default_value("0,0");
   program.add_argument("-t", "--target").help("起始点").default_value("11,14");
@@ -358,6 +369,17 @@ int main(int argc, char *argv[]) {
     return -1;
 
   spdlog::info("支持的方向数量 => {}", options.use_4directions ? 4 : 8);
+
+  // 处理启发式函数的选用
+  if (options.astar_heuristic_method.empty()) {
+    if (options.use_4directions) {
+      spdlog::info("默认对于4方向移动时,选用曼哈顿距离作为启发函数");
+      options.astar_heuristic_method = "manhattan";
+    } else {
+      spdlog::info("默认对于8方向移动时,选用欧式距离作为启发函数");
+      options.astar_heuristic_method = "euclidean";
+    }
+  }
 
   // 选用算法
   if (AlgorithmMakers.find(options.algorithm) == AlgorithmMakers.end()) {
@@ -520,6 +542,10 @@ void Visualizer::Start() {
     if ((code == -2 || is_shortest_path_ever_rendered) && enable_screenshot) {
       enable_screenshot = false;
       spdlog::info("算法已结束, 已关闭自动截图");
+    } else if ((!enable_screenshot && options.enable_screenshot) && !is_shortest_path_ever_rendered) {
+      // 自动恢复录制
+      enable_screenshot = true;
+      spdlog::info("自动恢复截图");
     }
     // 自动截图一次
     if (enable_screenshot) {
@@ -820,6 +846,7 @@ void AlgorithmImplAStar::Setup(Blackboard &b, const Options &options) {
     heuristic_method = 2;
     spdlog::info("astar 选用欧式距离");
   } else {
+    heuristic_method = 1;
     spdlog::info("astar 选用曼哈顿距离");
   }
   // 复用 dijkstra 的 Setup 即可
@@ -892,7 +919,9 @@ int AlgorithmImplLPAStar::h(int x) {
   // 方格内的坐标
   auto ti = unpack_i(t), tj = unpack_j(t);
   auto xi = unpack_i(x), xj = unpack_j(x);
-  // return (abs(ti - xi) + abs(tj - xj)) * COST_UNIT;
+  // 曼哈顿
+  if (heuristic_method == 1)
+    return (abs(ti - xi) + abs(tj - xj)) * COST_UNIT;
   // 欧式距离
   return std::floor(std::hypot(abs(ti - xi), abs(tj - xj))) * COST_UNIT;
 }
@@ -924,10 +953,18 @@ void AlgorithmImplLPAStar::update(int x) {
     q.insert({k(x), x});
 }
 
-void AlgorithmImplLPAStar::collect(std::vector<int> &path) {
+int AlgorithmImplLPAStar::collect(std::vector<int> &path) {
   path.push_back(t);
+  // st 用来判环, 如果检测到, 则即时终止, 以防死循环
+  std::bitset<n> st;
   int x = t;
   while (x != s) {
+    if (st[x]) {
+      spdlog::warn("得到的路径存在环, 可能启发函数设计不良存在高估, 将强制继续传播一轮以恢复");
+      force_stop_until_target = true;
+      return -1;
+    }
+    st[x] = 1;
     // 找到 g + w 最小的前继邻居
     int y1 = inf;
     int g1 = inf;
@@ -945,6 +982,7 @@ void AlgorithmImplLPAStar::collect(std::vector<int> &path) {
   // 原地反转
   for (int l = 0, r = path.size() - 1; l < r; l++, r--)
     std::swap(path[l], path[r]);
+  return 0;
 }
 
 void AlgorithmImplLPAStar::add_obstacle(int i, int j) {
@@ -1023,8 +1061,16 @@ void AlgorithmImplLPAStar::HandleMapChanges(Blackboard &b, const Options &option
 void AlgorithmImplLPAStar::Setup(Blackboard &b, const Options &options) {
   heuristic_weight = options.astar_heuristic_weight;
   if (heuristic_weight > 1) {
-    throw std::runtime_error(
-        "选用 LAPStar 时不可以吧启发权重设置为 > 1的, 这会引起代价高估, 导致增量计算不充分");
+    spdlog::warn("选用 LAPStar 时的启发权重设置为 > 1, 这可能会引起代价高估, 导致增量计算不充分");
+  }
+  if (options.astar_heuristic_method == "euclidean") {
+    heuristic_method = 2;
+    spdlog::info("LPAStar 选用欧式距离");
+  } else {
+    heuristic_method = 1;
+    spdlog::info("LPAStar 选用曼哈顿距离");
+    if (!options.use_4directions)
+      spdlog::warn("LPAStar 在8方向上采用曼哈顿可能会引起代价高估");
   }
   // 清理黑板
   setupBlackboard(b);
@@ -1066,7 +1112,7 @@ void AlgorithmImplLPAStar::Setup(Blackboard &b, const Options &options) {
 int AlgorithmImplLPAStar::Update(Blackboard &b) {
   while (q.size()) {
     auto it = q.begin();
-    if (it->first >= k(t) && rhs[t] == g[t])
+    if ((!force_stop_until_target) && it->first >= k(t) && rhs[t] == g[t])
       break;
 
     // 弹出队头
@@ -1090,6 +1136,10 @@ int AlgorithmImplLPAStar::Update(Blackboard &b) {
       b.exploring[unpack_i(y)][unpack_j(y)] = g[y];
     }
 
+    // 无论如何, 已经扩散到目标, 都可以终止
+    if (x == t)
+      break;
+
     // 每一次 Update 都只考察一个点, 不算结束
     return -1;
   }
@@ -1099,7 +1149,11 @@ int AlgorithmImplLPAStar::Update(Blackboard &b) {
     return -2; // 失败
 
   std::vector<int> path;
-  collect(path);
+  if (collect(path) != 0)
+    // 收集失败, 继续重试 Update
+    return -1;
+  // 收集成功, 重置 force_stop_until_target
+  force_stop_until_target = false;
   // 输出到 blackboard
   b.path.clear();
   for (auto x : path)
