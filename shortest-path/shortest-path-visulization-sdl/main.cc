@@ -1,9 +1,11 @@
 #include <cmath>
 #include <cstring>
 #include <fstream>
+#include <map>
 #include <memory>
 #include <queue>
 #include <string>
+#include <tuple>
 #include <utility>
 
 #include <SDL2/SDL.h>
@@ -95,7 +97,9 @@ public:
   // 处理地图变化 (目前就是新增和删除障碍物点)
   // 如果算法支持增量计算, 就直接增量重新规划路径
   // 否则就需要完全重新计算, 相当于 Setup 要重新执行一次
-  virtual void HandleMapChanges(Blackboard &b, const Options &options, const std::vector<Point> &points) = 0;
+  virtual void HandleMapChanges(Blackboard &b, const Options &options,
+                                const std::vector<Point> &to_become_obstacles,
+                                const std::vector<Point> &to_remove_obstacles) = 0;
 };
 
 // 主要的程序 Visualizer
@@ -140,19 +144,32 @@ private:
   int shortest_grid_no = 0;
   // 第一次绘制完毕最短路后变为 true
   bool is_shortest_path_ever_rendered = false;
-  // 需要新增/删除的障碍物的坐标点
-  std::vector<Point> to_invert_obstacles;
+  // 需要新增成为障碍物的坐标点
+  std::vector<Point> to_become_obstacles, to_remove_obstacles;
 };
+
+// 一个编码规则 i*N+j => 标号, 注意, 因为 N 比 M 大, 所以采用 N
+inline int pack(int i, int j) { return i * N + j; }
+inline int pack(const Point &p) { return p.first * N + p.second; }
+inline int unpack_i(int x) { return x / N; }
+inline int unpack_j(int x) { return x % N; }
+static const int n = M * N; // 总的节点数量
 
 class AlgorithmImplBase : public Algorithm {
 protected:
-  // 节点号编码规则: j * N + i
-  // 总的节点数量
-  static const int n = M * N;
   // (距离 OR 边权, 节点号)
   using P = std::pair<int, int>;
   // 起始点标号 s, 结束点标号 t
   int s, t;
+
+  // 一些 Utils (可重载)
+
+  // 设置黑板 (清理) (允许重复执行)
+  virtual void setupBlackboard(Blackboard &b);
+};
+
+class AlgorithmImplUtilMixin : public AlgorithmImplBase {
+protected:
   // edges[x] => {{w, y}}  边权,邻接点
   std::vector<std::vector<P>> edges;
   // from[x] 保存 x 最短路的上一步由哪个节点而来
@@ -161,8 +178,6 @@ protected:
 
   // 一些 Utils (可重载)
 
-  // 设置黑板 (清理) (允许重复执行)
-  virtual void setupBlackboard(Blackboard &b);
   // 初始化建图 (允许重复执行)
   virtual void setupEdges(bool use_4directions = false);
   // 收集最短路结果
@@ -170,12 +185,13 @@ protected:
 };
 
 // 算法实现 - dijkstra
-class AlgorithmImplDijkstra : public AlgorithmImplBase {
+class AlgorithmImplDijkstra : public AlgorithmImplUtilMixin {
 public:
   virtual void Setup(Blackboard &b, const Options &options) override;
   virtual int Update(Blackboard &b) override;
   virtual void HandleMapChanges(Blackboard &b, const Options &options,
-                                const std::vector<Point> &points) override;
+                                const std::vector<Point> &to_become_obstacles,
+                                const std::vector<Point> &to_remove_obstacles) override;
 
 protected:
   // 小根堆, 实际是按第一项 f[y] 作为比较
@@ -191,7 +207,8 @@ public:
   // Setup 其实可以直接复用 dijkstra 的
   void Setup(Blackboard &b, const Options &options) override;
   int Update(Blackboard &b) override;
-  void HandleMapChanges(Blackboard &b, const Options &options, const std::vector<Point> &points) override;
+  void HandleMapChanges(Blackboard &b, const Options &options, const std::vector<Point> &to_become_obstacles,
+                        const std::vector<Point> &to_remove_obstacles) override;
 
 private:
   int heuristic_weight = 1;
@@ -200,17 +217,52 @@ private:
   int future_cost(int y, int t);
 };
 
+// 算法实现 - LPAstar
+class AlgorithmImplLPAStar : public AlgorithmImplBase {
+public:
+  void Setup(Blackboard &b, const Options &options) override;
+  int Update(Blackboard &b) override;
+  void HandleMapChanges(Blackboard &b, const Options &options, const std::vector<Point> &to_become_obstacles,
+                        const std::vector<Point> &to_remove_obstacles) override;
+
+private:
+  // { 标号, 边权 }
+  using P = std::pair<int, int>;
+  // { 键值k1, 键值k2, 标号 }
+  using K = std::tuple<int, int, int>;
+  // 前继 {标号, 边权}
+  std::vector<std::vector<P>> pred;
+  // 后继
+  std::vector<std::vector<int>> succ;
+
+  // g 值: 起点到当前点的实际代价 (旧值)
+  // rhs 值: 起点到当前点的实际代价的临时值, 由前继节点更新而来
+  int g[n], rhs[n];
+  // 优先级队列 (因为要支持 update 操作, 所以用 map)
+  std::map<K, int> q;
+
+  // 启发函数
+  int h(int x);
+  // 计算 queue 的 key 的函数
+  K k(int x);
+  // 初始化
+  void init();
+  // 更新节点
+  void update(int x);
+  // 收集最短路, 结果存储在入参 path (必须是空的)
+  void collect(std::vector<int> &path);
+  // 新增障碍物
+  void add_obstacle(int i, int j);
+  // 清理障碍物
+  void remove_obstacle(int i, int j);
+};
+
 // 算法 Handler 构造器表格, 每新增一个算法, 需要到这里注册一下
 std::unordered_map<std::string, std::function<std::unique_ptr<Algorithm>()>> AlgorithmMakers = {
     {"dijkstra", []() { return std::make_unique<AlgorithmImplDijkstra>(); }},
     {"astar", []() { return std::make_unique<AlgorithmImplAStar>(); }},
+    {"lpastar", []() { return std::make_unique<AlgorithmImplLPAStar>(); }},
 };
-
-// 一个编码规则 i*N+j => 标号, 注意, 因为 N 比 M 大, 所以采用 N
-inline int pack(int i, int j) { return i * N + j; }
-inline int pack(const Point &p) { return p.first * N + p.second; }
-inline int unpack_i(int x) { return x / N; }
-inline int unpack_j(int x) { return x % N; }
 
 // 一个切割类似 "x,y" 的字符串到 Point 的 util 函数
 Point ParsePointString(const std::string &s);
@@ -268,7 +320,7 @@ int main(int argc, char *argv[]) {
   program.add_argument("algorithm")
       .help("算法名称")
       .metavar("ALGORITHM")
-      .choices("dijkstra", "astar")
+      .choices("dijkstra", "astar", "lpastar")
       .default_value(std::string("dijkstra"))
       .store_into(options.algorithm);
   program.add_argument("-d4", "--use-4-directions")
@@ -478,18 +530,19 @@ void Visualizer::Start() {
 }
 
 void Visualizer::handleMapChanges() {
-  std::vector<Point> changes;
-  for (const auto &p : to_invert_obstacles) {
-    GRID_MAP[p.first][p.second] ^= 1;
-    changes.push_back(p);
-  }
-  to_invert_obstacles.clear();
-  if (changes.size()) {
-    algo->HandleMapChanges(blackboard, options, changes);
+  for (const auto &p : to_become_obstacles)
+    GRID_MAP[p.first][p.second] = 1;
+  for (const auto &p : to_remove_obstacles)
+    GRID_MAP[p.first][p.second] = 0;
+  if (to_become_obstacles.size() > 0 || to_remove_obstacles.size() > 0) {
+    algo->HandleMapChanges(blackboard, options, to_become_obstacles, to_remove_obstacles);
+    // 注意清理当前最短路的播放
     memset(shortest_grids, 0, sizeof shortest_grids);
     shortest_grid_no = 0;
     is_shortest_path_ever_rendered = false;
   }
+  to_become_obstacles.clear();
+  to_remove_obstacles.clear();
 }
 
 int Visualizer::handleInputs() {
@@ -519,9 +572,14 @@ int Visualizer::handleInputs() {
       // 单击翻转地图元素, 新增或者删除一个障碍物, 更新地图
       if (e.button.button == SDL_BUTTON_LEFT) {
         Point p{e.button.y / GRID_SIZE, e.button.x / GRID_SIZE};
-        spdlog::info("监听到鼠标左键点击 {},{}, {}一个障碍物", p.first, p.second,
-                     GRID_MAP[p.first][p.second] ? "删除" : "新增");
-        to_invert_obstacles.push_back(p);
+        int flag = 0;
+        if (GRID_MAP[p.first][p.second]) { // 消除障碍物
+          to_remove_obstacles.push_back(p);
+        } else { // 新增障碍物
+          to_become_obstacles.push_back(p);
+          flag = 1;
+        }
+        spdlog::info("监听到鼠标左键点击 {},{}, {}一个障碍物", p.first, p.second, flag ? "新增" : "消除");
       }
       break;
     }
@@ -641,7 +699,11 @@ void AlgorithmImplBase::setupBlackboard(Blackboard &b) {
   b.path.clear();
 }
 
-void AlgorithmImplBase::setupEdges(bool use_4directions) {
+/////////////////////////////////////
+/// 实现 AlgorithmImplUtilMixin
+/////////////////////////////////////
+
+void AlgorithmImplUtilMixin::setupEdges(bool use_4directions) {
   memset(from, 0x3f, sizeof(from));
   // 构造 edges
   edges.clear();
@@ -665,7 +727,7 @@ void AlgorithmImplBase::setupEdges(bool use_4directions) {
   }
 }
 
-void AlgorithmImplBase::buildShortestPathResult(Blackboard &b) {
+void AlgorithmImplUtilMixin::buildShortestPathResult(Blackboard &b) {
   std::vector<int> path;
   path.push_back(t);
   int x = t;
@@ -682,7 +744,7 @@ void AlgorithmImplBase::buildShortestPathResult(Blackboard &b) {
 }
 
 /////////////////////////////////////
-/// 实现 AlgorithmImplDijkstra
+/// 实现 Dijkstra
 /////////////////////////////////////
 
 void AlgorithmImplDijkstra::Setup(Blackboard &b, const Options &options) {
@@ -738,8 +800,9 @@ int AlgorithmImplDijkstra ::Update(Blackboard &b) {
 }
 
 void AlgorithmImplDijkstra::HandleMapChanges(Blackboard &b, const Options &options,
-                                             const std::vector<Point> &points) {
-  if (points.empty())
+                                             const std::vector<Point> &to_become_obstacles,
+                                             const std::vector<Point> &to_remove_obstacles) {
+  if (to_become_obstacles.empty() && to_remove_obstacles.empty())
     return;
   // dijkstra 不支持增量计算, 只可以重新计算
   spdlog::info("dijkstra 算法不支持增量计算, 将重新计算");
@@ -747,7 +810,7 @@ void AlgorithmImplDijkstra::HandleMapChanges(Blackboard &b, const Options &optio
 }
 
 /////////////////////////////////////
-/// 实现 AlgorithmImplDijkstra
+/// 实现 AStar
 /////////////////////////////////////
 
 void AlgorithmImplAStar::Setup(Blackboard &b, const Options &options) {
@@ -811,10 +874,236 @@ int AlgorithmImplAStar::future_cost(int y, int t) {
 }
 
 void AlgorithmImplAStar::HandleMapChanges(Blackboard &b, const Options &options,
-                                          const std::vector<Point> &points) {
-  if (points.empty())
+                                          const std::vector<Point> &to_become_obstacles,
+                                          const std::vector<Point> &to_remove_obstacles) {
+  if (to_become_obstacles.empty() && to_remove_obstacles.empty())
     return;
   // astar 不支持增量计算, 只可以重新计算
   spdlog::info("astar 算法不支持增量计算, 将重新计算");
   Setup(b, options);
+}
+
+/////////////////////////////////////
+/// 实现 LPAstar
+/////////////////////////////////////
+
+// 采用欧式距离
+// TODO: 不知为何, 曼哈顿距离对于 LPAstar 在支持斜角方向时会出现问题.
+int AlgorithmImplLPAStar::h(int x) {
+  // 方格内的坐标
+  auto ti = unpack_i(t), tj = unpack_j(t);
+  auto xi = unpack_i(x), xj = unpack_j(x);
+  // return (abs(ti - xi) + abs(tj - xj)) * COST_UNIT;
+  // 欧式距离
+  return std::floor(std::hypot(abs(ti - xi), abs(tj - xj))) * COST_UNIT;
+}
+
+AlgorithmImplLPAStar::K AlgorithmImplLPAStar::k(int x) {
+  return {std::min(g[x], rhs[x]) + h(x), std::min(g[x], rhs[x]), x};
+}
+
+void AlgorithmImplLPAStar::init() {
+  memset(g, 0x3f, sizeof g);
+  memset(rhs, 0x3f, sizeof rhs);
+  rhs[s] = 0;
+  q.insert({k(s), s});
+}
+
+void AlgorithmImplLPAStar::update(int x) {
+  // 其实点不可更新, g[s] 和 rhs[s] 恒等于 0
+  if (x == s)
+    return;
+  // 从队列中删除
+  q.erase(k(x));
+  // 根据 x 的前继节点的实际代价 g, 加上边权 w, 取最小.
+  // 来获取 x 处的新代价 rhs
+  rhs[x] = inf;
+  for (auto [y, w] : pred[x])
+    rhs[x] = std::min(rhs[x], g[y] + w);
+  // 如果 x 的 g 和 rhs 没有对齐, 则重新加入队列等待更新
+  if (g[x] != rhs[x])
+    q.insert({k(x), x});
+}
+
+void AlgorithmImplLPAStar::collect(std::vector<int> &path) {
+  path.push_back(t);
+  int x = t;
+  while (x != s) {
+    // 找到 g + w 最小的前继邻居
+    int y1 = inf;
+    int g1 = inf;
+    for (const auto &[y, w] : pred[x]) {
+      if (g1 >= g[y] + w) {
+        g1 = g[y] + w;
+        y1 = y;
+      }
+    }
+    if (y1 >= inf)
+      break;
+    x = y1;
+    path.push_back(x);
+  }
+  // 原地反转
+  for (int l = 0, r = path.size() - 1; l < r; l++, r--)
+    std::swap(path[l], path[r]);
+}
+
+void AlgorithmImplLPAStar::add_obstacle(int i, int j) {
+  int x = pack(i, j);
+  // 到达 x 的边权全部无穷大
+  for (auto &[y, w] : pred[x])
+    w = inf;
+
+  // x 到达后继邻居的边权全部无穷大
+  for (auto y : succ[x])
+    for (auto &[x1, w] : pred[y])
+      if (x1 == x)
+        w = inf;
+
+  // update x 和 后继邻居
+  // 原则是:  update 边权有变化的边的末端节点
+  update(x);
+  for (auto y : succ[x])
+    update(y);
+}
+
+void AlgorithmImplLPAStar::remove_obstacle(int i, int j) {
+  int x = pack(i, j);
+
+  // 到达 x 的边权全部恢复
+  for (auto &[y, w] : pred[x]) {
+    int i1 = unpack_i(y), j1 = unpack_j(y);
+    int di = i - i1, dj = j - j1;
+    if (di != 0 && dj != 0) { // 斜边邻居
+      w = DIAGONAL_COST;
+    } else { // 水平竖直邻居
+      w = COST_UNIT;
+    }
+  }
+  // x 到达后继邻居的边权全部恢复
+  for (auto y : succ[x]) { // 对每个 x 的后继 y
+    int i1 = unpack_i(y), j1 = unpack_j(y);
+    int di = i - i1, dj = j - j1;
+    for (auto &[x1, w] : pred[y])
+      // 找到 y 的前继 x 的边权 w
+      if (x1 == x) {
+        if (di != 0 && dj != 0) { // 斜边邻居
+          w = DIAGONAL_COST;
+        } else { // 水平竖直邻居
+          w = COST_UNIT;
+        }
+      }
+  }
+  // update x 和 后继邻居
+  // 原则是:  update 边权有变化的边的末端节点
+  update(x);
+  for (auto y : succ[x])
+    update(y);
+}
+
+// 支持增量计算
+void AlgorithmImplLPAStar::HandleMapChanges(Blackboard &b, const Options &options,
+                                            const std::vector<Point> &to_become_obstacles,
+                                            const std::vector<Point> &to_remove_obstacles) {
+  if (to_become_obstacles.empty() && to_remove_obstacles.empty())
+    return;
+  spdlog::info("LAPStar 支持增量计算, 将进行增量寻路修正");
+  // 清理一下黑板  (以完全重新渲染)
+  setupBlackboard(b);
+  // 新增障碍物
+  for (const auto &p : to_become_obstacles) {
+    add_obstacle(p.first, p.second);
+  }
+  // 移除障碍物
+  for (const auto &p : to_remove_obstacles) {
+    remove_obstacle(p.first, p.second);
+  }
+  spdlog::info("LAPStar 增量修改完毕");
+}
+
+void AlgorithmImplLPAStar::Setup(Blackboard &b, const Options &options) {
+  // 清理黑板
+  setupBlackboard(b);
+  // 建图
+  pred.clear();
+  succ.clear();
+  pred.resize(n);
+  succ.resize(n);
+  // 初始化 pred 和 succ
+  for (int i = 0; i < M; i++) {
+    for (int j = 0; j < N; j++) {
+      int x = pack(i, j);
+      int di_max = options.use_4directions ? 4 : 8;
+      for (int di = 0; di < di_max; di++) {
+        const auto &[w, d] = DIRECTIONS[di];
+        auto i1 = i + d.first, j1 = j + d.second;
+        auto y = pack(i1, j1);
+        if (ValidatePoint(i1, j1)) {
+          // 现在考虑的边 (x => y)
+          // 后继
+          succ[x].push_back(y);
+          // 前继, 从障碍物出发或者到达障碍物都算作无穷大的边权
+          pred[y].push_back({x, (GRID_MAP[i][j] || GRID_MAP[i1][j1]) ? inf : w});
+        }
+      }
+    }
+  }
+
+  // 清理 q
+  q.clear();
+  // 设置初始坐标
+  s = pack(options.start);
+  // 设置结束点
+  t = pack(options.target);
+  // 初始化
+  init();
+}
+
+int AlgorithmImplLPAStar::Update(Blackboard &b) {
+  while (q.size()) {
+    auto it = q.begin();
+    // TODO: 这里有问题!!
+    spdlog::info("debug {},{},{} {},{},{} {} {} {} {}", std::get<0>(it->first), std::get<1>(it->first),
+                 std::get<2>(it->first), std::get<0>(k(t)), std::get<1>(k(t)), std::get<2>(k(t)), rhs[t],
+                 g[t], unpack_i(it->second), unpack_j(it->second));
+    if (it->first >= k(t) && rhs[t] == g[t])
+      break;
+
+    // 弹出队头
+    int x = it->second;
+    q.erase(it);
+
+    int i = unpack_i(x), j = unpack_j(x);
+    b.visited[unpack_i(x)][unpack_j(x)] = true;
+
+    if (g[x] > rhs[x]) {
+      // 局部过一致
+      g[x] = rhs[x];
+    } else {
+      // 局部欠一致, 通常说明新增了障碍物
+      g[x] = inf;
+      update(x);
+    }
+    // 向后继节点传播, 更新邻域
+    for (auto y : succ[x]) {
+      update(y);
+      b.exploring[unpack_i(y)][unpack_j(y)] = g[y];
+    }
+
+    // 每一次 Update 都只考察一个点, 不算结束
+    return -1;
+  }
+
+  // 已经结束, 需要计算最短路
+  if (g[t] >= inf)
+    return -2; // 失败
+
+  std::vector<int> path;
+  collect(path);
+  // 输出到 blackboard
+  b.path.clear();
+  for (auto x : path)
+    b.path.push_back({unpack_i(x), unpack_j(x)});
+  b.isStopped = true;
+  return 0;
 }
