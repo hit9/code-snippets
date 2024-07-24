@@ -27,6 +27,10 @@ const int inf = 0x3f3f3f3f;
 // 网格地图: 0 表示空白方格 (白色), 1 表示有障碍物 (灰色)
 int GRID_MAP[M][N]; // 12 x 15
 
+// 记录下被修改过的位置(只为渲染)
+// for Visualizer
+bool CHANGED_GRIDS[M][N];
+
 // 坐标 (i, j)
 using Point = std::pair<int, int>;
 
@@ -462,6 +466,8 @@ Visualizer::Visualizer(const Options &options, Blackboard &b, Algorithm *algo)
 }
 
 int Visualizer::Init() {
+  memset(CHANGED_GRIDS, 0, sizeof CHANGED_GRIDS);
+
   // 初始化 SDL
   if (SDL_Init(SDL_INIT_EVERYTHING) != 0) {
     spdlog::error("SDL 初始化错误 {}", SDL_GetError());
@@ -557,10 +563,14 @@ void Visualizer::Start() {
 }
 
 void Visualizer::handleMapChanges() {
-  for (const auto &p : to_become_obstacles)
-    GRID_MAP[p.first][p.second] = 1;
-  for (const auto &p : to_remove_obstacles)
-    GRID_MAP[p.first][p.second] = 0;
+  for (const auto &[i, j] : to_become_obstacles) {
+    GRID_MAP[i][j] = 1;
+    CHANGED_GRIDS[i][j] ^= 1; // 两次修改相当于没修改
+  }
+  for (const auto &[i, j] : to_remove_obstacles) {
+    GRID_MAP[i][j] = 0;
+    CHANGED_GRIDS[i][j] ^= 1; // 两次修改相当于没修改
+  }
   if (to_become_obstacles.size() > 0 || to_remove_obstacles.size() > 0) {
     algo->HandleMapChanges(blackboard, options, to_become_obstacles, to_remove_obstacles);
     // 注意清理当前最短路的播放
@@ -623,6 +633,9 @@ void Visualizer::draw() {
       SDL_Rect inner = {x + 1, y + 1, GRID_SIZE - 2, GRID_SIZE - 2};
       // 绘制外层正方形, 边框是黑色
       SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+      // 对于修改过的正方形, 边框是红色
+      if (CHANGED_GRIDS[i][j])
+        SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
       SDL_RenderDrawRect(renderer, &rect);
       // 选用内层正方形的填充颜色
       if (GRID_MAP[i][j] == 1)
