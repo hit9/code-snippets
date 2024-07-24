@@ -43,6 +43,8 @@ make build
  ./build/shortest-path-visulization-sdl --start 6,1 --target 6,14 lpastar
 ```
 
+对于 `A*` 和 `LPA*`, 如果选用 `-astar-w` 设置启发函数的权重为 `0` 即退化到 dijkstra 算法.
+
 
 #### 操作说明:
 

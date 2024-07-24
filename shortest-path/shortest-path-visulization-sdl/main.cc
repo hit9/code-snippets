@@ -226,6 +226,7 @@ public:
                         const std::vector<Point> &to_remove_obstacles) override;
 
 private:
+  int heuristic_weight = 1;
   // { 标号, 边权 }
   using P = std::pair<int, int>;
   // { 键值k1, 键值k2, 标号 }
@@ -328,7 +329,7 @@ int main(int argc, char *argv[]) {
       .default_value(false)
       .store_into(options.use_4directions);
   program.add_argument("-astar-w", "--astar-heuristic-weight")
-      .help("AStar 算法的启发式未来估价的权重倍数, 自然数")
+      .help("AStar/LPAStar 算法的启发式未来估价的权重倍数, 自然数")
       .default_value(1)
       .store_into(options.astar_heuristic_weight);
   program.add_argument("-astar-m", "--astar-heuristic-method")
@@ -887,9 +888,6 @@ void AlgorithmImplAStar::HandleMapChanges(Blackboard &b, const Options &options,
 /// 实现 LPAstar
 /////////////////////////////////////
 
-// 采用欧式距离
-// 允许斜角的时候, 曼哈顿启发函数会高估代价, 有可能会导致提前增量搜索提前终止,
-// 从而无法重新刷新 g 数组, 导致死循环
 int AlgorithmImplLPAStar::h(int x) {
   // 方格内的坐标
   auto ti = unpack_i(t), tj = unpack_j(t);
@@ -900,7 +898,7 @@ int AlgorithmImplLPAStar::h(int x) {
 }
 
 AlgorithmImplLPAStar::K AlgorithmImplLPAStar::k(int x) {
-  return {std::min(g[x], rhs[x]) + h(x), std::min(g[x], rhs[x]), x};
+  return {std::min(g[x], rhs[x]) + heuristic_weight * h(x), std::min(g[x], rhs[x]), x};
 }
 
 void AlgorithmImplLPAStar::init() {
@@ -1023,6 +1021,11 @@ void AlgorithmImplLPAStar::HandleMapChanges(Blackboard &b, const Options &option
 }
 
 void AlgorithmImplLPAStar::Setup(Blackboard &b, const Options &options) {
+  heuristic_weight = options.astar_heuristic_weight;
+  if (heuristic_weight > 1) {
+    throw std::runtime_error(
+        "选用 LAPStar 时不可以吧启发权重设置为 > 1的, 这会引起代价高估, 导致增量计算不充分");
+  }
   // 清理黑板
   setupBlackboard(b);
   // 建图
