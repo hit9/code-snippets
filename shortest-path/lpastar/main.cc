@@ -182,6 +182,24 @@ void add_obstacle(int i, int j) {
     for (auto y : succ[x]) update(y);
 }
 
+// 移除一个障碍物
+void remove_obstacle(int i, int j) {
+    if (!GRID_MAP[i][j]) return;
+    // 会影响周围的四个邻居
+    GRID_MAP[i][j] = 0;
+    int x = i * m + j;
+    // 到达 x 的边权全部 1
+    for (auto& [_, w] : pred[x]) w = 1;
+    // x 到达后继邻居的边权全部 1
+    for (auto y : succ[x])
+        for (auto& [x1, w] : pred[y])
+            if (x1 == x) w = 1;
+    // update x 和 后继邻居
+    // 原则是:  update 边权有变化的边的末端节点
+    update(x);
+    for (auto y : succ[x]) update(y);
+}
+
 int main(void) {
     pred.resize(n);
     succ.resize(n);
@@ -220,6 +238,14 @@ int main(void) {
     // 加障碍物
     add_obstacle(5, 5);
     add_obstacle(6, 5);
+    compute();
+    path = collect();
+    std::cout << "shortest distance (updated):" << g[t] << std::endl;
+    for (auto x : path) std::cout << x / m << "," << x % m << std::endl;
+
+    // 移除碍物
+    remove_obstacle(5, 5);
+    remove_obstacle(6, 5);
     compute();
     path = collect();
     std::cout << "shortest distance (updated):" << g[t] << std::endl;
