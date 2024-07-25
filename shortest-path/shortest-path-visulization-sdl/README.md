@@ -45,6 +45,11 @@ make build
 
 对于 `A*` 和 `LPA*`, 如果选用 `-astar-w` 设置启发函数的权重为 `0` 即退化到 dijkstra 算法.
 
+可视化 `bidirectional-dijkstra` 双向搜索的 dijkstra 算法:
+
+```bash
+ ./build/shortest-path-visulization-sdl --start 0,0 --target 11,14 dijkstra-bi
+```
 
 #### 操作说明:
 
