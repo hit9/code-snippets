@@ -51,6 +51,12 @@ make build
  ./build/shortest-path-visulization-sdl --start 0,0 --target 11,14 dijkstra-bi
 ```
 
+可视化 `bidirectional-astar` 双向搜索的 `A*` 算法:
+
+```bash
+ ./build/shortest-path-visulization-sdl --start 0,0 --target 11,14 astar-bi
+```
+
 #### 操作说明:
 
 1. 可以按下 `ESC` 或者 `Ctrl-C` 来退出.
