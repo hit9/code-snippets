@@ -1632,7 +1632,7 @@ int AlgorithmImplFlowField::Update(Blackboard &b) {
   }
 
   // 收集路径
-  if (find(unpack_i(s), unpack_j(s), b.path, b)) {
+  if (b.path.empty() && find(unpack_i(s), unpack_j(s), b.path, b)) {
     b.isStopped = true;
     return 0; // 寻路成功
   }
