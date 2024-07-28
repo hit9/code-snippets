@@ -115,12 +115,14 @@ public:
   virtual void HandleMapChanges(Blackboard &b, const Options &options,
                                 const std::vector<Point> &to_become_obstacles,
                                 const std::vector<Point> &to_remove_obstacles) = 0;
+  // 处理起始点变化
+  virtual void HandleStartPointChange(Blackboard &b, const Options &options) = 0;
 };
 
 // 主要的程序 Visualizer
 class Visualizer {
 public:
-  Visualizer(const Options &options, Blackboard &b, Algorithm *algo);
+  Visualizer(Options &options, Blackboard &b, Algorithm *algo);
   // 初始化工作, 包括 SDL 的各种初始化, 需要显式调用
   // 返回 0 表示成功
   int Init();
@@ -140,9 +142,11 @@ protected:
   void handleShortestPathPalyStates();
   // 处理地图变化
   void handleMapChanges();
+  // 处理起始点变更
+  void handleStartPointChange();
 
 private:
-  const Options &options;
+  Options &options;
   Blackboard &blackboard;
   Algorithm *algo;
   // 拷贝一份 enable_screenshot (因为要修改)
@@ -171,6 +175,8 @@ private:
   bool is_shortest_path_ever_rendered = false;
   // 需要新增成为障碍物的坐标点
   std::vector<Point> to_become_obstacles, to_remove_obstacles;
+  // 将变更到的起始点
+  Point new_start = {-1, -1};
 };
 
 // 一个编码规则 i*N+j => 标号, 注意, 因为 N 比 M 大, 所以采用 N
@@ -217,6 +223,7 @@ public:
   virtual void HandleMapChanges(Blackboard &b, const Options &options,
                                 const std::vector<Point> &to_become_obstacles,
                                 const std::vector<Point> &to_remove_obstacles) override;
+  virtual void HandleStartPointChange(Blackboard &b, const Options &options) override;
 
 protected:
   // 小根堆, 实际是按第一项 f[y] 作为比较
@@ -234,6 +241,7 @@ public:
   int Update(Blackboard &b) override;
   void HandleMapChanges(Blackboard &b, const Options &options, const std::vector<Point> &to_become_obstacles,
                         const std::vector<Point> &to_remove_obstacles) override;
+  virtual void HandleStartPointChange(Blackboard &b, const Options &options) override;
 
 private:
   int heuristic_weight = 1;
@@ -249,6 +257,7 @@ public:
   int Update(Blackboard &b) override;
   void HandleMapChanges(Blackboard &b, const Options &options, const std::vector<Point> &to_become_obstacles,
                         const std::vector<Point> &to_remove_obstacles) override;
+  void HandleStartPointChange(Blackboard &b, const Options &options) override;
 
 private:
   int heuristic_weight = 1;
@@ -298,6 +307,7 @@ public:
   virtual void HandleMapChanges(Blackboard &b, const Options &options,
                                 const std::vector<Point> &to_become_obstacles,
                                 const std::vector<Point> &to_remove_obstacles) override;
+  virtual void HandleStartPointChange(Blackboard &b, const Options &options) override;
 
 protected:
   // 1 是出发点正向, 2 是目标点反向
@@ -325,6 +335,7 @@ class AlgorithmImplBidirectionalAStar : public AlgorithmImplBidirectionalDijkstr
   int Update(Blackboard &b) override;
   void HandleMapChanges(Blackboard &b, const Options &options, const std::vector<Point> &to_become_obstacles,
                         const std::vector<Point> &to_remove_obstacles) override;
+  void HandleStartPointChange(Blackboard &b, const Options &options) override;
 
 protected:
   int heuristic_weight = 1;
@@ -349,6 +360,7 @@ public:
   int Update(Blackboard &b) override;
   void HandleMapChanges(Blackboard &b, const Options &options, const std::vector<Point> &to_become_obstacles,
                         const std::vector<Point> &to_remove_obstacles) override;
+  void HandleStartPointChange(Blackboard &b, const Options &options) override;
 
 protected:
   // dijkstra 的小根堆
@@ -562,7 +574,7 @@ int LoadMap(const std::string &filepath) {
 /// 实现 Visualizer
 /////////////////////////////////////
 
-Visualizer::Visualizer(const Options &options, Blackboard &b, Algorithm *algo)
+Visualizer::Visualizer(Options &options, Blackboard &b, Algorithm *algo)
     : options(options), blackboard(b), algo(algo), enable_screenshot(options.enable_screenshot) {
   memset(shortest_grids, 0, sizeof(shortest_grids));
 }
@@ -689,6 +701,8 @@ void Visualizer::Start() {
 
     // 地图是否有变化?
     handleMapChanges();
+    // 起始点是否有变化?
+    handleStartPointChange();
 
     // 继续进行一步 Update
     int code = -1;
@@ -746,6 +760,19 @@ void Visualizer::handleMapChanges() {
   to_remove_obstacles.clear();
 }
 
+void Visualizer::handleStartPointChange() {
+  if (new_start.first >= 0 && new_start.second >= 0) {
+    // 需要设置
+    options.start = new_start;
+    new_start = {-1, -1};
+    algo->HandleStartPointChange(blackboard, options);
+    // 注意清理当前最短路的播放
+    memset(shortest_grids, 0, sizeof shortest_grids);
+    shortest_grid_no = 0;
+    is_shortest_path_ever_rendered = false;
+  }
+}
+
 int Visualizer::handleInputs() {
   SDL_Event e;
   while (SDL_PollEvent(&e)) {
@@ -773,7 +800,7 @@ int Visualizer::handleInputs() {
       // 单击翻转地图元素, 新增或者删除一个障碍物, 更新地图
       if (e.button.button == SDL_BUTTON_LEFT) {
         Point p{e.button.y / GRID_SIZE, e.button.x / GRID_SIZE};
-        int flag = 0;
+        int flag = 0;                      // for 日志
         if (GRID_MAP[p.first][p.second]) { // 消除障碍物
           to_remove_obstacles.push_back(p);
         } else { // 新增障碍物
@@ -781,6 +808,13 @@ int Visualizer::handleInputs() {
           flag = 1;
         }
         spdlog::info("监听到鼠标左键点击 {},{}, {}一个障碍物", p.first, p.second, flag ? "新增" : "消除");
+      }
+      if (e.button.button == SDL_BUTTON_RIGHT) {
+        Point p{e.button.y / GRID_SIZE, e.button.x / GRID_SIZE};
+        if (p != options.start) {
+          spdlog::info("监听到鼠标右键点击 {},{}, 变更起始点", p.first, p.second);
+          new_start = p;
+        }
       }
       break;
     }
@@ -977,7 +1011,7 @@ void AlgorithmImplDijkstra::Setup(Blackboard &b, const Options &options) {
   // 清理 queue
   while (q.size())
     q.pop();
-  // 设置初始坐标
+  // 设置初始坐标 (or重设)
   s = pack(options.start);
   f[s] = 0;
   from[s] = s;
@@ -1026,6 +1060,11 @@ void AlgorithmImplDijkstra::HandleMapChanges(Blackboard &b, const Options &optio
     return;
   // dijkstra 不支持增量计算, 只可以重新计算
   spdlog::info("dijkstra 算法不支持增量计算, 将重新计算");
+  Setup(b, options);
+}
+
+void AlgorithmImplDijkstra::HandleStartPointChange(Blackboard &b, const Options &options) {
+  spdlog::info("dijkstra 算法不支持动态变更起始点, 将重新计算");
   Setup(b, options);
 }
 
@@ -1099,6 +1138,12 @@ void AlgorithmImplAStar::HandleMapChanges(Blackboard &b, const Options &options,
                                           const std::vector<Point> &to_remove_obstacles) {
   if (to_become_obstacles.empty() && to_remove_obstacles.empty())
     return;
+  // astar 不支持增量计算, 只可以重新计算
+  spdlog::info("astar 算法不支持增量计算, 将重新计算");
+  Setup(b, options);
+}
+
+void AlgorithmImplAStar::HandleStartPointChange(Blackboard &b, const Options &options) {
   // astar 不支持增量计算, 只可以重新计算
   spdlog::info("astar 算法不支持增量计算, 将重新计算");
   Setup(b, options);
@@ -1249,6 +1294,11 @@ void AlgorithmImplLPAStar::HandleMapChanges(Blackboard &b, const Options &option
     remove_obstacle(p.first, p.second);
   }
   spdlog::info("LAPStar 增量修改完毕");
+}
+
+void AlgorithmImplLPAStar::HandleStartPointChange(Blackboard &b, const Options &options) {
+  spdlog::info("LAPStar 不支持动态变更起始点, 将重新计算");
+  Setup(b, options);
 }
 
 void AlgorithmImplLPAStar::Setup(Blackboard &b, const Options &options) {
@@ -1470,6 +1520,11 @@ void AlgorithmImplBidirectionalDijkstra::HandleMapChanges(Blackboard &b, const O
   Setup(b, options);
 }
 
+void AlgorithmImplBidirectionalDijkstra::HandleStartPointChange(Blackboard &b, const Options &options) {
+  spdlog::info("dijkstra 算法不支持动态调整起始点, 将重新计算");
+  Setup(b, options);
+}
+
 /////////////////////////////////////
 /// 实现 BidirectionalAStar
 /////////////////////////////////////
@@ -1568,6 +1623,11 @@ void AlgorithmImplBidirectionalAStar::HandleMapChanges(Blackboard &b, const Opti
                                                        const std::vector<Point> &to_remove_obstacles) {
   // 不支持增量计算, 只可以重新计算
   spdlog::info("astar-bi 算法不支持增量计算, 将重新计算");
+  Setup(b, options);
+}
+
+void AlgorithmImplBidirectionalAStar::HandleStartPointChange(Blackboard &b, const Options &options) {
+  spdlog::info("astar-bi 算法不支持动态调整起始点, 将重新计算");
   Setup(b, options);
 }
 
@@ -1692,4 +1752,13 @@ void AlgorithmImplFlowField::HandleMapChanges(Blackboard &b, const Options &opti
   // 不支持增量计算, 只可以重新计算
   spdlog::info("flow-field 算法不支持增量计算, 将重新计算");
   Setup(b, options);
+}
+
+void AlgorithmImplFlowField::HandleStartPointChange(Blackboard &b, const Options &options) {
+  spdlog::info("flow-field 支持动态调整起始点, 无需重新计算!");
+  // 重设起点
+  s = pack(options.start);
+  b.path.clear();
+  b.isStopped = false;
+  spdlog::info("flow-field 已修改完起始点");
 }
