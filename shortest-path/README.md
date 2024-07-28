@@ -7,4 +7,5 @@
 * [bidirectional-dijkstra](bidirectional-dijkstra) 双向搜索 + dijkstra
 * [bidirectional-astar](bidirectional-astar) 双向搜索 + A*
 * [lpastar](lpastar) 增量化计算的 A* 算法 (目标和起点不变, 但是可以动态添加和删除障碍物 和 修改边权)
+* [flow-field](flow-field)  朴素的流场寻路
 * [shortest-path-visulization-sdl](shortest-path-visulization-sdl) 可视化寻路算法的一个 SDL 程序
