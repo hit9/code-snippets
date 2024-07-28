@@ -11,6 +11,7 @@
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
+#include <SDL2/SDL_ttf.h>
 #include <argparse/argparse.hpp>
 #include <spdlog/spdlog.h>
 
@@ -37,16 +38,19 @@ using Point = std::pair<int, int>;
 // 方向 和 成本
 const std::pair<int, std::pair<int, int>> DIRECTIONS[8] = {
     // 前 4 个是水平和竖直
-    {COST_UNIT, {-1, 0}},
-    {COST_UNIT, {0, -1}},
-    {COST_UNIT, {1, 0}},
-    {COST_UNIT, {0, 1}},
+    {COST_UNIT, {0, 1}},  // 右
+    {COST_UNIT, {0, -1}}, // 左
+    {COST_UNIT, {-1, 0}}, // 上
+    {COST_UNIT, {1, 0}},  // 下
     // 后 4 个是斜向
-    {DIAGONAL_COST, {-1, -1}},
-    {DIAGONAL_COST, {-1, 1}},
-    {DIAGONAL_COST, {1, -1}},
-    {DIAGONAL_COST, {1, 1}},
+    {DIAGONAL_COST, {-1, -1}}, // 左上
+    {DIAGONAL_COST, {1, -1}},  // 左下
+    {DIAGONAL_COST, {-1, 1}},  // 右上
+    {DIAGONAL_COST, {1, 1}},   // 右下
 };
+
+// 字体 Arrow 中的字符
+const char DIRECTIONS_CHAR[9] = "ABCDEFGH";
 
 // 命令行选项
 struct Options {
@@ -85,6 +89,11 @@ struct Blackboard {
   int exploring[M][N];
   // 从出发到目标的一条最短路径 (包含 start 和 target)
   std::vector<Point> path;
+  // 是否支持 flow 流场展示?
+  bool isSupportedFlowField = false;
+  // 如果支持流场展示的话, 这里设置方向标号
+  // 设置为 -1 表示没有流
+  int flows[M][N];
 };
 
 // 算法实现的虚类
@@ -141,6 +150,16 @@ private:
   // SDL
   SDL_Window *window = nullptr;
   SDL_Renderer *renderer = nullptr;
+  // SDL 加载好的 arrow font
+  TTF_Font *arrow_font = nullptr;
+  // 箭头的 texture
+  SDL_Texture *arrow_texture;
+  // 渲染时每个字符的宽度 和 offset
+  int arrow_w[8];
+  int arrow_offset[8];
+  // 字体宽度
+  int arrow_h;
+
   // 帧号
   int seq = 0;
   // 绘制最短路时的临时状态
@@ -323,6 +342,34 @@ protected:
   int future_cost(int x, int t);
 };
 
+// 算法实现 - FlowField
+class AlgorithmImplFlowField : public AlgorithmImplUtilMixin {
+public:
+  void Setup(Blackboard &b, const Options &options) override;
+  int Update(Blackboard &b) override;
+  void HandleMapChanges(Blackboard &b, const Options &options, const std::vector<Point> &to_become_obstacles,
+                        const std::vector<Point> &to_remove_obstacles) override;
+
+protected:
+  // dijkstra 的小根堆
+  std::priority_queue<P, std::vector<P>, std::greater<P>> q;
+  // 距离场, 按标号
+  int dist[n];
+  // 流场直接写到黑板
+
+  // 是否已经计算完毕流场
+  bool is_flow_calc_done = false;
+
+  // 是否支持四个方向
+  bool use_4directions = false;
+
+  // 寻找从点 (i,j) 出发的路径
+  // 返回 false 表示失败
+  bool find(int i, int j, std::vector<Point> &path, const Blackboard &b);
+  // 计算流程
+  void calc_flow(Blackboard &b);
+};
+
 // 算法 Handler 构造器表格, 每新增一个算法, 需要到这里注册一下
 std::unordered_map<std::string, std::function<std::unique_ptr<Algorithm>()>> AlgorithmMakers = {
     {"dijkstra", []() { return std::make_unique<AlgorithmImplDijkstra>(); }},
@@ -330,6 +377,7 @@ std::unordered_map<std::string, std::function<std::unique_ptr<Algorithm>()>> Alg
     {"lpastar", []() { return std::make_unique<AlgorithmImplLPAStar>(); }},
     {"dijkstra-bi", []() { return std::make_unique<AlgorithmImplBidirectionalDijkstra>(); }},
     {"astar-bi", []() { return std::make_unique<AlgorithmImplBidirectionalAStar>(); }},
+    {"flow-field", []() { return std::make_unique<AlgorithmImplFlowField>(); }},
 };
 
 // 一个切割类似 "x,y" 的字符串到 Point 的 util 函数
@@ -388,7 +436,7 @@ int main(int argc, char *argv[]) {
   program.add_argument("algorithm")
       .help("算法名称")
       .metavar("ALGORITHM")
-      .choices("dijkstra", "astar", "lpastar", "dijkstra-bi", "astar-bi")
+      .choices("dijkstra", "astar", "lpastar", "dijkstra-bi", "astar-bi", "flow-field")
       .default_value(std::string("dijkstra"))
       .store_into(options.algorithm);
   program.add_argument("-d4", "--use-4-directions")
@@ -533,11 +581,41 @@ int Visualizer::Init() {
     SDL_Quit();
     return -2;
   }
+  // 初始化 font
+  if (TTF_Init() == -1) {
+    spdlog::error("SDL_ttf 初始化错误: {}", SDL_GetError());
+    SDL_Quit();
+    return -1;
+  }
+  arrow_font = TTF_OpenFont("Arrows.ttf", 21);
+  if (arrow_font == nullptr) {
+    spdlog::error("无法打开字体 Arrows.ttf: {}", SDL_GetError());
+    TTF_Quit();
+    IMG_Quit();
+    SDL_Quit();
+    return -1;
+  }
+
+  // 创建 Arrows 的 texture
+  SDL_Surface *ts = TTF_RenderUTF8_Solid(arrow_font, DIRECTIONS_CHAR, {0, 0, 0, 255});
+  if (!ts) {
+    spdlog::error("无法创建字体 SDL_Surface: {}", TTF_GetError());
+    TTF_CloseFont(arrow_font);
+    TTF_Quit();
+    IMG_Quit();
+    SDL_Quit();
+    return -1;
+  }
+
   // 创建窗口
   window = SDL_CreateWindow("shortest-path-visulization-sdl", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
                             WINDOW_WIDTH, WINDOW_HEIGHT, SDL_WINDOW_SHOWN);
   if (window == nullptr) {
     spdlog::error("无法创建窗口: {}", SDL_GetError());
+    SDL_DestroyTexture(arrow_texture);
+    SDL_FreeSurface(ts);
+    TTF_CloseFont(arrow_font);
+    TTF_Quit();
     IMG_Quit();
     SDL_Quit();
     return -3;
@@ -548,10 +626,39 @@ int Visualizer::Init() {
   if (renderer == nullptr) {
     spdlog::error("创建渲染器失败: {}", SDL_GetError());
     SDL_DestroyWindow(window);
+    SDL_FreeSurface(ts);
+    TTF_CloseFont(arrow_font);
+    TTF_Quit();
     IMG_Quit();
     SDL_Quit();
     return -1;
   }
+
+  arrow_texture = SDL_CreateTextureFromSurface(renderer, ts);
+  if (arrow_texture == nullptr) {
+    spdlog::error("无法创建箭头的 texture: {}", SDL_GetError());
+    SDL_DestroyRenderer(renderer);
+    SDL_DestroyWindow(window);
+    SDL_FreeSurface(ts);
+    TTF_CloseFont(arrow_font);
+    TTF_Quit();
+    IMG_Quit();
+    SDL_Quit();
+    return -1;
+  }
+  SDL_FreeSurface(ts);
+
+  // 计算每个箭头的宽度
+  int offset = 0;
+  for (int i = 0; i < 8; i++) {
+    int minx, maxx, miny, maxy, advance;
+    TTF_GlyphMetrics(arrow_font, DIRECTIONS_CHAR[i], &minx, &maxx, &miny, &maxy, &advance);
+    arrow_w[i] = advance;
+    arrow_offset[i] = offset;
+    offset += advance;
+  }
+  arrow_h = TTF_FontHeight(arrow_font);
+
   spdlog::info("初始化 SDL 成功");
 
   // 初始化算法设置
@@ -564,6 +671,9 @@ int Visualizer::Init() {
 void Visualizer::Destroy() {
   SDL_DestroyRenderer(renderer);
   SDL_DestroyWindow(window);
+  SDL_DestroyTexture(arrow_texture);
+  TTF_CloseFont(arrow_font);
+  TTF_Quit();
   IMG_Quit();
   SDL_Quit();
 }
@@ -713,6 +823,20 @@ void Visualizer::draw() {
         SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
       // 绘制内侧正方形
       SDL_RenderFillRect(renderer, &inner);
+      // 如果支持流场箭头展示. 背景色不变, 黑色字体
+      if (blackboard.isSupportedFlowField) {
+        auto flow = blackboard.flows[i][j];
+        if (0 <= flow && flow < 8) {
+          // 方格的中心位置
+          int x1 = x + GRID_SIZE / 2, y1 = y + GRID_SIZE / 2;
+          // 获取字符宽度 和 宽度
+          int w = arrow_w[flow], h = arrow_h, offset = arrow_offset[flow];
+          SDL_Rect dst = {x1 - w / 2, y1 - h / 2, w, h};
+          SDL_Rect src = {offset, 0, w, h};
+          // 目标位置
+          SDL_RenderCopy(renderer, arrow_texture, &src, &dst);
+        }
+      }
     }
   }
 }
@@ -790,6 +914,8 @@ void AlgorithmImplBase::setupBlackboard(Blackboard &b) {
   for (int i = 0; i < M; i++)
     for (int j = 0; j < N; j++)
       b.exploring[i][j] = -1;
+  // 默认情况下, 都不支持流场 (除了流场寻路)
+  b.isSupportedFlowField = false;
   b.path.clear();
 }
 
@@ -1442,5 +1568,128 @@ void AlgorithmImplBidirectionalAStar::HandleMapChanges(Blackboard &b, const Opti
                                                        const std::vector<Point> &to_remove_obstacles) {
   // 不支持增量计算, 只可以重新计算
   spdlog::info("astar-bi 算法不支持增量计算, 将重新计算");
+  Setup(b, options);
+}
+
+/////////////////////////////////////
+/// 实现 流场寻路 FlowField
+/////////////////////////////////////
+
+void AlgorithmImplFlowField::Setup(Blackboard &b, const Options &options) {
+  // 清理黑板
+  setupBlackboard(b);
+  // 支持流场
+  for (int i = 0; i < M; i++)
+    for (int j = 0; j < N; j++)
+      b.flows[i][j] = -1;
+  b.isSupportedFlowField = true;
+  // 建图
+  // 注意!!! NOTE: 实际应该反向建图, 但是这里是方格图,
+  // 正反向是对称的 (边总是双向的).
+  setupEdges(options.use_4directions);
+  // 清理距离场, 到无穷大
+  memset(dist, 0x3f, sizeof(dist));
+  // 清理 queue
+  while (q.size())
+    q.pop();
+  // 设置目标和起始点
+  s = pack(options.start);
+  t = pack(options.target);
+  // 重设 is_flow_calc_done 标记
+  is_flow_calc_done = false;
+  use_4directions = options.use_4directions;
+  // 初始化目标的 dist
+  dist[t] = 0;
+  q.push({dist[t], t});
+}
+
+int AlgorithmImplFlowField::Update(Blackboard &b) {
+  // 计算距离场: dijkstra 算法
+  while (!q.empty()) {
+    // q 不空, 说明还没计算完毕距离场
+    auto [_, x] = q.top();
+    q.pop();
+    int i = unpack_i(x), j = unpack_j(x);
+    b.exploring[i][j] = -1;
+    if (b.visited[i][j])
+      continue;
+    b.visited[i][j] = true;
+    for (const auto &[w, y] : edges[x]) {
+      if (dist[y] > dist[x] + w) {
+        dist[y] = dist[x] + w;
+        q.push({dist[y], y});
+        b.exploring[unpack_i(y)][unpack_j(y)] = dist[y];
+      }
+    }
+    // 每次 Update 只考察一个点, 不算结束
+    return -1;
+  }
+
+  if (!is_flow_calc_done) {
+    calc_flow(b);
+    is_flow_calc_done = true;
+    return -1;
+  }
+
+  // 收集路径
+  if (find(unpack_i(s), unpack_j(s), b.path, b)) {
+    b.isStopped = true;
+    return 0; // 寻路成功
+  }
+  return -2; // 失败
+}
+
+void AlgorithmImplFlowField::calc_flow(Blackboard &b) {
+  spdlog::info("计算流场中");
+  // 计算 flow 场
+  int max_directions = use_4directions ? 4 : 8;
+  for (int i = 0; i < M; i++) {
+    for (int j = 0; j < N; j++) {
+      // 记录最小的 dist 的邻居
+      int min_dist = inf;
+      // 默认情况下, 方向值是 -1
+      b.flows[i][j] = -1;
+      // 如果当前格子是障碍物, 则不考虑流向
+      if (GRID_MAP[i][j])
+        continue;
+      for (int k = 0; k < max_directions; k++) {
+        const auto &[_, d] = DIRECTIONS[k];
+        auto i1 = i + d.first, j1 = j + d.second;
+        if (ValidatePoint(i1, j1) and !GRID_MAP[i1][j1]) {
+          // 确保邻居方格是合法的, 且不是障碍物
+          int y = pack(i1, j1);
+          if (min_dist > dist[y]) {
+            min_dist = dist[y];
+            b.flows[i][j] = k;
+          }
+        }
+      }
+    }
+  }
+  spdlog::info("计算流场完毕!");
+}
+
+bool AlgorithmImplFlowField::find(int i, int j, std::vector<Point> &path, const Blackboard &b) {
+  P x = {i, j};
+  path.push_back(x);
+  // 目标
+  int ti = unpack_i(t), tj = unpack_j(t);
+  while (!(i == ti && j == tj)) {
+    if (b.flows[i][j] == -1)
+      return false;
+    const auto &[_, d] = DIRECTIONS[b.flows[i][j]];
+    i += d.first;
+    j += d.second;
+    x = {i, j};
+    path.push_back(x);
+  }
+  return true;
+}
+
+void AlgorithmImplFlowField::HandleMapChanges(Blackboard &b, const Options &options,
+                                              const std::vector<Point> &to_become_obstacles,
+                                              const std::vector<Point> &to_remove_obstacles) {
+  // 不支持增量计算, 只可以重新计算
+  spdlog::info("flow-field 算法不支持增量计算, 将重新计算");
   Setup(b, options);
 }

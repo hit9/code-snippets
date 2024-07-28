@@ -57,6 +57,12 @@ make build
  ./build/shortest-path-visulization-sdl --start 0,0 --target 11,14 astar-bi
 ```
 
+可视化 `flow-field` 流场寻路:
+
+```bash
+ ./build/shortest-path-visulization-sdl --start 0,0 --target 11,14 flow-field
+```
+
 #### 操作说明:
 
 1. 可以按下 `ESC` 或者 `Ctrl-C` 来退出.
@@ -78,3 +84,7 @@ make build
 1. 深蓝色: 已经探索过的方格 (也常叫做 `closed_list`, `closed_set`, visited 数组)
 1. 绿色: 起点, 终点都是绿色. 探索到的最短路径是绿色
 1. 红色边框: 鼠标修改过此位置
+
+### 说明
+
+字体 [Arrows.ttf](Arrows.ttf) 来自 https://www.dafont.com/arrows.font
