@@ -30,6 +30,7 @@ bool vis[n];
 priority_queue<P, vector<P>, greater<P>> q;
 
 // 支持的距离 8 方向, 前4个是水平竖直方向,后面的是斜角方向
+// 对应 Arrows.font: ABCDEGH
 const pair<int, int> DIRECTIONS[8] = {
     {0, 1},    // 右
     {1, 0},    // 下
@@ -47,7 +48,7 @@ const char DIRECTION_REPL[8][4] = {
 };
 
 // 要支持的方向 4 或者 8
-const int MAX_DIRECTIONS = 4;
+const int MAX_DIRECTIONS = 8;
 
 // 流场, 对应方向的下标
 // 默认设置为 -1 (表示无路可走)
@@ -150,6 +151,8 @@ int main(void) {
     edges.resize(n);
 
     // 初始化边权数组
+    // 注意!!!!!!!!!!: 实际中 edges 只被用在 dijkstra 中
+    // 所以要注意反向建边. 这里是方格地图, 所以才正反都可以.
     for (int i = 0; i < m; i++) {
         for (int j = 0; j < m; j++) {
             int x = i * m + j;
