@@ -1639,9 +1639,7 @@ void AlgorithmImplFlowField::Setup(Blackboard &b, const Options &options) {
   // 清理黑板
   setupBlackboard(b);
   // 支持流场
-  for (int i = 0; i < M; i++)
-    for (int j = 0; j < N; j++)
-      b.flows[i][j] = -1;
+  memset(b.flows, -1, sizeof b.flows);
   b.isSupportedFlowField = true;
   // 建图
   // 注意!!! NOTE: 实际应该反向建图, 但是这里是方格图,
