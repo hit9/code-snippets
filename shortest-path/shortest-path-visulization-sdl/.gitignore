@@ -1,5 +1,0 @@
-build
-CMakeUserPresets.json
-screenshots/*.PNG
-.DS_Store
-.cache
