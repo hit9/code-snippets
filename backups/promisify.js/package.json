@@ -1,0 +1,12 @@
+{
+    "name": "promisify.js",
+    "version": "0.0.1",
+    "repository": {
+        "type": "git",
+        "url": "git://github.com/hit9/promisify.js"
+    },
+    "description": "Promisify module for node.js/io.js.",
+    "author": "hit9 <hit9@icloud.com>",
+    "keywords": ["promisify"],
+    "license": "MIT"
+}
