@@ -1,0 +1,13 @@
+{
+    "name": "logging.js",
+    "version": "0.1.7",
+    "repository": {
+        "type": "git",
+        "url": "git://github.com/hit9/logging.js"
+    },
+    "description": "Stream based logging module for nodejs/iojs.",
+    "author": "hit9 <hit9@icloud.com>",
+    "keywords": ["logging"],
+    "license": "MIT"
+
+}
