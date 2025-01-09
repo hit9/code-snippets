@@ -36,8 +36,9 @@ class Solution {
 
         int N = word1.size();
 
-        long long dp[N];
-        memset(dp, 0, sizeof(dp));
+        // 注意 dp 可以滚动更新
+        // ans 就是 dp 之和
+        long long ans = 0, dp = 0;
 
         // 以右端为主迭代滑动窗口 [L,R]
         // 要让闭区间 [L,R] 时刻处于无法覆盖的状态
@@ -46,7 +47,7 @@ class Solution {
             if ((++d1[word1[R] - 'a']) == d2[word1[R] - 'a']) ++c1;
 
             // 无论如何, 继承前一个 DP 值
-            if (R > 0) dp[R] = dp[R - 1];
+            if (R > 0) ans += dp;
 
             // 已经满足的状态下, 左端收缩, 直到空区间,
             // 或左端卡在一个尚未满足的字符上, 或未知字符串上
@@ -54,12 +55,9 @@ class Solution {
                 if ((--d1[word1[L] - 'a']) < d2[word1[L] - 'a']) --c1;
                 ++L;
                 // 走过多少个字符, dp 就加多少
-                ++dp[R];
+                ++dp, ++ans;
             }
         }
-
-        long long ans = 0;
-        for (int i = 0; i < N; ++i) ans += dp[i];
         return ans;
     }
 };
