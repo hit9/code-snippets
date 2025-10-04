@@ -1,4 +1,9 @@
 // clang++ main.cc -std=c++20
+//
+// OR:
+//   cmake -S . -B build
+//   make -C build
+//   ./build/skiplist_test
 
 #include <iostream>
 
