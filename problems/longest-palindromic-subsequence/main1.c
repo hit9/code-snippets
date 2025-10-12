@@ -1,5 +1,5 @@
 // 给出最长回文子序列 - 反转 + 最长公共子序列方法
-// http://writings.sh/post/algorithm-longest-palindromic-subsequence
+// https://hit9.dev/post/algorithm-longest-palindromic-subsequence
 
 #include <assert.h>  // for assert
 #include <stdio.h>   // for printf

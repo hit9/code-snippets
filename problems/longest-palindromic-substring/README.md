@@ -1,4 +1,4 @@
-http://writings.sh/post/algorithm-longest-palindromic-substring
+https://hit9.dev/post/algorithm-longest-palindromic-substring
 
 - [中心扩展法](main1.c)
 - [前缀哈希法](main2.cc)

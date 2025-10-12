@@ -1,6 +1,6 @@
 // 将所有 0 原地移动到数组的右边，保序
 // https://leetcode-cn.com/problems/move-zeroes
-// 类似问题：http://writings.sh/post/algorithm-inplace-operations-on-array#%E5%8E%9F%E5%9C%B0%E5%88%A0%E9%99%A4%E6%95%B0%E7%BB%84%E5%85%83%E7%B4%A0
+// 类似问题：https://hit9.dev/post/algorithm-inplace-operations-on-array#%E5%8E%9F%E5%9C%B0%E5%88%A0%E9%99%A4%E6%95%B0%E7%BB%84%E5%85%83%E7%B4%A0
 
 // 编译: cc main.c
 // 执行: ./a.out

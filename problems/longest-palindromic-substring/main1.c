@@ -1,5 +1,5 @@
 // 给出最长回文子串的长度 - 中心扩展法
-// http://writings.sh/post/algorithm-longest-palindromic-substring
+// https://hit9.dev/post/algorithm-longest-palindromic-substring
 
 #include <assert.h>  // for assert
 #include <stdio.h>   // for printf

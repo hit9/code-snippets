@@ -1,5 +1,5 @@
 // 给出最长回文子序列 - 打印所有回文子序列 - 动态规划方法
-// http://writings.sh/post/algorithm-longest-palindromic-subsequence
+// https://hit9.dev/post/algorithm-longest-palindromic-subsequence
 
 #include <assert.h>  // for assert
 #include <stdio.h>   // for printf

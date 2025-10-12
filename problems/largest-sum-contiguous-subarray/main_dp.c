@@ -1,5 +1,5 @@
 // 最大连续子序列和问题 - 动态规划方法
-// http://writings.sh/post/algorithm-largest-sum-contiguous-subarray
+// https://hit9.dev/post/algorithm-largest-sum-contiguous-subarray
 
 #include <assert.h>
 #include <stdio.h>  // for printf
