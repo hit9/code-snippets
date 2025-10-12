@@ -1,5 +1,5 @@
 // 回文串判断
-// https://writings.sh/post/algorithm-longest-palindromic-substring
+// https://hit9.dev/post/algorithm-longest-palindromic-substring
 
 #include <assert.h>
 #include <stdbool.h>  // for bool

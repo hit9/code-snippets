@@ -1,5 +1,5 @@
 // 数据结构堆的最小化实现（最小堆）
-// https://writings.sh/post/data-structure-heap-and-common-problems
+// https://hit9.dev/post/data-structure-heap-and-common-problems
 
 // 采用数组表示堆
 //

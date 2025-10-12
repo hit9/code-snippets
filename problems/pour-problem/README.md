@@ -1,3 +1,3 @@
 倒酒问题
 
-https://writings.sh/post/pour-problem
+https://hit9.dev/post/pour-problem

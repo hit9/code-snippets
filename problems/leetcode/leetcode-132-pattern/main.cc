@@ -14,7 +14,7 @@
 // 例子: 输入：nums = [-1,3,2,0] 输出：true 解释：序列中有 3 个 132
 // 模式的的子序列：[-1, 3, 2]、[-1, 3, 0] 和 [-1, 2, 0] 。
 
-// https://writings.sh/post/monotonic-stack#132%E6%A8%A1%E5%BC%8F
+// https://hit9.dev/post/monotonic-stack#132%E6%A8%A1%E5%BC%8F
 
 #include <stack>
 #include <vector>

@@ -1,5 +1,5 @@
 // 最长公共子序列
-// https://writings.sh/post/algorithm-longest-common-substring-and-longest-common-subsequence
+// https://hit9.dev/post/algorithm-longest-common-substring-and-longest-common-subsequence
 
 #include <assert.h>
 #include <stdio.h>   // for printf

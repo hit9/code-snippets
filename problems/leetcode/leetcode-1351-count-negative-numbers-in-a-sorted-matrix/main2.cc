@@ -3,7 +3,7 @@
 using namespace std;
 
 // 方法2：从右上角搜索 O(m+n)
-// https://writings.sh/post/algorithm-search-sorted-2d-matrix
+// https://hit9.dev/post/algorithm-search-sorted-2d-matrix
 
 class Solution {
    public:

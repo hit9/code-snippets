@@ -1,5 +1,5 @@
 // 判断字符串是否是周期串模式
-// https://writings.sh/post/algorithm-repeated-string-pattern
+// https://hit9.dev/post/algorithm-repeated-string-pattern
 // 采用 KMP Next 数组的方法
 
 #include <assert.h>
@@ -7,7 +7,7 @@
 #include <string.h>   // for strlen
 
 // 同 KMP 的 Next 数组
-// https://writings.sh/post/algorithm-string-searching-kmp
+// https://hit9.dev/post/algorithm-string-searching-kmp
 void ComputeNext(char *s, int n, int next[]) {
     if (n > 0) next[0] = 0;
     if (n > 1) next[1] = 0;

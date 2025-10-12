@@ -1,4 +1,4 @@
-// https://writings.sh/post/binary-search#例子寻找两个正序数组的中位数
+// https://hit9.dev/post/binary-search#例子寻找两个正序数组的中位数
 
 #include <algorithm>
 #include <iostream>

@@ -6,7 +6,7 @@
 // ((+|-)[0-9])?[0-9]*(([0-9].)|(.[0-9]))?[0-9]*
 //
 // 博客 - 自动机校验浮点数字符串 (DFA & NFA)
-// https://writings.sh/post/statemachine-validate-float
+// https://hit9.dev/post/statemachine-validate-float
 
 #include <cassert>
 #include <string>

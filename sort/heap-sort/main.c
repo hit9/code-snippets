@@ -32,7 +32,7 @@ int main(void) {
 }
 
 // 最大堆实现
-// https://writings.sh/post/data-structure-heap-and-common-problems
+// https://hit9.dev/post/data-structure-heap-and-common-problems
 
 // Swap 交换数组 a 的位置 i 和 j
 void Swap(int a[], int i, int j) {

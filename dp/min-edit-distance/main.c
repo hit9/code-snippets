@@ -1,5 +1,5 @@
 // 最短编辑距离
-// https://writings.sh/post/algorithm-minimum-edit-distance
+// https://hit9.dev/post/algorithm-minimum-edit-distance
 // https://leetcode-cn.com/problems/edit-distance/
 
 #include <assert.h>  // for assert

@@ -1,5 +1,5 @@
 // 最长公共子串 - 动态规划方法
-// https://writings.sh/post/algorithm-longest-common-substring-and-subsequence
+// https://hit9.dev/post/algorithm-longest-common-substring-and-subsequence
 
 #include <assert.h>
 #include <stdio.h>   // for printf

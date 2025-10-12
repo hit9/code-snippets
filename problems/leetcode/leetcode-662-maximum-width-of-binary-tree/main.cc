@@ -3,7 +3,7 @@
 
 // 思路: 层序遍历，带上 index
 // 图:
-// https://writings.sh/assets/images/posts/data-structure-heap-and-common-problems/heap-array-representation-3.jpeg
+// https://hit9.dev/assets/images/posts/data-structure-heap-and-common-problems/heap-array-representation-3.jpeg
 #include <deque>
 #include <utility>
 using namespace std;

@@ -1,5 +1,5 @@
 # 最大值队列 - 在队列的基础上，实现一个常数时间的最大值函数
-# https://writings.sh/post/monotonous-stack-and-monotonous-queue
+# https://hit9.dev/post/monotonous-stack-and-monotonous-queue
 # https://leetcode-cn.com/problems/dui-lie-de-zui-da-zhi-lcof/
 # 要求 PushBack() PopFront() Max() 三个函数平均时间复杂度 O(1)
 

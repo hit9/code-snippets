@@ -1,5 +1,5 @@
 // 三分法求单峰
-// https://writings.sh/post/algorithm-golden-search
+// https://hit9.dev/post/algorithm-golden-search
 
 #include <stdio.h>
 

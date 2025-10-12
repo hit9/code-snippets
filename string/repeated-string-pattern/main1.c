@@ -1,5 +1,5 @@
 // 判断字符串是否是周期串模式
-// https://writings.sh/post/algorithm-repeated-string-pattern
+// https://hit9.dev/post/algorithm-repeated-string-pattern
 // 双倍字符串方法
 
 #include <assert.h>

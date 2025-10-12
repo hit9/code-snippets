@@ -1,5 +1,5 @@
 // 最长递增子序列
-// https://writings.sh/post/algorithm-longest-increasing-subsequence
+// https://hit9.dev/post/algorithm-longest-increasing-subsequence
 
 #include <assert.h>  // for assert
 #include <stdio.h>   // for printf

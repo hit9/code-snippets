@@ -1,4 +1,4 @@
-// https://writings.sh/post/algorithm-longest-palindromic-substring
+// https://hit9.dev/post/algorithm-longest-palindromic-substring
 // 从给定的字符串 s 中找到最长的回文子串的长度。
 // 思路: 前缀哈希 + 二分
 // nlog(n)

@@ -1,5 +1,5 @@
 // Boyer-Moore 字符串匹配算法 (只采用二维坏字符表的方法)
-// https://writings.sh/post/algorithm-string-searching-boyer-moore
+// https://hit9.dev/post/algorithm-string-searching-boyer-moore
 
 #include <assert.h>
 #include <stdio.h>   // for printf

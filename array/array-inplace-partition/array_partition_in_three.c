@@ -1,5 +1,5 @@
 // 原地分割数组（三份）
-// https://writings.sh/post/algorithm-inplace-operations-on-array
+// https://hit9.dev/post/algorithm-inplace-operations-on-array
 
 #include <stdio.h>
 

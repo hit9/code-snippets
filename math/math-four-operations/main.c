@@ -1,5 +1,5 @@
 // 基本数学运算类算法 - 加减乘除
-// https://writings.sh/post/algorithm-basic-math-computations
+// https://hit9.dev/post/algorithm-basic-math-computations
 
 #include <assert.h>
 #include <limits.h>

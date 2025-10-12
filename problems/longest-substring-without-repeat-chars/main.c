@@ -1,5 +1,5 @@
 // 无重复字符的最长子串
-// https://writings.sh/post/algorithm-longest-substring-without-repeat-chars
+// https://hit9.dev/post/algorithm-longest-substring-without-repeat-chars
 
 #include <assert.h>  // for assert
 #include <string.h>  // for strlen

@@ -1,5 +1,5 @@
 // 字符串搜索 KMP 算法
-// https://writings.sh/post/algorithm-string-searching-kmp
+// https://hit9.dev/post/algorithm-string-searching-kmp
 
 #include <assert.h>
 #include <stdio.h>   // for printf

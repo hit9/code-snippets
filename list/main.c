@@ -1,5 +1,5 @@
 // 链表类问题
-// https://writings.sh/post/data-structure-list-common-algorithm-problems
+// https://hit9.dev/post/data-structure-list-common-algorithm-problems
 
 #include <assert.h>   // for assert
 #include <stdbool.h>  // for bool

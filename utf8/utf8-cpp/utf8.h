@@ -1,5 +1,5 @@
 // Copyright 2023 hit9
-// https://writings.sh/post/utf8
+// https://hit9.dev/post/utf8
 
 #ifndef HIT9_CODE_SNIPPETS_UTF8_H
 #define HIT9_CODE_SNIPPETS_UTF8_H

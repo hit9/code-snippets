@@ -1,5 +1,5 @@
 // 跳跃表 C++ 实现
-// 介绍: https://writings.sh/post/data-structure-skiplist
+// 介绍: https://hit9.dev/post/data-structure-skiplist
 // 编译选项: -std=c++20
 
 #include <cstdlib>

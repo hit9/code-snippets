@@ -1,7 +1,7 @@
 // Copyright (c) 2023, Chao Wang <hit9@icloud.com>
 // Copyright (c) 2008-2009 Bjoern Hoehrmann <bjoern@hoehrmann.de>
 // utf8 encoding between codepoints.
-// https://writings.sh/post/utf8
+// https://hit9.dev/post/utf8
 
 #ifndef HIT9_CODE_SNIPPETS_UTF8_H
 #define HIT9_CODE_SNIPPETS_UTF8_H

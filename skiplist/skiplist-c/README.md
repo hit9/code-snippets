@@ -1,6 +1,6 @@
 跳表
 
-https://writings.sh/post/data-structure-skiplist
+https://hit9.dev/post/data-structure-skiplist
 
 
 ```

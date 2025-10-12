@@ -1,5 +1,5 @@
 // 二分查找算法
-// https://writings.sh/post/algorithm-binary-search
+// https://hit9.dev/post/algorithm-binary-search
 
 #include <stdio.h>
 

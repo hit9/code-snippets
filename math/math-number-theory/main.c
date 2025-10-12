@@ -1,5 +1,5 @@
 // 基本数论类算法
-// https://writings.sh/post/algorithm-number-theory
+// https://hit9.dev/post/algorithm-number-theory
 
 #include <assert.h>
 #include <stdbool.h>  // for bool

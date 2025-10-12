@@ -4,7 +4,7 @@
 using namespace std;
 
 // 方法3: 四分取其三，O(log(mn))
-// https://writings.sh/post/search-sorted-2d-matrix-revisited
+// https://hit9.dev/post/search-sorted-2d-matrix-revisited
 
 // clang-format: off
 //
